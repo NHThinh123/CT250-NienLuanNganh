@@ -4,7 +4,13 @@ const saltRounds = 10;
 
 const User = require("../models/user.model");
 const AppError = require("../utils/AppError");
-const getUserService = async () => {
+
+const getListUserService = async () => {
+  let result = await User.find().select("-password");
+  return result;
+};
+
+const helloUserService = async () => {
   return {
     message: "Hello user!",
   };
@@ -28,4 +34,4 @@ const createUserService = async (email, username, password, role) => {
 
   return result;
 };
-module.exports = { getUserService, createUserService };
+module.exports = { getListUserService, helloUserService, createUserService };

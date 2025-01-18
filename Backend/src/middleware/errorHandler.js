@@ -4,7 +4,7 @@ const errorHandler = (err, req, res, next) => {
     ? err.message
     : "Something went wrong, please try again later.";
 
-  console.error("Error stack:", err.stack); // Log lỗi chi tiết
+  //console.error("Error stack:", err.stack); // Log lỗi chi tiết
 
   res.status(statusCode).json({
     status: "error",
