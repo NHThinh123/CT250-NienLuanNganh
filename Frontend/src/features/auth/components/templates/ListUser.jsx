@@ -24,9 +24,11 @@ const columns = [
   },
 ];
 const ListUser = () => {
-  const { userData } = useUser();
+  const { userData, loading } = useUser();
   const userDataWithKey = userData.map((user) => ({ ...user, key: user._id }));
-  return <Table dataSource={userDataWithKey} columns={columns} />;
+  return (
+    <Table loading={loading} dataSource={userDataWithKey} columns={columns} />
+  );
 };
 
 export default ListUser;
