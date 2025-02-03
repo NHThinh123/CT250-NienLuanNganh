@@ -11,6 +11,8 @@ import UserPage from "./pages/UserPage.jsx";
 import PostPage from "./pages/PostPage.jsx";
 
 import PostCreatePage from "./pages/PostCreatePage.jsx";
+import PostDetailPage from "./pages/PostDetailPage.jsx";
+import PostEditPage from "./pages/PostEditPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -29,7 +31,20 @@ const router = createBrowserRouter([
       },
       {
         path: "/posts",
-        element: <PostPage />,
+        children: [
+          {
+            index: true,
+            element: <PostPage />,
+          },
+          {
+            path: ":id",
+            element: <PostDetailPage />,
+          },
+          {
+            path: ":id/edit",
+            element: <PostEditPage />,
+          },
+        ],
       },
       {
         path: "/posts/create",
