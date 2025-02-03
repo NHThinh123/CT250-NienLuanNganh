@@ -8,6 +8,7 @@ import "./styles/global.css";
 import App from "./App.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import UserPage from "./pages/UserPage.jsx";
+import PostPage from "./pages/PostPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: "/users",
         element: <UserPage />,
+      },
+      {
+        path: "/posts",
+        element: <PostPage />,
       },
     ],
   },

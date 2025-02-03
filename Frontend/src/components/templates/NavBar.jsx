@@ -1,4 +1,4 @@
-import { AppstoreOutlined, MailOutlined } from "@ant-design/icons";
+import { FireOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link } from "react-router-dom";
 const items = [
@@ -10,7 +10,12 @@ const items = [
   {
     label: <Link to="/users">Người dùng</Link>,
     key: "user",
-    icon: <AppstoreOutlined />,
+    icon: <UserOutlined />,
+  },
+  {
+    label: <Link to="/posts">Bài viết</Link>,
+    key: "post",
+    icon: <FireOutlined />,
   },
 ];
 const NavBar = () => {

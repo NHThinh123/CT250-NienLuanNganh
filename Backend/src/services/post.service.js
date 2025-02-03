@@ -5,7 +5,7 @@ const AppError = require("../utils/AppError");
 require("dotenv").config();
 
 const getListPostService = async () => {
-  let result = await Post.find();
+  let result = await Post.find().populate("userId", "username email");
   return result;
 };
 
