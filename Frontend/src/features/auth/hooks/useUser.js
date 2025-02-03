@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { getUserApi } from "../services/userApi";
 import { useQuery } from "@tanstack/react-query";

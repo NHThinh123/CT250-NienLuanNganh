@@ -8,7 +8,7 @@ const items = [
     icon: <MailOutlined />,
   },
   {
-    label: <Link to="/user">Người dùng</Link>,
+    label: <Link to="/users">Người dùng</Link>,
     key: "user",
     icon: <AppstoreOutlined />,
   },

@@ -6,7 +6,8 @@ const configViewEngine = require("./config/viewEngine");
 const connection = require("./config/database");
 
 const userRoutes = require("./routes/user.route");
-// const errorHandler = require("./middleware/errorHandler");
+const postRoutes = require("./routes/post.route");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 const port = process.env.PORT || 8888;
@@ -18,10 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 
 configViewEngine(app);
 
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
+
+app.use("/api/posts", postRoutes);
 
 // Middleware xử lý lỗi
-// app.use(errorHandler);
+app.use(errorHandler);
 (async () => {
   try {
     await connection();
