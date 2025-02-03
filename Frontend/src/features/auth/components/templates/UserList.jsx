@@ -23,7 +23,7 @@ const columns = [
     key: "role",
   },
 ];
-const ListUser = () => {
+const UserList = () => {
   const { userData, loading } = useUser();
   const userDataWithKey = userData.map((user) => ({ ...user, key: user._id }));
   return (
@@ -31,4 +31,4 @@ const ListUser = () => {
   );
 };
 
-export default ListUser;
+export default UserList;

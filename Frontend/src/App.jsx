@@ -15,7 +15,7 @@ function App() {
   // }, []);
   return (
     <>
-      <h1>Food Review App</h1>
+      <h1>YUMZY</h1>
       <NavBar />
       <Outlet />
     </>

@@ -34,7 +34,7 @@ const columns = [
     ),
   },
 ];
-const ListPost = () => {
+const PostList = () => {
   const { postData, loading } = usePost();
   const postDataWithKey = postData.map((post) => ({
     ...post,
@@ -58,4 +58,4 @@ const ListPost = () => {
   );
 };
 
-export default ListPost;
+export default PostList;

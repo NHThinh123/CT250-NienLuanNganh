@@ -1,4 +1,4 @@
-import { FireOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
+import { FireFilled, MailOutlined, UserOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link } from "react-router-dom";
 const items = [
@@ -15,7 +15,7 @@ const items = [
   {
     label: <Link to="/posts">Bài viết</Link>,
     key: "post",
-    icon: <FireOutlined />,
+    icon: <FireFilled style={{ color: "red" }} />,
   },
 ];
 const NavBar = () => {
