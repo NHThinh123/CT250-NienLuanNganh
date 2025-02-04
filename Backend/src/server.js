@@ -9,6 +9,7 @@ const userRoutes = require("./routes/user.route");
 const dishRoutes = require("./routes/dish.route");
 // const errorHandler = require("./middleware/errorHandler");
 const postRoutes = require("./routes/post.route");
+const menuRoutes = require("./routes/menu.route");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -23,6 +24,7 @@ configViewEngine(app);
 
 app.use("/api/user", userRoutes);
 app.use("/api/dish", dishRoutes);
+app.use("/api/menu", menuRoutes);
 app.use("/api/users", userRoutes);
 
 app.use("/api/posts", postRoutes);
