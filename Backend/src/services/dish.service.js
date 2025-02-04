@@ -1,65 +1,42 @@
 const Dish = require("../models/dish.model");
-const AppError = require("../utils/AppError");
 
-//Tạo một món ăn
-const createDishService = async (dish_name, dish_description, dish_price, dish_url) => {
-    let result = await Dish.create({
-        dish_name: dish_name,
-        dish_description: dish_description,
-        dish_price: dish_price,
-        dish_url: dish_url,
-    });
-    return result;
-}
+const getListDishService = async (page = 1, limit = 10, search = "") => {
+  const skip = (page - 1) * limit;
+  const query = search ? { dish_name: { $regex: search, $options: "i" } } : {};
 
-//Cập nhật thông tin món
-const updateDishService = async (id, body) => {
-    let result = await Dish.findByIdAndUpdate(
-        id,
-        body,
-        {
-            new: true
-        });
-    return result;
-}
+  const dishes = await Dish.find(query).skip(skip).limit(limit);
+  const total = await Dish.countDocuments(query);
 
-//Tìm món theo tên món
-const searchDishService = async (name) => {
-    let result = [];
-    if (name) {
-        result = await Dish.find({
-            dish_name: new RegExp(name, "i")
-        });
-    }
-    else {
-        result = await Dish.find();
-    }
-    return result;
-}
+  return {
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+    data: dishes,
+  };
+};
 
-//Tìm món theo id món
-const findByIdDishService = async (dish_id) => {
-    let result = [];
-    result = await Dish.findById(dish_id);
-    return result;
-}
+const getDishByIdService = async (id) => {
+  return await Dish.findById(id);
+};
 
-//Tìm tất cả món
-const findAllDishService = async () => {
-    let result = [];
-    result = await Dish.find();
-    return result;
-}
+const createDishService = async (dishData) => {
+  return await Dish.create(dishData);
+};
 
-//Xóa một món theo id
-const deleteDishService = async (dish_id) => {
-    let result = await Dish.findByIdAndDelete(dish_id);
-    return result;
-}
+const updateDishService = async (id, dataUpdate) => {
+  return await Dish.findByIdAndUpdate(id, dataUpdate, { new: true });
+};
 
-//Xóa tất cả
-const deleteAllDishService = async () => {
-    await Dish.deleteMany({});
-}
+const deleteDishService = async (id) => {
+  return await Dish.delete({ _id: id });
+};
 
-module.exports = { createDishService, updateDishService, searchDishService, findByIdDishService, findAllDishService, deleteDishService, deleteAllDishService};
+
+module.exports = {
+  getListDishService,
+  getDishByIdService,
+  createDishService,
+  updateDishService,
+  deleteDishService,
+};
