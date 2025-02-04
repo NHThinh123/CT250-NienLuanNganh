@@ -6,6 +6,7 @@ const configViewEngine = require("./config/viewEngine");
 const connection = require("./config/database");
 
 const userRoutes = require("./routes/user.route");
+const dishRoutes = require("./routes/dish.route");
 // const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 configViewEngine(app);
 
 app.use("/api/user", userRoutes);
+app.use("/api/dish", dishRoutes);
 
 // Middleware xử lý lỗi
 // app.use(errorHandler);
