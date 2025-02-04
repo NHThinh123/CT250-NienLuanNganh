@@ -1,7 +1,7 @@
-import ListUser from "../features/auth/components/templates/ListUser";
+import UserList from "../features/auth/components/templates/UserList";
 
 const UserPage = () => {
-  return <ListUser />;
+  return <UserList />;
 };
 
 export default UserPage;
