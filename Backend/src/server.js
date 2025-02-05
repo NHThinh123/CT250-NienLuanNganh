@@ -7,8 +7,9 @@ const connection = require("./config/database");
 
 const userRoutes = require("./routes/user.route");
 const dishRoutes = require("./routes/dish.route");
-// const errorHandler = require("./middleware/errorHandler");
+//const errorHandler = require("./middleware/errorHandler");
 const postRoutes = require("./routes/post.route");
+const tagRoutes = require("./routes/tag.route");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -24,6 +25,7 @@ configViewEngine(app);
 app.use("/api/user", userRoutes);
 app.use("/api/dish", dishRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/tags", tagRoutes);
 
 app.use("/api/posts", postRoutes);
 
