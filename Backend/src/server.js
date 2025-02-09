@@ -7,9 +7,10 @@ const connection = require("./config/database");
 
 const userRoutes = require("./routes/user.route");
 const dishRoutes = require("./routes/dish.route");
-//const errorHandler = require("./middleware/errorHandler");
+
 const postRoutes = require("./routes/post.route");
 const tagRoutes = require("./routes/tag.route");
+const post_tagRoutes = require("./routes/post_tag.route");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -23,11 +24,16 @@ app.use(express.urlencoded({ extended: true }));
 configViewEngine(app);
 
 app.use("/api/user", userRoutes);
+
 app.use("/api/dish", dishRoutes);
+
 app.use("/api/users", userRoutes);
+
 app.use("/api/tags", tagRoutes);
 
 app.use("/api/posts", postRoutes);
+
+app.use("/api/post_tag", post_tagRoutes);
 
 // Middleware xử lý lỗi
 app.use(errorHandler);

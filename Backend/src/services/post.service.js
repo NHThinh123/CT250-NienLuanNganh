@@ -3,12 +3,34 @@ const Post = require("../models/post.model");
 const AppError = require("../utils/AppError");
 const Asset = require("../models/asset.model");
 const { type } = require("os");
+const Post_Tag = require("../models/post_tag.model");
+const { getTagByPost } = require("../controllers/post_tag.controller");
+const { getTagByPostService } = require("./post_tag.service");
 
 require("dotenv").config();
 
 const getListPostService = async () => {
+  // Lấy danh sách tất cả bài viết, kèm userId (username, email)
   let result = await Post.find().populate("userId", "username email");
-  return result;
+
+  // Lấy danh sách tất cả post_id để truy vấn ảnh và tags nhanh hơn
+  const postIds = result.map((post) => post._id);
+
+  // Lấy tất cả ảnh theo danh sách post_id
+  const images = await Asset.find({ post_id: { $in: postIds } });
+
+  // Lấy tất cả tags theo danh sách post_id
+  const tagsMap = {};
+  for (const postId of postIds) {
+    tagsMap[postId] = await getTagByPostService(postId);
+  }
+
+  // Gán images và tags vào từng post
+  return result.map((post) => ({
+    ...post._doc,
+    images: images.filter((image) => image.post_id.equals(post._id)),
+    tags: tagsMap[post._id] || [],
+  }));
 };
 
 const getPostByIdService = async (post_id) => {
@@ -20,11 +42,12 @@ const getPostByIdService = async (post_id) => {
 
   const images = await Asset.find({ post_id });
 
+  const tags = await getTagByPostService(post_id);
   if (!result) {
     throw new AppError("Post not found", 404);
   }
 
-  return { ...result._doc, images };
+  return { ...result._doc, images, tags };
 };
 
 const createPostService = async (userId, title, content, files) => {
@@ -70,6 +93,8 @@ const updatePostService = async (id, dataUpdate) => {
 
 const deletePostService = async (id) => {
   let post = await Post.findById(id);
+  await Asset.deleteMany({ post_id: id });
+  await Post_Tag.deleteMany({ post_id: id });
   if (!post) {
     throw new AppError("Post not found", 404);
   }
