@@ -4,7 +4,10 @@ const getListDishService = async (page = 1, limit = 10, search = "") => {
   const skip = (page - 1) * limit;
   const query = search ? { dish_name: { $regex: search, $options: "i" } } : {};
 
-  const dishes = await Dish.find(query).skip(skip).limit(limit);
+  const dishes = await Dish.find(query)
+    .populate("menu_id", "menu_name")
+    .skip(skip)
+    .limit(limit);
   const total = await Dish.countDocuments(query);
 
   return {
@@ -17,7 +20,8 @@ const getListDishService = async (page = 1, limit = 10, search = "") => {
 };
 
 const getDishByIdService = async (id) => {
-  return await Dish.findById(id);
+  return await Dish.findById(id)
+    .populate("menu_id", "menu_name");
 };
 
 const createDishService = async (dishData) => {
