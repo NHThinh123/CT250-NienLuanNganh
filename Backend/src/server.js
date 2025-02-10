@@ -11,6 +11,7 @@ const dishRoutes = require("./routes/dish.route");
 const postRoutes = require("./routes/post.route");
 const tagRoutes = require("./routes/tag.route");
 const post_tagRoutes = require("./routes/post_tag.route");
+const user_like_postRoutes = require("./routes/user_like_post.route");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -34,6 +35,8 @@ app.use("/api/tags", tagRoutes);
 app.use("/api/posts", postRoutes);
 
 app.use("/api/post_tag", post_tagRoutes);
+
+app.use("/api/user_like_post", user_like_postRoutes);
 
 // Middleware xử lý lỗi
 app.use(errorHandler);
