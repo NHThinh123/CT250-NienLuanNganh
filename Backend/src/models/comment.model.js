@@ -1,8 +1,13 @@
 const mongoose = require("mongoose");
 const mongooseDelete = require("mongoose-delete");
 
-const postSchema = new mongoose.Schema(
+const commentSchema = new mongoose.Schema(
   {
+    post_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
+      required: true,
+    },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -15,11 +20,11 @@ const postSchema = new mongoose.Schema(
 );
 
 // Thêm plugin xóa mềm
-postSchema.plugin(mongooseDelete, {
+commentSchema.plugin(mongooseDelete, {
   deletedAt: true, // Tự động thêm trường `deletedAt`
   overrideMethods: "all", // Ghi đè các phương thức mặc định (find, findOne, count...)
 });
 
-const Post = mongoose.model("Post", postSchema);
+const Comment = mongoose.model("Comment", commentSchema);
 
 module.exports = Post;

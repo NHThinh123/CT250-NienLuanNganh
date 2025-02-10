@@ -27,8 +27,8 @@ const getPostById = async (req, res, next) => {
 
 const createPost = async (req, res, next) => {
   try {
-    const { userId, title, content } = req.body;
-    const data = await createPostService(userId, title, content, req.files);
+    const { user_id, title, content } = req.body;
+    const data = await createPostService(user_id, title, content, req.files);
     res.status(200).json(data);
   } catch (error) {
     next(error);

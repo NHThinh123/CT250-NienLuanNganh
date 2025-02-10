@@ -11,7 +11,7 @@ require("dotenv").config();
 
 const getListPostService = async () => {
   // Lấy danh sách tất cả bài viết, kèm userId (username, email)
-  let result = await Post.find().populate("userId", "username email");
+  let result = await Post.find().populate("user_id", "username email");
 
   // Lấy danh sách tất cả post_id để truy vấn ảnh và tags nhanh hơn
   const postIds = result.map((post) => post._id);
@@ -50,13 +50,13 @@ const getPostByIdService = async (post_id) => {
   return { ...result._doc, images, tags };
 };
 
-const createPostService = async (userId, title, content, files) => {
-  if (!userId || !title || !content) {
+const createPostService = async (user_id, title, content, files) => {
+  if (!user_id || !title || !content) {
     throw new AppError("Missing required fields", 400);
   }
 
   let result = await Post.create({
-    userId: userId,
+    user_id: user_id,
     title: title,
     content: content,
   });

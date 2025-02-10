@@ -21,7 +21,7 @@ const PostForm = ({ initialValues, mode = "create" }) => {
     if (mode === "create") {
       createPost(
         {
-          userId: "678b2f5ffc88df85ce348612",
+          user_id: "678b2f5ffc88df85ce348612",
           title: values.title,
           content: values.content,
         },
