@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
     dateOfBirth: { type: Date, required: true },
     verified: { type: Boolean, default: false },
     role: { type: String, required: true },
-    img_url: { type: String, required: true }
+    //img_url: { type: String, required: true }
 
   },
   { timestamps: true }
