@@ -4,7 +4,10 @@ const getListMenuService = async (page = 1, limit = 10, search = "") => {
   const skip = (page - 1) * limit;
   const query = search ? { menu_name: { $regex: search, $options: "i" } } : {};
 
-  const menus = await Menu.find(query).skip(skip).limit(limit);
+  const menus = await Menu.find(query)
+    .populate("business_id", "business_name")
+    .skip(skip)
+    .limit(limit);
   const total = await Menu.countDocuments(query);
 
   return {
@@ -17,7 +20,8 @@ const getListMenuService = async (page = 1, limit = 10, search = "") => {
 };
 
 const getMenuByIdService = async (id) => {
-  return await Menu.findById(id);
+  return await Menu.findById(id)
+    .populate("business_id", "business_name");
 };
 
 const createMenuService = async (menu_name) => {
