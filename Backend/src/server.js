@@ -27,7 +27,7 @@ app.use("/api/user", userRoutes);
 
 app.use("/api/dish", dishRoutes);
 
-app.use("/api/users", userRoutes);
+//app.use("/api/users", userRoutes);
 
 app.use("/api/tags", tagRoutes);
 
