@@ -7,7 +7,7 @@ const connection = require("./config/database");
 
 const userRoutes = require("./routes/user.route");
 const dishRoutes = require("./routes/dish.route");
-
+const businessRoutes = require("./routes/business.route");
 const postRoutes = require("./routes/post.route");
 const tagRoutes = require("./routes/tag.route");
 const post_tagRoutes = require("./routes/post_tag.route");
@@ -27,6 +27,7 @@ app.use("/api/user", userRoutes);
 
 app.use("/api/dish", dishRoutes);
 
+app.use("/api/business", businessRoutes);
 //app.use("/api/users", userRoutes);
 
 app.use("/api/tags", tagRoutes);
