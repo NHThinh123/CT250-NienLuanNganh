@@ -36,6 +36,19 @@ const createDish = async (req, res, next) => {
   }
 };
 
+// const createDishController = async (req, res) => {
+//   try {
+//     const dishData = req.body;
+//     const imagePaths = req.files?.map((file) => file.path) || []; // Lấy danh sách đường dẫn ảnh
+
+//     const newDish = await createDishService(dishData, imagePaths);
+
+//     res.status(201).json({ success: true, data: newDish });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
 const updateDish = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -46,6 +59,20 @@ const updateDish = async (req, res, next) => {
     next(error);
   }
 };
+
+// const updateDishController = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const dataUpdate = req.body;
+//     const imagePaths = req.files?.map((file) => file.path) || [];
+
+//     const updatedDish = await updateDishService(id, dataUpdate, imagePaths);
+
+//     res.json({ success: true, data: updatedDish });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
 
 const deleteDish = async (req, res, next) => {
   try {

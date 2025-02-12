@@ -36,6 +36,42 @@ const deleteDishService = async (id) => {
   return await Dish.delete({ _id: id });
 };
 
+//Api upload nhiều ảnh
+// const uploadMultipleImagesService = async (imagePaths) => {
+//   try {
+//     const uploadPromises = imagePaths.map((path) =>
+//       cloudinary.uploader.upload(path, { folder: "dishes" })
+//     );
+//     const uploadResults = await Promise.all(uploadPromises);
+//     return uploadResults.map((result) => result.secure_url); // Trả về danh sách URL
+//   } catch (error) {
+//     throw new Error("Upload images failed: " + error.message);
+//   }
+// };
+
+// Hàm tạo món ăn với nhiều ảnh
+// const createDishService = async (dishData, imagePaths) => {
+//   let imageUrls = dishData.dish_url || []; // Giữ nguyên nếu có sẵn URL
+
+//   if (imagePaths && imagePaths.length > 0) {
+//     const uploadedUrls = await uploadMultipleImagesService(imagePaths);
+//     imageUrls = [...imageUrls, ...uploadedUrls]; // Gộp ảnh mới vào danh sách
+//   }
+
+//   return await Dish.create({ ...dishData, dish_url: imageUrls });
+// };
+
+// Hàm cập nhật món ăn với nhiều ảnh
+// const updateDishService = async (id, dataUpdate, imagePaths) => {
+//   let imageUrls = dataUpdate.dish_url || [];
+
+//   if (imagePaths && imagePaths.length > 0) {
+//     const uploadedUrls = await uploadMultipleImagesService(imagePaths);
+//     imageUrls = [...imageUrls, ...uploadedUrls];
+//   }
+
+//   return await Dish.findByIdAndUpdate(id, { ...dataUpdate, dish_url: imageUrls }, { new: true });
+// };
 
 module.exports = {
   getListDishService,
