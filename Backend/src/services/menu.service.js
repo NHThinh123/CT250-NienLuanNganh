@@ -1,4 +1,5 @@
 const Menu = require("../models/menu.model");
+const AppError = require("../utils/AppError");
 
 const getListMenuService = async (page = 1, limit = 10, search = "") => {
   const skip = (page - 1) * limit;
@@ -24,8 +25,12 @@ const getMenuByIdService = async (id) => {
     .populate("business_id", "business_name");
 };
 
-const createMenuService = async (menu_name) => {
-  return await Menu.create({ menu_name });
+const createMenuService = async (menu_name, business_id) => {
+  if (!menu_name || !business_id) {
+    throw new AppError("Missing required fields", 400);
+  }
+  let result = await Menu.create({ menu_name: menu_name, business_id: business_id });
+  return result;
 };
 
 const updateMenuService = async (id, dataUpdate) => {
