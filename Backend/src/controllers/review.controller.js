@@ -2,7 +2,7 @@ const {
   getListReviewService,
   createReviewService,
   getReviewByIdService,
-  updateReviewService,
+  // updateReviewService,
   deleteReviewService,
 } = require("../services/review.service");
 
@@ -36,16 +36,16 @@ const createReview = async (req, res, next) => {
   }
 };
 
-const updateReview = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const dataUpdate = req.body;
-    const data = await updateReviewService(id, dataUpdate);
-    res.status(200).json(data);
-  } catch (error) {
-    next(error);
-  }
-};
+// const updateReview = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const dataUpdate = req.body;
+//     const data = await updateReviewService(id, dataUpdate);
+//     res.status(200).json(data);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 const deleteReview = async (req, res, next) => {
   try {
@@ -61,6 +61,6 @@ module.exports = {
   getListReview,
   getReviewById,
   createReview,
-  updateReview,
+  // updateReview,
   deleteReview,
 };

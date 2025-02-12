@@ -12,7 +12,7 @@ const reviewSchema = new mongoose.Schema(
 );
 
 // Thêm plugin xóa mềm
-menuSchema.plugin(mongooseDelete, {
+reviewSchema.plugin(mongooseDelete, {
   deletedAt: true, // Tự động thêm trường `deletedAt`
   overrideMethods: "all", // Ghi đè các phương thức mặc định (find, findOne, count...)
 });

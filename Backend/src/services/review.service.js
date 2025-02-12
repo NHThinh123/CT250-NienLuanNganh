@@ -30,9 +30,9 @@ const createReviewService = async (reviewData) => {
   return await Review.create(reviewData);
 };
 
-const updateReviewService = async (id, dataUpdate) => {
-  return await Review.findByIdAndUpdate(id, dataUpdate, { new: true });
-};
+// const updateReviewService = async (id, dataUpdate) => {
+//   return await Review.findByIdAndUpdate(id, dataUpdate, { new: true });
+// };
 
 const deleteReviewService = async (id) => {
   return await Review.delete({ _id: id });
@@ -42,6 +42,6 @@ module.exports = {
   getListReviewService,
   getReviewByIdService,
   createReviewService,
-  updateReviewService,
+  // updateReviewService,
   deleteReviewService,
 };
