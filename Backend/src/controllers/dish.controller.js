@@ -6,6 +6,7 @@ const {
   deleteDishService,
 } = require("../services/dish.service");
 
+
 const getListDish = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
@@ -26,53 +27,53 @@ const getDishById = async (req, res, next) => {
   }
 };
 
-const createDish = async (req, res, next) => {
-  try {
-    const dishData = req.body;
-    const data = await createDishService(dishData);
-    res.status(201).json(data);
-  } catch (error) {
-    next(error);
-  }
-};
-
-// const createDishController = async (req, res) => {
+// const createDish = async (req, res, next) => {
 //   try {
 //     const dishData = req.body;
-//     const imagePaths = req.files?.map((file) => file.path) || []; // Lấy danh sách đường dẫn ảnh
-
-//     const newDish = await createDishService(dishData, imagePaths);
-
-//     res.status(201).json({ success: true, data: newDish });
+//     const data = await createDishService(dishData);
+//     res.status(201).json(data);
 //   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
+//     next(error);
 //   }
 // };
 
-const updateDish = async (req, res, next) => {
+const createDish = async (req, res) => {
   try {
-    const { id } = req.params;
-    const dataUpdate = req.body;
-    const data = await updateDishService(id, dataUpdate);
-    res.status(200).json(data);
+    const dishData = req.body;
+    const imagePaths = req.files?.map((file) => file.path) || []; // Lấy danh sách đường dẫn ảnh
+
+    const newDish = await createDishService(dishData, imagePaths);
+
+    res.status(201).json({ success: true, data: newDish });
   } catch (error) {
-    next(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// const updateDishController = async (req, res) => {
+// const updateDish = async (req, res, next) => {
 //   try {
 //     const { id } = req.params;
 //     const dataUpdate = req.body;
-//     const imagePaths = req.files?.map((file) => file.path) || [];
-
-//     const updatedDish = await updateDishService(id, dataUpdate, imagePaths);
-
-//     res.json({ success: true, data: updatedDish });
+//     const data = await updateDishService(id, dataUpdate);
+//     res.status(200).json(data);
 //   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
+//     next(error);
 //   }
 // };
+
+const updateDish = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const dataUpdate = req.body;
+    const imagePaths = req.files?.map((file) => file.path) || [];
+
+    const updatedDish = await updateDishService(id, dataUpdate, imagePaths);
+
+    res.json({ success: true, data: updatedDish });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 const deleteDish = async (req, res, next) => {
   try {

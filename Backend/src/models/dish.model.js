@@ -6,7 +6,7 @@ const dishSchema = new mongoose.Schema(
     dish_name: { type: String, require: true, trim: true },
     dish_description: { type: String, minlength: 1, maxlength: 1000, trim: true },
     dish_price: { type: Number, require: true, min: 1000 },
-    dish_url: { type: [String], require: true }, //Mảng lưu nhiều ảnh
+    dish_url: { type: [String], require: true },
     menu_id: { type: mongoose.Schema.Types.ObjectId, ref: "Menu", require: true },
   },
   { timestamps: true }

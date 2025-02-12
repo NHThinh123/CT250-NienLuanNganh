@@ -1,4 +1,5 @@
 const express = require("express");
+const uploadDishes = require("../middleware/uploadDishes");
 const {
   getListDish,
   getDishById,
@@ -10,9 +11,9 @@ const {
 const router = express.Router();
 
 router.get("/", getListDish); // Hỗ trợ tìm kiếm & phân trang
-router.post("/", createDish);
+router.post("/", uploadDishes.array("dish_url", 5), createDish);
 router.get("/:id", getDishById);
-router.put("/:id", updateDish);
+router.put("/:id", uploadDishes.array("dish_url", 5), updateDish);
 router.delete("/:id", deleteDish);
 
 module.exports = router;
