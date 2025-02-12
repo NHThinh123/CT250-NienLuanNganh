@@ -12,6 +12,7 @@ const postRoutes = require("./routes/post.route");
 const tagRoutes = require("./routes/tag.route");
 const post_tagRoutes = require("./routes/post_tag.route");
 const menuRoutes = require("./routes/menu.route");
+const reviewRoutes = require("./routes/review.route");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -26,13 +27,14 @@ configViewEngine(app);
 
 app.use("/api/user", userRoutes);
 
-app.use("/api/dish", dishRoutes);
+app.use("/api/dishes", dishRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.use("/api/business", businessRoutes);
 //app.use("/api/users", userRoutes);
 
 app.use("/api/tags", tagRoutes);
-app.use("/api/menu", menuRoutes);
+app.use("/api/menus", menuRoutes);
 app.use("/api/users", userRoutes);
 
 app.use("/api/posts", postRoutes);
