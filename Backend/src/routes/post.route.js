@@ -6,13 +6,13 @@ const {
   updatePost,
   deletePost,
 } = require("../controllers/post.controller");
-
+const uploadPost = require("../middleware/uploadPost");
 const router = express.Router();
 
 //Public routes
 router.get("/", getListPost);
 router.get("/:id", getPostById);
-router.post("/create", createPost);
+router.post("/create", uploadPost.array("images", 5), createPost);
 router.put("/:id", updatePost);
 router.delete("/:id", deletePost);
 

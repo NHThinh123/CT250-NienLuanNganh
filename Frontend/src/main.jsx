@@ -7,7 +7,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./styles/global.css";
 import App from "./App.jsx";
 import HomePage from "./pages/HomePage.jsx";
-import UserPage from "./pages/UserPage.jsx";
+//import UserPage from "./pages/UserPage.jsx";
 import PostPage from "./pages/PostPage.jsx";
 
 import PostCreatePage from "./pages/PostCreatePage.jsx";
@@ -25,10 +25,10 @@ const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
-      {
-        path: "/users",
-        element: <UserPage />,
-      },
+      // {
+      //   path: "/users",
+      //   element: <UserPage />,
+      // },
       {
         path: "/posts",
         children: [

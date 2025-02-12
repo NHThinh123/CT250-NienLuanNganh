@@ -1,12 +1,20 @@
 const mongoose = require("mongoose");
 const mongooseDelete = require("mongoose-delete");
 
+const Schema = mongoose.Schema;
+
 const userSchema = new mongoose.Schema(
   {
-    username: { type: String, required: true },
+    name: { type: String, required: true },
     email: { type: String, unique: true, required: true },
-    password: { type: String, require: true },
-    role: String,
+    password: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true },
+    verified: { type: Boolean, default: false },
+
+    role: { type: String, required: true, enum: ["user", "admin"] },
+
+    //img_url: { type: String, required: true }
+
   },
   { timestamps: true }
 );

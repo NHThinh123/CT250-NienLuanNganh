@@ -23,6 +23,8 @@ const deletePostApi = (id) => {
   const URL_API = `/api/posts/${id}`;
   return axios.delete(URL_API);
 };
+
+
 export {
   getPostApi,
   createPostApi,

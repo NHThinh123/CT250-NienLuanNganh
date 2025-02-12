@@ -7,7 +7,7 @@ const usePostById = (postId) => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["post", postId],
+    queryKey: ["posts", postId],
     queryFn: () => getPostByIdApi(postId),
   });
 

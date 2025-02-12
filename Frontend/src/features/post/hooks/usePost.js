@@ -7,7 +7,7 @@ const usePost = () => {
     isLoading: loading,
     isError,
   } = useQuery({
-    queryKey: ["post"],
+    queryKey: ["posts"],
     queryFn: getPostApi,
   });
 

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Status</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            background: linear-gradient(135deg, #065F46, #0d9488);
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            text-align: center;
+            border-radius: 12px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .header {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .icon {
+            position: relative;
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+        }
+
+        .success .icon::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 10px solid rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        .success .icon::after {
+            content: "✔";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            color: white;
+        }
+
+        .error .icon::after {
+            content: "✖";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            color: white;
+        }
+
+        .message {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .subtext {
+            font-size: 16px;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const error = urlParams.get("error");
+        const message = urlParams.get("message");
+
+        const isSuccess = !error;
+        const headerMessage = isSuccess
+            ? "Chào mừng bạn đã đến với GinD"
+            : "Xác minh thất bại!";
+        const textMessage = isSuccess
+            ? "Bạn đã xác thực thành công"
+            : (message || "Đã xảy ra lỗi trong quá trình xác thực");
+
+        const subtextMessage = isSuccess
+            ? "Bạn có thể đăng nhập vào tài khoản của mình"
+            : "Vui lòng kiểm tra lại hoặc thử lại sau.";
+
+        const containerClass = isSuccess ? "container success" : "container error";
+
+        const bodyContent = `
+            <div class="${containerClass}">
+                <div class="header">${headerMessage}</div>
+                <div class="icon"></div>
+                <div class="message">${textMessage}</div>
+                <div class="subtext">${subtextMessage}</div>
+            </div>
+        `;
+
+        document.body.innerHTML = bodyContent;
+    </script>
+</body>
+
+</html>
