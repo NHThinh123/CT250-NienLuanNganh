@@ -17,10 +17,11 @@ const PostList = () => {
     });
   };
   const { postData, loading } = usePost();
+  console.log(postData);
   const postDataWithKey = postData.map((post) => ({
     ...post,
     key: post._id,
-    username: post.userId?.username || "Không có tên",
+    username: post.user_id?.username || "Không có tên",
   }));
 
   const columns = [
