@@ -3,18 +3,21 @@ const mongooseDelete = require("mongoose-delete");
 
 const commentSchema = new mongoose.Schema(
   {
-    post_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
-      required: true,
-    },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    title: { type: String, required: true },
-    content: { type: String, required: true },
+    post_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
+      required: true,
+    },
+    parent_comment_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+    },
+    comment_content: { type: String, required: true },
   },
   { timestamps: true }
 );
@@ -27,4 +30,4 @@ commentSchema.plugin(mongooseDelete, {
 
 const Comment = mongoose.model("Comment", commentSchema);
 
-module.exports = Post;
+module.exports = Comment;

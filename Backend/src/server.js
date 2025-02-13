@@ -12,6 +12,7 @@ const postRoutes = require("./routes/post.route");
 const tagRoutes = require("./routes/tag.route");
 const post_tagRoutes = require("./routes/post_tag.route");
 const user_like_postRoutes = require("./routes/user_like_post.route");
+const commentRoutes = require("./routes/comment.route");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -24,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 configViewEngine(app);
 
-app.use("/api/user", userRoutes);
+//app.use("/api/user", userRoutes);
 
 app.use("/api/dish", dishRoutes);
 
@@ -38,8 +39,10 @@ app.use("/api/post_tag", post_tagRoutes);
 
 app.use("/api/user_like_post", user_like_postRoutes);
 
+app.use("/api/comments", commentRoutes);
+
 // Middleware xử lý lỗi
-app.use(errorHandler);
+//app.use(errorHandler);
 (async () => {
   try {
     await connection();

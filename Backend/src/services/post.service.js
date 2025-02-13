@@ -2,9 +2,7 @@ const mongoose = require("mongoose");
 const Post = require("../models/post.model");
 const AppError = require("../utils/AppError");
 const Asset = require("../models/asset.model");
-const { type } = require("os");
 const Post_Tag = require("../models/post_tag.model");
-const { getTagByPost } = require("../controllers/post_tag.controller");
 const { getTagByPostService } = require("./post_tag.service");
 
 require("dotenv").config();

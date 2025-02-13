@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { message, Space, Table } from "antd";
 import usePost from "../../hooks/usePost";
 import { Link } from "react-router-dom";
