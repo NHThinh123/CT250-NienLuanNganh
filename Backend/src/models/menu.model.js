@@ -4,6 +4,7 @@ const mongooseDelete = require("mongoose-delete");
 const menuSchema = new mongoose.Schema(
   {
     menu_name: { type: String },
+    business_id: { type: mongoose.Schema.Types.ObjectId, ref: "Business", require: true },
   },
   { timestamps: true }
 );

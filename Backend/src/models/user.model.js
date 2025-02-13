@@ -10,8 +10,10 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     dateOfBirth: { type: Date, required: true },
     verified: { type: Boolean, default: false },
-    role: { type: String, required: true },
-    img_url: { type: String, required: true }
+
+    role: { type: String, required: true, enum: ["user", "admin"] },
+
+    //img_url: { type: String, required: true }
 
   },
   { timestamps: true }
