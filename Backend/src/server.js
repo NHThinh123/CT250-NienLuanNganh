@@ -7,13 +7,18 @@ const connection = require("./config/database");
 
 const userRoutes = require("./routes/user.route");
 const dishRoutes = require("./routes/dish.route");
-
+const businessRoutes = require("./routes/business.route");
 const postRoutes = require("./routes/post.route");
 const tagRoutes = require("./routes/tag.route");
 const post_tagRoutes = require("./routes/post_tag.route");
+<<<<<<< HEAD
 const user_like_postRoutes = require("./routes/user_like_post.route");
 const user_like_commentRoutes = require("./routes/user_like_comment.route");
 const commentRoutes = require("./routes/comment.route");
+=======
+const menuRoutes = require("./routes/menu.route");
+const reviewRoutes = require("./routes/review.route");
+>>>>>>> test-api-dish-review-menu-cloudinary
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -28,11 +33,15 @@ configViewEngine(app);
 
 //app.use("/api/user", userRoutes);
 
-app.use("/api/dish", dishRoutes);
+app.use("/api/dishes", dishRoutes);
+app.use("/api/reviews", reviewRoutes);
 
-app.use("/api/users", userRoutes);
+app.use("/api/business", businessRoutes);
+//app.use("/api/users", userRoutes);
 
 app.use("/api/tags", tagRoutes);
+app.use("/api/menus", menuRoutes);
+app.use("/api/users", userRoutes);
 
 app.use("/api/posts", postRoutes);
 

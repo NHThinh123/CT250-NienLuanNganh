@@ -1,110 +1,94 @@
 const {
+  getListDishService,
   createDishService,
+  getDishByIdService,
   updateDishService,
-  searchDishService,
-  findByIdDishService,
-  findAllDishService,
   deleteDishService,
-  deleteAllDishService
 } = require("../services/dish.service");
 
-const AppError = require("../utils/AppError");
 
-
-//Tạo một món ăn
-const createDish = async (req, res, next) => {
+const getListDish = async (req, res, next) => {
   try {
-    const { dish_name, dish_description, dish_price, dish_url} = req.body;
-    const data = await createDishService(dish_name, dish_description, dish_price, dish_url);
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const data = await getListDishService(Number(page), Number(limit), search);
     res.status(200).json(data);
   } catch (error) {
-    return next(
-      new AppError(500, "Lỗi! Không thể tạo món ăn")
-    );
+    next(error);
   }
 };
 
-//Cập nhật thông tin món
-const updateDish = async (req, res, next) => {
+const getDishById = async (req, res, next) => {
   try {
-    const updateData = req.body;
-    const data = await updateDishService(req.params.id, updateData);
-    if (!data) {
-      return next(new AppError(404, "Tài nguyên không tìm thấy"));
-    }
+    const { id } = req.params;
+    const data = await getDishByIdService(id);
     res.status(200).json(data);
   } catch (error) {
-    return next(
-      new AppError(500, "Lỗi! Không thể cập nhật thông tin món ăn")
-    );
+    next(error);
   }
 };
 
-//Tìm món theo tên món
-const searchDish = async (req, res, next) => {
+// const createDish = async (req, res, next) => {
+//   try {
+//     const dishData = req.body;
+//     const data = await createDishService(dishData);
+//     res.status(201).json(data);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+const createDish = async (req, res) => {
   try {
-    const data = await searchDishService(req.params.name);
-    res.status(200).json(data);
+    const dishData = req.body;
+    const imagePaths = req.files?.map((file) => file.path) || []; // Lấy danh sách đường dẫn ảnh
+
+    const newDish = await createDishService(dishData, imagePaths);
+
+    res.status(201).json({ success: true, data: newDish });
   } catch (error) {
-    return next(
-      new AppError(500, "Lỗi! Không thể tìm món ăn")
-    );
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-//Tìm món theo id món
-const findByIdDish = async (req, res, next) => {
+// const updateDish = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const dataUpdate = req.body;
+//     const data = await updateDishService(id, dataUpdate);
+//     res.status(200).json(data);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+const updateDish = async (req, res) => {
   try {
-    const data = await findByIdDishService(req.params.id);
-    if (!data) {
-      return next(new AppError(404, "Tài nguyên không tìm thấy"));
-    }
-    res.status(200).json(data);
+    const { id } = req.params;
+    const dataUpdate = req.body;
+    const imagePaths = req.files?.map((file) => file.path) || [];
+
+    const updatedDish = await updateDishService(id, dataUpdate, imagePaths);
+
+    res.json({ success: true, data: updatedDish });
   } catch (error) {
-    return next(
-      new AppError(500, "Lỗi! Không thể tìm món ăn")
-    );
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-//Tìm tất cả món
-const findAllDish = async (req, res, next) => {
-  try {
-    const data = await findAllDishService();
-    res.status(200).json(data);
-  } catch (error) {
-    return next(
-      new AppError(500, "Lỗi! Không thể tìm món ăn")
-    );
-  }
-};
-
-//Xóa một món theo id
 const deleteDish = async (req, res, next) => {
   try {
-    const data = await deleteDishService(req.params.id);
-    if (!data) {
-      return next(new AppError(404, "Tài nguyên không tìm thấy"));
-    }
-    res.status(200).send({ message: "Đã xóa thành công"});
+    const { id } = req.params;
+    const data = await deleteDishService(id);
+    res.status(200).json(data);
   } catch (error) {
-    return next(
-      new AppError(500, "Lỗi! Không thể xóa món ăn")
-    );
+    next(error);
   }
-}
+};
 
-//Xóa tất cả
-const deleteAllDish = async (req, res, next) => {
-  try {
-    const data = await deleteAllDishService();
-    res.status(200).send({ message: "Đã xóa thành công tất cả món ăn"});
-  } catch (error) {
-    return next(
-      new AppError(500, "Lỗi! Không thể xóa tất cả món ăn")
-    );
-  }
-}
-
-
-module.exports = { createDish, updateDish, searchDish, findByIdDish, findAllDish, deleteDish, deleteAllDish };
+module.exports = {
+  getListDish,
+  getDishById,
+  createDish,
+  updateDish,
+  deleteDish,
+};
