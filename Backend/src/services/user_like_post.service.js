@@ -33,7 +33,7 @@ const getUserLikePostService = async (post_id) => {
   }
   let result = await User_Like_Post.find({ post_id }).populate(
     "user_id",
-    "username _id"
+    "name _id"
   );
   return result.map((item) => item.user_id);
 };

@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 
 import NavBar from "./components/templates/NavBar";
+import { Layout } from "antd";
 
 function App() {
   // useEffect(() => {
@@ -14,11 +15,11 @@ function App() {
   //   fetchData();
   // }, []);
   return (
-    <>
-      <h1>YUMZY</h1>
+    <Layout>
+      <h1 style={{ backgroundColor: "#fff" }}>YUMZY</h1>
       <NavBar />
       <Outlet />
-    </>
+    </Layout>
   );
 }
 

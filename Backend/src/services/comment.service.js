@@ -27,7 +27,7 @@ const getListCommentByPostService = async (post_id) => {
   }
   // Lấy tất cả comment của bài post
   let comments = await Comment.find({ post_id: post_id })
-    .populate("user_id", "username")
+    .populate("user_id", "name _id")
     .lean();
 
   // Tạo danh sách comment cha
@@ -51,7 +51,7 @@ const getCommentByIdService = async (comment_id) => {
 
   let result = await Comment.findById(comment_id).populate(
     "user_id",
-    "username"
+    "name _id"
   );
 
   if (!result) {
@@ -59,7 +59,7 @@ const getCommentByIdService = async (comment_id) => {
   }
   let replies = await Comment.find({ parent_comment_id: comment_id }).populate(
     "user_id",
-    "username"
+    "name _id"
   );
   return { ...result._doc, replies };
 };
@@ -70,7 +70,7 @@ const getReplyByCommentService = async (comment_id) => {
   }
   let result = await Comment.find({ parent_comment_id: comment_id }).populate(
     "user_id",
-    "username"
+    "name _id"
   );
   return result;
 };

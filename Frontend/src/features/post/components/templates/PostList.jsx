@@ -1,78 +1,54 @@
-import { message, Space, Table } from "antd";
+/* eslint-disable no-unused-vars */
+import { Col, List, Row, Space, Table } from "antd";
 import usePost from "../../hooks/usePost";
 import { Link } from "react-router-dom";
-import useDeletePost from "../../hooks/useDeletePost";
+import BoxContainer from "../../../../components/atoms/BoxContainer";
+import PostItem from "../organisms/PostItem";
+//import useDeletePost from "../../hooks/useDeletePost";
 
 const PostList = () => {
-  const { mutate } = useDeletePost();
+  //const { mutate } = useDeletePost();
 
-  const handleDelete = (id) => {
-    mutate(id, {
-      onSuccess: () => {
-        message.success("Post deleted successfully");
-      },
-      onError: () => {
-        message.error("Error deleting post");
-      },
-    });
-  };
+  // const handleDelete = (id) => {
+  //   mutate(id, {
+  //     onSuccess: () => {
+  //       message.success("Post deleted successfully");
+  //     },
+  //     onError: () => {
+  //       message.error("Error deleting post");
+  //     },
+  //   });
+  // };
   const { postData, loading } = usePost();
   console.log(postData);
-  const postDataWithKey = postData.map((post) => ({
-    ...post,
-    key: post._id,
-    username: post.user_id?.username || "Không có tên",
-  }));
+  // const postDataWithKey = postData.map((post) => ({
+  //   ...post,
+  //   key: post._id,
+  //   username: post.user_id?.username || "Không có tên",
+  // }));
 
-  const columns = [
-    {
-      title: "Id",
-      dataIndex: "_id",
-      key: "id",
-      render: (id) => <Link to={`/posts/${id}`}>{id}</Link>,
-    },
-    {
-      title: "Tiêu Đề",
-      dataIndex: "title",
-      key: "title",
-    },
-    {
-      title: "Người Viết",
-      dataIndex: "username",
-      key: "username",
-    },
-    {
-      title: "Ngày đăng tải",
-      dataIndex: "createdAt",
-      key: "createdAt",
-    },
-    {
-      title: "Tương tác",
-      key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <Link to={`/posts/${record._id}/edit`}>Sửa</Link>
-          <Link
-            onClick={() => {
-              handleDelete(record._id);
-            }}
-          >
-            Xóa
-          </Link>
-        </Space>
-      ),
-    },
-  ];
   return (
-    <Table
-      loading={loading}
-      dataSource={postDataWithKey}
-      columns={columns}
-      pagination={{
-        current: 1,
-        pageSize: 10,
-      }}
-    />
+    <>
+      <Row>
+        <Col span={6}>
+          <BoxContainer>aaa</BoxContainer>
+        </Col>
+        <Col span={12}>
+          <List
+            dataSource={postData}
+            grid={{ gutter: 8, column: 1 }}
+            renderItem={(item) => (
+              <List.Item style={{ padding: "0px", margin: "0px" }}>
+                <PostItem postData={item}></PostItem>
+              </List.Item>
+            )}
+          />
+        </Col>
+        <Col span={6}>
+          <BoxContainer>ccc</BoxContainer>
+        </Col>
+      </Row>
+    </>
   );
 };
 

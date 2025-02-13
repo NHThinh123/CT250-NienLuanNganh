@@ -33,7 +33,7 @@ const getUserLikeCommentService = async (comment_id) => {
   }
   let result = await User_Like_Comment.find({ comment_id }).populate(
     "user_id",
-    "username _id"
+    "name _id"
   );
   return result.map((item) => item.user_id);
 };

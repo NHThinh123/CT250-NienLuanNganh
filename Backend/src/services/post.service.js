@@ -9,7 +9,7 @@ require("dotenv").config();
 
 const getListPostService = async () => {
   // Lấy danh sách tất cả bài viết, kèm userId (username, email)
-  let result = await Post.find().populate("user_id", "username email");
+  let result = await Post.find().populate("user_id", "name email");
 
   // Lấy danh sách tất cả post_id để truy vấn ảnh và tags nhanh hơn
   const postIds = result.map((post) => post._id);

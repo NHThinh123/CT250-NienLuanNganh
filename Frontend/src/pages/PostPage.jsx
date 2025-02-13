@@ -1,12 +1,12 @@
-import ButtonCustomize from "../components/atoms/ButtonCustomize";
+//import ButtonCustomize from "../components/atoms/ButtonCustomize";
 import PostList from "../features/post/components/templates/PostList";
 
 const PostPage = () => {
   return (
     <>
-      <ButtonCustomize margin={"8px 0px"} to={"/posts/create"}>
+      {/* <ButtonCustomize margin={"8px 0px"} to={"/posts/create"}>
         Thêm bài đăng
-      </ButtonCustomize>
+      </ButtonCustomize> */}
       <PostList />;
     </>
   );
