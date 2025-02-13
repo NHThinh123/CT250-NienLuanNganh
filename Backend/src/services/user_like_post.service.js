@@ -31,7 +31,10 @@ const getUserLikePostService = async (post_id) => {
   if (!mongoose.Types.ObjectId.isValid(post_id)) {
     throw new AppError("Invalid post ID", 400);
   }
-  let result = await User_Like_Post.find({ post_id }).populate("user_id");
+  let result = await User_Like_Post.find({ post_id }).populate(
+    "user_id",
+    "username _id"
+  );
   return result.map((item) => item.user_id);
 };
 
