@@ -8,7 +8,7 @@ const usePost = () => {
     isError,
   } = useQuery({
     queryKey: ["posts"],
-    queryFn: getPostApi,
+    queryFn: () => getPostApi("678b2f5ffc88df85ce348612"),
   });
 
   return { postData, loading, isError };

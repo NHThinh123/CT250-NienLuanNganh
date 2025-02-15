@@ -11,7 +11,7 @@ const PostItem = ({ postData }) => {
       <PostHeader userData={postData?.user_id}></PostHeader>
       <PostBody postData={postData}></PostBody>
       <PostImages imagesData={postData?.images}></PostImages>
-      <PostFooter></PostFooter>
+      <PostFooter postData={postData}></PostFooter>
     </BoxContainer>
   );
 };
