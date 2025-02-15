@@ -8,7 +8,8 @@ const {
 
 const getListPost = async (req, res, next) => {
   try {
-    const data = await getListPostService();
+    const { user_id } = req.body;
+    const data = await getListPostService(user_id);
     res.status(200).json(data);
   } catch (error) {
     next(error);
@@ -18,7 +19,8 @@ const getListPost = async (req, res, next) => {
 const getPostById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const data = await getPostByIdService(id);
+    const { user_id } = req.body;
+    const data = await getPostByIdService(id, user_id);
     res.status(200).json(data);
   } catch (error) {
     next(error);
