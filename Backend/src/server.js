@@ -48,7 +48,7 @@ app.use("/api/user_like_comment", user_like_commentRoutes);
 app.use("/api/post_tag", post_tagRoutes);
 
 // Middleware xử lý lỗi
-app.use(errorHandler);
+//app.use(errorHandler);
 (async () => {
   try {
     await connection();

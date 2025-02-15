@@ -8,7 +8,7 @@ import { Button, Col, Row, Typography } from "antd";
 const PostFooter = () => {
   return (
     <>
-      <Row style={{ textAlign: "center" }}>
+      <Row style={{ textAlign: "center", marginTop: "16px" }}>
         <Col span={8}>
           <Button type="text">
             <HeartFilled />
