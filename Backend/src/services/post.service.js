@@ -9,51 +9,87 @@ const User_Like_Post = require("../models/user_like_post.model");
 require("dotenv").config();
 
 const getListPostService = async (user_id) => {
-  // Lấy danh sách tất cả bài viết, kèm userId (username, email)
-  let result = await Post.find().populate("user_id", "name email");
-
-  // Lấy danh sách tất cả post_id để truy vấn ảnh và tags nhanh hơn
-  const postIds = result.map((post) => post._id);
-
-  // Lấy tất cả ảnh theo danh sách post_id
-  const images = await Asset.find({ post_id: { $in: postIds } });
-
-  // Lấy tất cả tags theo danh sách post_id
-  const tagsMap = {};
-  for (const postId of postIds) {
-    tagsMap[postId] = await getTagByPostService(postId);
-  }
-  //kiểm tra user đang đăng nhập có like bài post này không
-
-  const likedPosts = await User_Like_Post.find({
-    user_id,
-    post_id: { $in: postIds },
-  }).select("post_id");
-
-  const likedPostIds = new Set(
-    likedPosts.map((like) => like.post_id.toString())
-  );
-
-  // Lấy số lượt thích của từng bài post
-  const likesCount = await User_Like_Post.aggregate([
-    { $match: { post_id: { $in: postIds } } },
-    { $group: { _id: "$post_id", count: { $sum: 1 } } },
+  let result = await Post.aggregate([
+    {
+      //tìm kiếm thông tin user tác giả
+      $lookup: {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    //chuyển user từ mảng object về object
+    { $unwind: "$user" },
+    {
+      // tìm kiếm ảnh của bài viết
+      $lookup: {
+        from: "assets",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "images",
+      },
+    },
+    {
+      // tìm kiếm tag của bài viết
+      $lookup: {
+        from: "post_tags",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "postTags",
+      },
+    },
+    {
+      $lookup: {
+        from: "tags", // Bảng chứa tên tags
+        localField: "postTags.tag_id",
+        foreignField: "_id",
+        as: "tags",
+      },
+    },
+    {
+      // tìm danh sách id người like bài viết
+      $lookup: {
+        from: "user_like_posts",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "likes",
+      },
+    },
+    {
+      //tính số lượt like và user đang đăng nhập có like bài viết không
+      $addFields: {
+        likeCount: { $size: "$likes" },
+        isLike: {
+          $cond: {
+            if: {
+              $in: [new mongoose.Types.ObjectId(user_id), "$likes.user_id"],
+            },
+            then: 1,
+            else: 0,
+          },
+        },
+      },
+    },
+    {
+      // chọn ra những trường cần thiết
+      $project: {
+        user_id: 1,
+        "user.name": 1,
+        "user.email": 1,
+        title: 1, // Tiêu đề bài viết
+        content: 1, // Nội dung bài viết
+        createdAt: 1, // Ngày tạo
+        updatedAt: 1, // Ngày cập nhật
+        images: 1,
+        tags: 1,
+        likeCount: 1,
+        isLike: 1,
+      },
+    },
   ]);
 
-  // Chuyển danh sách số lượt thích thành map để truy xuất nhanh
-  const likesMap = {};
-  likesCount.forEach((like) => {
-    likesMap[like._id.toString()] = like.count;
-  });
-
-  // Gán images và tags vào từng post
-  return result.map((post) => ({
-    ...post._doc,
-    images: images.filter((image) => image.post_id.equals(post._id)),
-    tags: tagsMap[post._id] || [],
-    isLike: likedPostIds.has(post._id.toString()) ? 1 : 0,
-    likeCount: likesMap[post._id.toString()] || 0, // Số lượt thích
-  }));
+  return result;
 };
 
 const getPostByIdService = async (post_id, user_id) => {
@@ -67,11 +103,12 @@ const getPostByIdService = async (post_id, user_id) => {
 
   const tags = await getTagByPostService(post_id);
   const isLiked = await User_Like_Post.findOne({ user_id, post_id });
+  const likeCount = await User_Like_Post.find({ post_id }).countDocuments();
   if (!result) {
     throw new AppError("Post not found", 404);
   }
 
-  return { ...result._doc, images, tags, isLike: isLiked ? 1 : 0 };
+  return { ...result._doc, images, tags, isLike: isLiked ? 1 : 0, likeCount };
 };
 
 const createPostService = async (user_id, title, content, files) => {
