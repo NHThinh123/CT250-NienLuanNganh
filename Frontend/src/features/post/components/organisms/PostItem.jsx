@@ -7,7 +7,7 @@ import PostImages from "../molecules/PostImages";
 
 const PostItem = ({ postData }) => {
   return (
-    <BoxContainer>
+    <BoxContainer style={{ minWidth: "500px" }}>
       <PostHeader userData={postData?.user}></PostHeader>
       <PostBody postData={postData}></PostBody>
       <PostImages imagesData={postData?.images}></PostImages>
