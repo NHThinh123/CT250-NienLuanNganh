@@ -34,12 +34,25 @@ const getListPostService = async (user_id) => {
     likedPosts.map((like) => like.post_id.toString())
   );
 
+  // Lấy số lượt thích của từng bài post
+  const likesCount = await User_Like_Post.aggregate([
+    { $match: { post_id: { $in: postIds } } },
+    { $group: { _id: "$post_id", count: { $sum: 1 } } },
+  ]);
+
+  // Chuyển danh sách số lượt thích thành map để truy xuất nhanh
+  const likesMap = {};
+  likesCount.forEach((like) => {
+    likesMap[like._id.toString()] = like.count;
+  });
+
   // Gán images và tags vào từng post
   return result.map((post) => ({
     ...post._doc,
     images: images.filter((image) => image.post_id.equals(post._id)),
     tags: tagsMap[post._id] || [],
     isLike: likedPostIds.has(post._id.toString()) ? 1 : 0,
+    likeCount: likesMap[post._id.toString()] || 0, // Số lượt thích
   }));
 };
 

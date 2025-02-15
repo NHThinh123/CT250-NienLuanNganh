@@ -9,8 +9,8 @@ const {
 const router = express.Router();
 
 //Public routes
-router.post("/like", likePost);
-router.delete("/unlike", unlikePost);
+router.put("/like", likePost);
+router.put("/unlike", unlikePost);
 router.get("/user/:post_id", getUserLikePost);
 router.get("/post/:user_id", getPostLikeByUser);
 

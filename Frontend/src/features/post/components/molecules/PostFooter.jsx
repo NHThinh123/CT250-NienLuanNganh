@@ -6,27 +6,51 @@ import {
 import { Button, Col, Row, Typography } from "antd";
 import { useState } from "react";
 import useLikePost from "../../hooks/useLikePost";
+import useUnlikePost from "../../hooks/useUnLikePost";
 
 const PostFooter = ({ postData }) => {
   const { mutate: likePost } = useLikePost();
+  const { mutate: unlikePost } = useUnlikePost();
 
   const [isLiked, setIsLiked] = useState(postData?.isLike || false);
+  const [likeCount, setLikeCount] = useState(postData?.likeCount || 0);
+
+  const user_id = "678b2f5ffc88df85ce348612";
 
   const handleLike = () => {
-    likePost(
-      {
-        user_id: "678b2f5ffc88df85ce348612",
-        post_id: postData._id,
-      },
-      {
-        onSuccess: () => {
-          setIsLiked((prev) => !prev); // Đảo ngược trạng thái like
+    if (!isLiked) {
+      likePost(
+        {
+          user_id: user_id,
+          post_id: postData._id,
         },
-        onError: () => {
-          console.log("like error");
+        {
+          onSuccess: () => {
+            setIsLiked(true);
+            setLikeCount((prev) => prev + 1);
+          },
+          onError: () => {
+            console.log("like error");
+          },
+        }
+      );
+    } else {
+      unlikePost(
+        {
+          user_id: user_id,
+          post_id: postData._id,
         },
-      }
-    );
+        {
+          onSuccess: () => {
+            setIsLiked(false);
+            setLikeCount((prev) => prev - 1);
+          },
+          onError: () => {
+            console.log("unlike error");
+          },
+        }
+      );
+    }
   };
   return (
     <>
@@ -35,7 +59,7 @@ const PostFooter = ({ postData }) => {
           <Button type="text" onClick={handleLike}>
             <HeartFilled style={{ color: isLiked ? "#ff4d4f" : "gray" }} />
             <Typography.Text style={{ color: isLiked ? "#ff4d4f" : "black" }}>
-              Yêu thích
+              {likeCount} Yêu thích
             </Typography.Text>
           </Button>
         </Col>

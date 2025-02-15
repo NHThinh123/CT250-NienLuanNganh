@@ -26,7 +26,11 @@ const deletePostApi = (id) => {
 
 const likePostApi = (user_id, post_id) => {
   const URL_API = `api/user_like_post/like`;
-  return axios.post(URL_API, { user_id, post_id });
+  return axios.put(URL_API, { user_id, post_id });
+};
+const unlikePostApi = (user_id, post_id) => {
+  const URL_API = `api/user_like_post/unlike`;
+  return axios.put(URL_API, { user_id, post_id });
 };
 
 export {
@@ -36,4 +40,5 @@ export {
   updatePostApi,
   deletePostApi,
   likePostApi,
+  unlikePostApi,
 };
