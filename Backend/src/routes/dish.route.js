@@ -5,6 +5,9 @@ const {
   getDishById,
   createDish,
   updateDish,
+  searchDish,
+  findByIdDish,
+  findAllDish,
   deleteDish,
 } = require("../controllers/dish.controller");
 

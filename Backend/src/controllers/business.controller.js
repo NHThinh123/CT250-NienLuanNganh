@@ -3,6 +3,7 @@ const AppError = require("../utils/AppError");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Business = require('../models/business.model');
+const cloudinary = require('cloudinary').v2;
 
 //Tạo một business
 const createBusiness = async (req, res, next) => {
@@ -55,20 +56,47 @@ const getBusinessById = async (req, res, next) => {
 //cập nhật thông tin business
 const updateBusiness = async (req, res, next) => {
     try {
-        const { id } = req.params;  // Lấy đúng tham số từ route
+        const { id } = req.params;  // Lấy ID user từ params
         const updateData = req.body;
 
-        const data = await updateBusinessService(id, updateData);
-        if (!data) {
-            return next(new AppError(404, "Tài nguyên không tìm thấy"));
+        // Kiểm tra user có tồn tại không
+        const business = await Business.findById(id);
+        if (!business) {
+            return next(new AppError(404, "Người dùng không tồn tại"));
         }
 
+        // Nếu có file ảnh mới => upload lên Cloudinary
+        if (req.file) {
+            const avatarUrl = req.file.path;  // URL ảnh từ Cloudinary
+            updateData.avatar = avatarUrl; // Thêm avatar mới vào updateData
+
+            // Nếu user có avatar cũ => Xóa ảnh cũ trên Cloudinary (nếu cần)
+            if (business.avatar) {
+                const publicId = business.avatar.split('/').pop().split('.')[0]; // Lấy public_id từ URL cũ
+                await cloudinary.uploader.destroy(publicId); // Xóa ảnh cũ trên Cloudinary
+            }
+        }
+
+        // Cập nhật thông tin user
+        const updateBusiness = await Business.findByIdAndUpdate(id, updateData, { new: true });
+
         res.status(200).json({
-            message: "Cập nhật thông tin Business thành công",
-            data
+            message: "Cập nhật thông tin thành công",
+            data: {
+                id: updateBusiness._id,
+                business_name: updateBusiness.business_name,
+                email: updateBusiness.email,
+                contact_info: updateBusiness.contact_info,
+                location: updateBusiness.location,
+                avatar: updateBusiness.avatar,
+                open_hours: updateBusiness.open_hours,
+                close_hours: updateBusiness.close_hours
+            }
         });
+
     } catch (error) {
-        return next(new AppError(500, "Lỗi! Không thể cập nhật thông tin business"));
+        console.error("Lỗi khi cập nhật user:", error);
+        return res.status(500).json({ message: "Lỗi! Không thể cập nhật thông tin user" });
     }
 };
 
@@ -85,6 +113,11 @@ const signupBusiness = async (req, res, next) => {
 
         // Mã hóa mật khẩu trước khi lưu
         const hashedPassword = await bcrypt.hash(password, 10);
+        //xử lý ảnh up lên cloudinary
+        let avatarUrl = null;
+        if (req.file) {
+            avatarUrl = req.file.path;
+        }
 
         // Tạo business mới
         const newBusiness = new Business({
@@ -94,11 +127,25 @@ const signupBusiness = async (req, res, next) => {
             location,
             contact_info,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            avatar: avatarUrl
         });
 
         await newBusiness.save();
-        res.status(201).json({ message: 'Business registered successfully' });
+        res.status(201).json({
+            status: "PENDING",
+            message: "Tài khoản đã được tạo!",
+            business: {
+                id: newBusiness._id,
+                business_name: newBusiness.business_name,
+                email: newBusiness.email,
+                contact_info: newBusiness.contact_info,
+                location: newBusiness.location,
+                avatar: newBusiness.avatar,
+                open_hours: newBusiness.open_hours,
+                close_hours: newBusiness.close_hours
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -134,7 +181,10 @@ const loginBusiness = async (req, res, next) => {
                 business_name: business.business_name,
                 email: business.email,
                 contact_info: business.contact_info,
-                location: business.location
+                location: business.location,
+                avatar: business.avatar,
+                open_hours: business.open_hours,
+                close_hours: business.close_hours
             }
         });
     } catch (error) {

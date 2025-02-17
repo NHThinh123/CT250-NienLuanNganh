@@ -5,6 +5,7 @@ const cors = require("cors");
 const configViewEngine = require("./config/viewEngine");
 const connection = require("./config/database");
 
+
 const userRoutes = require("./routes/user.route");
 const dishRoutes = require("./routes/dish.route");
 const businessRoutes = require("./routes/business.route");
@@ -33,7 +34,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/dishes", dishRoutes);
 app.use("/api/reviews", reviewRoutes);
 
-app.use("/api/business", businessRoutes);
+app.use("/api/businesss", businessRoutes);
 //app.use("/api/users", userRoutes);
 
 app.use("/api/tags", tagRoutes);

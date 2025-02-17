@@ -8,7 +8,7 @@ const BusinessSchema = new mongoose.Schema({
     close_hours: { type: String, required: true },
     location: { type: String, required: true },
     contact_info: { type: String, required: true },
-    //avatar_url: { type: String },
+    avatar: { type: String, default: "" },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
 }, { timestamps: true });

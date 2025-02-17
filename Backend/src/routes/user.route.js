@@ -1,21 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const path = require('path');
-const { signup, signin } = require("../controllers/user.controller");
+const { signup, signin, getUserById, getListUser, updateUser } = require("../controllers/user.controller");
 const { verifyEmail } = require("../controllers/user.verifiEmail");
+const upload = require("../middleware/uploadAvatar");
 
-router.post("/signup", signup);
+router.post("/signup", upload.single('avatar'), signup);
 router.get("/verify/:userId/:uniqueString", verifyEmail);
 
 router.get('/verified', (req, res) => {
-  const { error, message } = req.query;
-  if (error) {
-    return res.send(`<h1>Error: ${message}</h1>`);
+  try {
+    res.sendFile(path.join(__dirname, '../views/verification.html'));
+  } catch (error) {
+    console.error('Error sending verification page:', error);
+    res.status(500).send('Internal Server Error');
   }
-  //res.sendFile(path.join(__dirname, "./../views/verification.html"));  // Kiểm tra đường dẫn này
-  res.sendFile(path.resolve("views", "verification.html"));
-
 });
+router.get('/id/:id', getUserById);
+router.put('/update/:id', upload.single('avatar'), updateUser);
 
 
 router.post("/login", signin);
