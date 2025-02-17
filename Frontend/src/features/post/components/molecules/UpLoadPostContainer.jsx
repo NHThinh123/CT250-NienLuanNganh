@@ -1,17 +1,8 @@
-import {
-  Avatar,
-  Button,
-  Col,
-  Form,
-  Input,
-  Modal,
-  Popover,
-  Row,
-  Typography,
-} from "antd";
-import { ChefHat, Images, MapPinned, Tags, Utensils } from "lucide-react";
+import { Avatar, Button, Col, Row } from "antd";
+import { ChefHat, Utensils } from "lucide-react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import { useState } from "react";
+import ModalUploadPost from "./ModalUploadPost";
 
 const UpLoadPostContainer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,101 +48,11 @@ const UpLoadPostContainer = () => {
           </Button>
         </Col>
       </Row>
-
-      <Modal
-        title={
-          <Typography.Title level={4} style={{ textAlign: "center" }}>
-            Tạo bài viết
-          </Typography.Title>
-        }
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <Row>
-          <Col span={2}>
-            <Avatar
-              src={
-                "https://anhnail.com/wp-content/uploads/2024/11/Hinh-gai-xinh-2k4.jpg"
-              }
-            ></Avatar>
-          </Col>
-          <Col span={20}>
-            <Typography.Text style={{ fontWeight: "bold" }}>
-              Thịnh KAFF
-            </Typography.Text>
-          </Col>
-        </Row>
-        <Row style={{ marginTop: "16px" }}>
-          <Col span={24}>
-            <Form>
-              <Form.Item
-                name="title"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng nhập tiêu đề bài viết!",
-                  },
-                ]}
-              >
-                <Input size="large" placeholder="Nhập tiêu đề bài viết"></Input>
-              </Form.Item>
-              <Form.Item
-                name="content"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng nhập tiêu nội dung viết!",
-                  },
-                ]}
-              >
-                <Input.TextArea
-                  size="large"
-                  placeholder="Hãy viết về trải nghiệm ẩm thực của bạn hôm nay!"
-                  autoSize={{ minRows: 3, maxRows: 8 }}
-                ></Input.TextArea>
-              </Form.Item>
-            </Form>
-          </Col>
-        </Row>
-        <Row
-          style={{
-            border: "1px solid #000",
-            borderRadius: "8px",
-            padding: "8px",
-
-            textAlign: "center",
-          }}
-          align={"middle"}
-        >
-          <Col span={12}>
-            <Typography.Text style={{ fontWeight: "bold", textAlign: "right" }}>
-              Thêm vào bài viết của bạn
-            </Typography.Text>
-          </Col>
-          <Col span={4}>
-            <Button type="text" style={{ padding: "4px 18px" }}>
-              <Popover content="Thêm ảnh">
-                <Images size={24} color="#03c200" strokeWidth={2.5} />
-              </Popover>
-            </Button>
-          </Col>
-          <Col span={4}>
-            <Button type="text" style={{ padding: "4px 18px" }}>
-              <Popover content="Thêm chủ đề">
-                <Tags color="#e09c0b" size={24} strokeWidth={2.5} />
-              </Popover>
-            </Button>
-          </Col>
-          <Col span={4}>
-            <Button type="text" style={{ padding: "4px 18px" }}>
-              <Popover content="Thêm địa điểm">
-                <MapPinned color="#ff4d4f" size={24} strokeWidth={2.5} />
-              </Popover>
-            </Button>
-          </Col>
-        </Row>
-      </Modal>
+      <ModalUploadPost
+        isModalOpen={isModalOpen}
+        handleCancel={handleCancel}
+        handleOk={handleOk}
+      />
     </BoxContainer>
   );
 };
