@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   Avatar,
   Button,
@@ -8,11 +9,25 @@ import {
   Popover,
   Row,
   Typography,
-  Upload,
 } from "antd";
-import { ImageUp, MapPinned, Tags } from "lucide-react";
+import { Images, MapPinned, Tags } from "lucide-react";
+import UploadImage from "../atoms/UploadImage";
+import { useState } from "react";
+import UploadTag from "../atoms/UploadTag";
 
 const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
+  const [isShowUploadImage, setIsShowUploadImage] = useState(false);
+  const [isShowUploadTag, setIsShowUploadTag] = useState(false);
+  const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
+  const handleShowUploadImage = () => {
+    setIsShowUploadImage(true);
+  };
+  const handleShowUploadTag = () => {
+    setIsShowUploadTag(true);
+  };
+  const handleShowUploadLocation = () => {
+    setIsShowUploadLocation(true);
+  };
   return (
     <Modal
       title={
@@ -22,10 +37,17 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
       }
       open={isModalOpen}
       onOk={handleOk}
-      onCancel={handleCancel}
+      onCancel={() => {
+        handleCancel();
+        setIsShowUploadImage(false);
+        setIsShowUploadTag(false);
+        setIsShowUploadLocation(false);
+      }}
       okText="Đăng tải"
       cancelText="Hủy"
       maskClosable={false}
+      centered
+      style={{ minWidth: "50%" }}
     >
       <Row>
         <Col span={2}>
@@ -41,7 +63,15 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
           </Typography.Text>
         </Col>
       </Row>
-      <Row style={{ marginTop: "16px", maxHeight: "280px", overflowY: "auto" }}>
+      <Row
+        style={{
+          marginTop: "16px",
+          maxHeight: "320px",
+          overflowY: "auto",
+          padding: "8px",
+          scrollbarWidth: "thin",
+        }}
+      >
         <Col span={24}>
           <Form>
             <Form.Item
@@ -67,20 +97,21 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
               <Input.TextArea
                 size="large"
                 placeholder="Hãy viết về trải nghiệm ẩm thực của bạn hôm nay!"
-                autoSize={{ minRows: 3, maxRows: 10 }}
+                autoSize={{ minRows: 4, maxRows: 10 }}
               ></Input.TextArea>
             </Form.Item>
           </Form>
         </Col>
-        <Col span={24}>
-          <Form.Item>
-            <Upload.Dragger name="files" multiple={true}>
-              <ImageUp />
-              <br />
-              <Typography.Text>Thêm ảnh/video</Typography.Text>
-            </Upload.Dragger>
-          </Form.Item>
-        </Col>
+        {isShowUploadTag && (
+          <Col span={24}>
+            <UploadTag />
+          </Col>
+        )}
+        {isShowUploadImage && (
+          <Col span={24}>
+            <UploadImage />
+          </Col>
+        )}
       </Row>
 
       <Row
@@ -88,7 +119,7 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
           border: "1px solid #000",
           borderRadius: "8px",
           padding: "8px",
-
+          marginTop: "16px",
           textAlign: "center",
         }}
         align={"middle"}
@@ -98,16 +129,34 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
             Thêm vào bài viết của bạn:
           </Typography.Text>
         </Col>
-
-        <Col span={6}>
-          <Button type="text" style={{ padding: "4px 18px" }}>
+        <Col span={4}>
+          <Button
+            type="text"
+            style={{ padding: "4px 18px" }}
+            onClick={handleShowUploadImage}
+          >
+            <Popover content="Thêm ảnh">
+              <Images color="#03c200" size={24} strokeWidth={2.5} />
+            </Popover>
+          </Button>
+        </Col>
+        <Col span={4}>
+          <Button
+            type="text"
+            style={{ padding: "4px 18px" }}
+            onClick={handleShowUploadTag}
+          >
             <Popover content="Thêm chủ đề">
               <Tags color="#e09c0b" size={24} strokeWidth={2.5} />
             </Popover>
           </Button>
         </Col>
-        <Col span={6}>
-          <Button type="text" style={{ padding: "4px 18px" }}>
+        <Col span={4}>
+          <Button
+            type="text"
+            style={{ padding: "4px 18px" }}
+            onClick={handleShowUploadLocation}
+          >
             <Popover content="Thêm địa điểm">
               <MapPinned color="#ff4d4f" size={24} strokeWidth={2.5} />
             </Popover>
