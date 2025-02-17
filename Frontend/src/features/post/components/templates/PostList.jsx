@@ -4,6 +4,8 @@ import usePost from "../../hooks/usePost";
 import { Link } from "react-router-dom";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import PostItem from "../organisms/PostItem";
+
+import SideBar from "../organisms/SideBar";
 //import useDeletePost from "../../hooks/useDeletePost";
 
 const PostList = () => {
@@ -29,11 +31,8 @@ const PostList = () => {
 
   return (
     <>
-      <Row>
-        <Col span={6}>
-          <BoxContainer>aaa</BoxContainer>
-        </Col>
-        <Col span={12}>
+      <Row style={{ minWidth: "800px" }} justify={"center"}>
+        <Col xs={24} sm={24} md={24} lg={16}>
           <List
             dataSource={postData}
             grid={{ gutter: 8, column: 1 }}
@@ -44,8 +43,8 @@ const PostList = () => {
             )}
           />
         </Col>
-        <Col span={6}>
-          <BoxContainer>ccc</BoxContainer>
+        <Col xs={24} sm={0} md={0} lg={6}>
+          <SideBar />
         </Col>
       </Row>
     </>

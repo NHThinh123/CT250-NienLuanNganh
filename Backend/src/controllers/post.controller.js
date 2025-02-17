@@ -8,7 +8,7 @@ const {
 
 const getListPost = async (req, res, next) => {
   try {
-    const { user_id } = req.body;
+    const { user_id } = req.params;
     const data = await getListPostService(user_id);
     res.status(200).json(data);
   } catch (error) {

@@ -1,5 +1,5 @@
 import { EllipsisOutlined } from "@ant-design/icons";
-import { Avatar, Col, Row, Typography } from "antd";
+import { Avatar, Button, Col, Row, Typography } from "antd";
 
 const PostHeader = ({ userData }) => {
   return (
@@ -15,7 +15,9 @@ const PostHeader = ({ userData }) => {
         <Typography.Title level={5}>{userData?.name}</Typography.Title>
       </Col>
       <Col span={2} style={{ textAlign: "center" }}>
-        <EllipsisOutlined />
+        <Button type="text">
+          <EllipsisOutlined />
+        </Button>
       </Col>
     </Row>
   );
