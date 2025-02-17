@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   createDish,
-  updateDish, 
+  updateDish,
   searchDish,
   findByIdDish,
   findAllDish,

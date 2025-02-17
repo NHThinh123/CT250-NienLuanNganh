@@ -33,7 +33,30 @@ const helloUserService = async () => {
 
 //   return result;
 // };
-
+//câp nhật thông tin người dùng
+const updateUserService = async (id, updateData) => {
+  try {
+    const updateUser = await Business.findByIdAndUpdate(id, updateData, { new: true });
+    if (!updatedBusiness) {
+      throw new Error("Business không tồn tại");
+    }
+    return updatedBusiness;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+//lấy thông tin người dùng theo id
+const getUserByIdService = async (id) => {
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
 
 // Kiểm tra thông tin đăng nhập
 const checkUserCredentials = async (email, password) => {
@@ -53,4 +76,4 @@ const checkUserCredentials = async (email, password) => {
 
   return user;
 };
-module.exports = { getListUserService, helloUserService, checkUserCredentials };
+module.exports = { getListUserService, helloUserService, checkUserCredentials, updateUserService, getUserByIdService };
