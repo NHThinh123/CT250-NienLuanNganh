@@ -40,7 +40,7 @@ const PostImages = ({ imagesData }) => {
             <Swiper
               onSwiper={setThumbsSwiper}
               spaceBetween={10}
-              slidesPerView={imagesData.length > 3 ? 3 : imagesData.length}
+              slidesPerView={imagesData.length > 5 ? 5 : imagesData.length}
               freeMode={true}
               watchSlidesProgress={true}
               modules={[FreeMode, Navigation, Thumbs]}

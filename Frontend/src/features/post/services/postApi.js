@@ -9,9 +9,11 @@ const getPostByIdApi = (id) => {
   const URL_API = `/api/posts/${id}`;
   return axios.get(URL_API);
 };
-const createPostApi = (data) => {
+const createPostApi = (formData) => {
   const URL_API = "/api/posts/create";
-  return axios.post(URL_API, data);
+  return axios.post(URL_API, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 
 const updatePostApi = (id, data) => {

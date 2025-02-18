@@ -12,7 +12,7 @@ const UpLoadPostContainer = () => {
   };
   const handleOk = async () => {
     form.submit();
-    setIsModalOpen(false);
+    // setIsModalOpen(false);
   };
   const handleCancel = () => {
     form.resetFields();
@@ -56,6 +56,7 @@ const UpLoadPostContainer = () => {
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         handleOk={handleOk}
+        setIsModalOpen={setIsModalOpen}
       />
     </BoxContainer>
   );

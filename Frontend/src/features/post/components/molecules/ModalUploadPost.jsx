@@ -5,6 +5,7 @@ import {
   Col,
   Form,
   Input,
+  message,
   Modal,
   Popover,
   Row,
@@ -14,13 +15,24 @@ import { CloudLightning, Images, MapPinned, Tags } from "lucide-react";
 import UploadImage from "../atoms/UploadImage";
 import { useState } from "react";
 import UploadTag from "../atoms/UploadTag";
+import useCreatePost from "../../hooks/useCreatePost";
+import { Navigate, useNavigate } from "react-router-dom";
+import SpinLoading from "../../../../components/atoms/SpinLoading";
 
-const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk, form }) => {
+const ModalUploadPost = ({
+  isModalOpen,
+  handleCancel,
+  handleOk,
+  form,
+  setIsModalOpen,
+}) => {
+  const { mutate: createPost, isPending } = useCreatePost();
   const [tags, setTags] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [isShowUploadImage, setIsShowUploadImage] = useState(false);
   const [isShowUploadTag, setIsShowUploadTag] = useState(false);
   const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
+  const navigate = useNavigate();
 
   const handleShowUploadImage = () => {
     setIsShowUploadImage(true);
@@ -34,16 +46,35 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk, form }) => {
 
   const onFinish = (values) => {
     const formData = new FormData();
+    formData.append("user_id", "67adb2bcaa8bf0183be3ad9b");
     formData.append("title", values.title);
     formData.append("content", values.content);
     formData.append("tags", JSON.stringify(tags));
     fileList.forEach((file) => {
       formData.append("images", file.originFileObj);
     });
-    formData.forEach((value, key) => {
-      console.log(key, value);
+    // formData.forEach((value, key) => {
+    //   console.log(key, value);
+    // });
+    createPost(formData, {
+      onSuccess: () => {
+        message.success("Bài viết đã được tạo thành công!");
+        form.resetFields();
+        setIsShowUploadImage(false);
+        setIsShowUploadTag(false);
+        setIsShowUploadLocation(false);
+        setFileList([]);
+        setTags([]);
+        setIsModalOpen(false);
+      },
+      onError: () => {
+        message.error("Lỗi khi tạo bài viết!");
+      },
     });
   };
+  // if (true) {
+  //   return <SpinLoading />;
+  // }
   return (
     <Modal
       title={
@@ -61,7 +92,7 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk, form }) => {
         setFileList([]);
         setTags([]);
       }}
-      okText="Đăng tải"
+      okText={isPending ? "Đang đăng..." : "Đăng tải"}
       cancelText="Hủy"
       maskClosable={false}
       centered
