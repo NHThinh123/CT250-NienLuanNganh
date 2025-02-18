@@ -30,7 +30,7 @@ const MenuDetail = () => {
                 <Col span={3}>
                 </Col>
                 <Col span={4}>
-                    <div style={{padding: "13px 26px"}}>
+                    <div style={{ padding: "13px 26px" }}>
                         <p style={styles.titleMenu}>Thực Đơn</p>
                     </div>
                 </Col>
