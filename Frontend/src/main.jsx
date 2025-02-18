@@ -13,6 +13,8 @@ import PostPage from "./pages/PostPage.jsx";
 import PostCreatePage from "./pages/PostCreatePage.jsx";
 import PostDetailPage from "./pages/PostDetailPage.jsx";
 import PostEditPage from "./pages/PostEditPage.jsx";
+import DishDetailPage from "./pages/DishDetailPage.jsx";
+import BusinessDetailPage from "./pages/BusinessDetailPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,32 @@ const router = createBrowserRouter([
       {
         path: "/posts/create",
         element: <PostCreatePage />,
+      },
+      {
+        path: "/dishes",
+        children: [
+          // {
+          //   index: true,
+          //   element: <DishPage />,
+          // },
+          {
+            path: ":id",
+            element: <DishDetailPage />,
+          }
+        ]
+      },
+      {
+        path: "/business",
+        children: [
+          // {
+          //   index: true,
+          //   element: <BusinessPage />,
+          // },
+          {
+            path: ":id",
+            element: <BusinessDetailPage />,
+          }
+        ]
       },
     ],
   },

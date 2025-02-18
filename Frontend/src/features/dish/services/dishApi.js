@@ -1,0 +1,34 @@
+import axios from "../../../services/axios.customize";
+
+const getDishApi = () => {
+  const URL_API = "/api/dishes";
+  return axios.get(URL_API);
+}
+
+const getDishByIdApi = (id) => {
+    const URL_API = `/api/dishes/${id}`;
+    return axios.get(URL_API);
+}
+
+const createDishApi = (data) => {
+    const URL_API = "/api/dishes";
+    return axios.post(URL_API, data);
+}
+
+const updateDishApi = (id, data) => {
+    const URL_API = `/api/dishes/${id}`;
+    return axios.put(URL_API, data);
+}
+
+const deleteDishApi = (id) => {
+    const URL_API = `/api/dishes/${id}`;
+    return axios.delete(URL_API);
+}
+
+export {
+    getDishApi,
+    getDishByIdApi,
+    createDishApi,
+    updateDishApi,
+    deleteDishApi,
+}
