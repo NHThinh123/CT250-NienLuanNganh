@@ -1,4 +1,4 @@
-import { Avatar, Button, Col, Row } from "antd";
+import { Avatar, Button, Col, Form, Row } from "antd";
 import { ChefHat, Utensils } from "lucide-react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import { useState } from "react";
@@ -6,13 +6,16 @@ import ModalUploadPost from "./ModalUploadPost";
 
 const UpLoadPostContainer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
+  const handleOk = async () => {
+    form.submit();
     setIsModalOpen(false);
   };
   const handleCancel = () => {
+    form.resetFields();
     setIsModalOpen(false);
   };
   return (
@@ -49,6 +52,7 @@ const UpLoadPostContainer = () => {
         </Col>
       </Row>
       <ModalUploadPost
+        form={form}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         handleOk={handleOk}

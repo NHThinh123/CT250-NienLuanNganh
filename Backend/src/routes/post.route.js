@@ -11,7 +11,7 @@ const router = express.Router();
 
 //Public routes
 router.get("/:user_id", getListPost);
-router.get("/:id", getPostById);
+router.get("/detail/:id", getPostById);
 router.post("/create", uploadPost.array("images", 5), createPost);
 router.put("/:id", updatePost);
 router.delete("/:id", deletePost);
