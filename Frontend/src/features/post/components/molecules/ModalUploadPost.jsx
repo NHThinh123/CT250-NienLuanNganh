@@ -31,6 +31,19 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk, form }) => {
   const handleShowUploadLocation = () => {
     setIsShowUploadLocation(true);
   };
+
+  const onFinish = (values) => {
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("content", values.content);
+    formData.append("tags", JSON.stringify(tags));
+    fileList.forEach((file) => {
+      formData.append("images", file.originFileObj);
+    });
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+  };
   return (
     <Modal
       title={
@@ -45,6 +58,8 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk, form }) => {
         setIsShowUploadImage(false);
         setIsShowUploadTag(false);
         setIsShowUploadLocation(false);
+        setFileList([]);
+        setTags([]);
       }}
       okText="Đăng tải"
       cancelText="Hủy"
@@ -76,14 +91,7 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk, form }) => {
         }}
       >
         <Col span={24}>
-          <Form
-            form={form}
-            onFinish={(values) => {
-              console.log(values);
-              console.log(tags);
-              console.log(fileList);
-            }}
-          >
+          <Form form={form} onFinish={onFinish}>
             <Form.Item
               name="title"
               rules={[

@@ -29,8 +29,15 @@ const getPostById = async (req, res, next) => {
 
 const createPost = async (req, res, next) => {
   try {
-    const { user_id, title, content } = req.body;
-    const data = await createPostService(user_id, title, content, req.files);
+    const { user_id, title, content, tags } = req.body;
+    const parsedTags = tags ? JSON.parse(tags) : [];
+    const data = await createPostService(
+      user_id,
+      title,
+      content,
+      parsedTags,
+      req.files
+    );
     res.status(200).json(data);
   } catch (error) {
     next(error);
