@@ -10,15 +10,18 @@ import {
   Row,
   Typography,
 } from "antd";
-import { Images, MapPinned, Tags } from "lucide-react";
+import { CloudLightning, Images, MapPinned, Tags } from "lucide-react";
 import UploadImage from "../atoms/UploadImage";
 import { useState } from "react";
 import UploadTag from "../atoms/UploadTag";
 
-const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
+const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk, form }) => {
+  const [tags, setTags] = useState([]);
+  const [fileList, setFileList] = useState([]);
   const [isShowUploadImage, setIsShowUploadImage] = useState(false);
   const [isShowUploadTag, setIsShowUploadTag] = useState(false);
   const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
+
   const handleShowUploadImage = () => {
     setIsShowUploadImage(true);
   };
@@ -73,7 +76,14 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
         }}
       >
         <Col span={24}>
-          <Form>
+          <Form
+            form={form}
+            onFinish={(values) => {
+              console.log(values);
+              console.log(tags);
+              console.log(fileList);
+            }}
+          >
             <Form.Item
               name="title"
               rules={[
@@ -104,12 +114,12 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
         </Col>
         {isShowUploadTag && (
           <Col span={24}>
-            <UploadTag />
+            <UploadTag tags={tags} setTags={setTags} />
           </Col>
         )}
         {isShowUploadImage && (
           <Col span={24}>
-            <UploadImage />
+            <UploadImage fileList={fileList} setFileList={setFileList} />
           </Col>
         )}
       </Row>

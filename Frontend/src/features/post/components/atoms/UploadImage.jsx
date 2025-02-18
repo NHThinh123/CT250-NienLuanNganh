@@ -2,8 +2,7 @@ import { Typography, Upload } from "antd";
 import { ImageUp } from "lucide-react";
 import { useState } from "react";
 
-const UploadImage = () => {
-  const [fileList, setFileList] = useState([]);
+const UploadImage = ({ fileList, setFileList }) => {
   const [previewURLs, setPreviewURLs] = useState([]);
 
   const handleChange = ({ fileList }) => {
@@ -57,7 +56,7 @@ const UploadImage = () => {
         multiple={true}
         beforeUpload={() => false}
         onChange={handleChange}
-        style={{ maxHeight: "200px", marginBottom: "16px" }}
+        style={{ maxHeight: "200px", marginBottom: "16px", marginTop: "8px" }}
         fileList={fileList}
       >
         <ImageUp />
