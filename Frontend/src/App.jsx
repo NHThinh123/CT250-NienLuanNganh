@@ -1,22 +1,29 @@
-import { Outlet } from "react-router-dom";
-
+import { Outlet, useNavigate } from "react-router-dom";
+import { Layout, Button, Space } from "antd";
 import NavBar from "./components/templates/NavBar";
-import { Layout } from "antd";
+import logo from "../src/assets/logo/logo.png";
 
 function App() {
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await axios.get(
-  //       `${import.meta.env.VITE_BACKEND_URL}/api/users/`
-  //     );
-  //     console.log(res);
-  //   };
+  const navigate = useNavigate(); // Hook để chuyển trang
 
-  //   fetchData();
-  // }, []);
   return (
-    <Layout>
-      <h1 style={{ backgroundColor: "#fff" }}>YUMZY</h1>
+    <Layout style={{ padding: "10px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 20px",
+        }}
+      >
+        <img src={logo} style={{ width: "10vw", height: "10vh" }} alt="logo" />
+        <Space>
+          <Button type="primary" onClick={() => navigate("/login")}>
+            Đăng nhập
+          </Button>
+          <Button onClick={() => navigate("/signup")}>Đăng ký</Button>
+        </Space>
+      </div>
       <NavBar />
       <Outlet />
     </Layout>

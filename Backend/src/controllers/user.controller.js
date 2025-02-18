@@ -119,7 +119,7 @@ const signup = async (req, res) => {
       return res.status(400).json({ status: "FAILED", message: "Ngày - Tháng - Năm không hợp lệ" });
     }
 
-    if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
+    if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$#!%*?&]{8,}$/.test(password)) {
       return res.status(400).json({
         status: "FAILED",
         message: "Mật khẩu phải có chữ Hoa, chữ thường, số, ký tự đặc biệt và có độ dài lớn hơn 8 ký tự!"

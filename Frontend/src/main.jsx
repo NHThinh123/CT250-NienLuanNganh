@@ -13,6 +13,8 @@ import PostPage from "./pages/PostPage.jsx";
 import PostCreatePage from "./pages/PostCreatePage.jsx";
 import PostDetailPage from "./pages/PostDetailPage.jsx";
 import PostEditPage from "./pages/PostEditPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
+import Loginpage from "./pages/Loginpage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -50,8 +52,17 @@ const router = createBrowserRouter([
         path: "/posts/create",
         element: <PostCreatePage />,
       },
+
     ],
   },
+  {
+    path: "signup",
+    element: <SignupPage />,
+  },
+  {
+    path: "login",
+    element: <Loginpage />,
+  }
 ]);
 createRoot(document.getElementById("root")).render(
   <StrictMode>

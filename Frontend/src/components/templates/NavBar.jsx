@@ -7,16 +7,11 @@ const items = [
     key: "home",
     icon: <MailOutlined />,
   },
-  // {
-  //   label: <Link to="/users">Người dùng</Link>,
-  //   key: "user",
-  //   icon: <UserOutlined />,
-  // },
   {
     label: <Link to="/posts">Bài viết</Link>,
     key: "post",
     icon: <FireFilled style={{ color: "red" }} />,
-  },
+  }
 ];
 const NavBar = () => {
   return (
