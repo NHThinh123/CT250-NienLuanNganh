@@ -5,6 +5,8 @@ const Asset = require("../models/asset.model");
 const Post_Tag = require("../models/post_tag.model");
 const { getTagByPostService } = require("./post_tag.service");
 const User_Like_Post = require("../models/user_like_post.model");
+const { createTagService } = require("./tag.service");
+const Tag = require("../models/tag.model");
 
 require("dotenv").config();
 
@@ -111,7 +113,7 @@ const getPostByIdService = async (post_id, user_id) => {
   return { ...result._doc, images, tags, isLike: isLiked ? 1 : 0, likeCount };
 };
 
-const createPostService = async (user_id, title, content, files) => {
+const createPostService = async (user_id, title, content, tags, files) => {
   if (!user_id || !title || !content) {
     throw new AppError("Missing required fields", 400);
   }
@@ -129,6 +131,32 @@ const createPostService = async (user_id, title, content, files) => {
       url: file.path,
     }));
     await Asset.insertMany(imageDocs);
+  }
+
+  // Xử lý tags
+  if (tags && tags.length > 0) {
+    for (const tag_name of tags) {
+      let tag = await Tag.findOne({ tag_name });
+
+      // Nếu tag chưa tồn tại, tạo mới
+      if (!tag) {
+        tag = await createTagService(tag_name);
+      }
+
+      // Kiểm tra mối quan hệ post - tag đã tồn tại chưa
+      const existingPostTag = await Post_Tag.findOne({
+        post_id: result._id,
+        tag_id: tag._id,
+      });
+
+      // Nếu chưa có, thêm vào bảng Post_Tag
+      if (!existingPostTag) {
+        await Post_Tag.create({
+          post_id: result._id,
+          tag_id: tag._id,
+        });
+      }
+    }
   }
 
   return result;

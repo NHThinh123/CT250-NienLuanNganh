@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   Avatar,
   Button,
@@ -8,11 +9,41 @@ import {
   Popover,
   Row,
   Typography,
-  Upload,
 } from "antd";
-import { ImageUp, MapPinned, Tags } from "lucide-react";
+import { CloudLightning, Images, MapPinned, Tags } from "lucide-react";
+import UploadImage from "../atoms/UploadImage";
+import { useState } from "react";
+import UploadTag from "../atoms/UploadTag";
 
-const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
+const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk, form }) => {
+  const [tags, setTags] = useState([]);
+  const [fileList, setFileList] = useState([]);
+  const [isShowUploadImage, setIsShowUploadImage] = useState(false);
+  const [isShowUploadTag, setIsShowUploadTag] = useState(false);
+  const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
+
+  const handleShowUploadImage = () => {
+    setIsShowUploadImage(true);
+  };
+  const handleShowUploadTag = () => {
+    setIsShowUploadTag(true);
+  };
+  const handleShowUploadLocation = () => {
+    setIsShowUploadLocation(true);
+  };
+
+  const onFinish = (values) => {
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("content", values.content);
+    formData.append("tags", JSON.stringify(tags));
+    fileList.forEach((file) => {
+      formData.append("images", file.originFileObj);
+    });
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+  };
   return (
     <Modal
       title={
@@ -22,10 +53,19 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
       }
       open={isModalOpen}
       onOk={handleOk}
-      onCancel={handleCancel}
+      onCancel={() => {
+        handleCancel();
+        setIsShowUploadImage(false);
+        setIsShowUploadTag(false);
+        setIsShowUploadLocation(false);
+        setFileList([]);
+        setTags([]);
+      }}
       okText="Đăng tải"
       cancelText="Hủy"
       maskClosable={false}
+      centered
+      style={{ minWidth: "50%" }}
     >
       <Row>
         <Col span={2}>
@@ -41,9 +81,17 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
           </Typography.Text>
         </Col>
       </Row>
-      <Row style={{ marginTop: "16px", maxHeight: "280px", overflowY: "auto" }}>
+      <Row
+        style={{
+          marginTop: "16px",
+          maxHeight: "320px",
+          overflowY: "auto",
+          padding: "8px",
+          scrollbarWidth: "thin",
+        }}
+      >
         <Col span={24}>
-          <Form>
+          <Form form={form} onFinish={onFinish}>
             <Form.Item
               name="title"
               rules={[
@@ -67,20 +115,21 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
               <Input.TextArea
                 size="large"
                 placeholder="Hãy viết về trải nghiệm ẩm thực của bạn hôm nay!"
-                autoSize={{ minRows: 3, maxRows: 10 }}
+                autoSize={{ minRows: 4, maxRows: 10 }}
               ></Input.TextArea>
             </Form.Item>
           </Form>
         </Col>
-        <Col span={24}>
-          <Form.Item>
-            <Upload.Dragger name="files" multiple={true}>
-              <ImageUp />
-              <br />
-              <Typography.Text>Thêm ảnh/video</Typography.Text>
-            </Upload.Dragger>
-          </Form.Item>
-        </Col>
+        {isShowUploadTag && (
+          <Col span={24}>
+            <UploadTag tags={tags} setTags={setTags} />
+          </Col>
+        )}
+        {isShowUploadImage && (
+          <Col span={24}>
+            <UploadImage fileList={fileList} setFileList={setFileList} />
+          </Col>
+        )}
       </Row>
 
       <Row
@@ -88,7 +137,7 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
           border: "1px solid #000",
           borderRadius: "8px",
           padding: "8px",
-
+          marginTop: "16px",
           textAlign: "center",
         }}
         align={"middle"}
@@ -98,16 +147,34 @@ const ModalUploadPost = ({ isModalOpen, handleCancel, handleOk }) => {
             Thêm vào bài viết của bạn:
           </Typography.Text>
         </Col>
-
-        <Col span={6}>
-          <Button type="text" style={{ padding: "4px 18px" }}>
+        <Col span={4}>
+          <Button
+            type="text"
+            style={{ padding: "4px 18px" }}
+            onClick={handleShowUploadImage}
+          >
+            <Popover content="Thêm ảnh">
+              <Images color="#03c200" size={24} strokeWidth={2.5} />
+            </Popover>
+          </Button>
+        </Col>
+        <Col span={4}>
+          <Button
+            type="text"
+            style={{ padding: "4px 18px" }}
+            onClick={handleShowUploadTag}
+          >
             <Popover content="Thêm chủ đề">
               <Tags color="#e09c0b" size={24} strokeWidth={2.5} />
             </Popover>
           </Button>
         </Col>
-        <Col span={6}>
-          <Button type="text" style={{ padding: "4px 18px" }}>
+        <Col span={4}>
+          <Button
+            type="text"
+            style={{ padding: "4px 18px" }}
+            onClick={handleShowUploadLocation}
+          >
             <Popover content="Thêm địa điểm">
               <MapPinned color="#ff4d4f" size={24} strokeWidth={2.5} />
             </Popover>
