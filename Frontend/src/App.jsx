@@ -2,6 +2,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { Layout, Button, Space } from "antd";
 import NavBar from "./components/templates/NavBar";
 import logo from "../src/assets/logo/logo.png";
+import Footer from "./components/templates/Footer";
+import ScrollToTop from "./components/atoms/ScrollToTop";
 
 function App() {
   const navigate = useNavigate(); // Hook để chuyển trang
@@ -16,7 +18,7 @@ function App() {
           padding: "0 20px",
         }}
       >
-        <img src={logo} style={{ width: "10vw", height: "10vh" }} alt="logo" />
+        <img src={logo} style={{ width: "12vw", height: "12vh" }} alt="logo" />
         <Space>
           <Button type="primary" onClick={() => navigate("/login")}>
             Đăng nhập
@@ -25,7 +27,9 @@ function App() {
         </Space>
       </div>
       <NavBar />
+      <ScrollToTop />
       <Outlet />
+      <Footer />
     </Layout>
   );
 }

@@ -11,12 +11,16 @@ const items = [
     label: <Link to="/posts">Bài viết</Link>,
     key: "post",
     icon: <FireFilled style={{ color: "red" }} />,
-  }
+  },
 ];
 const NavBar = () => {
   return (
     <div>
-      <Menu items={items} mode="horizontal"></Menu>
+      <Menu
+        items={items}
+        mode="horizontal"
+        style={{ paddingTop: 8, paddingBottom: 8 }}
+      ></Menu>
     </div>
   );
 };
