@@ -1,25 +1,23 @@
-import { Col, List, Row, Tag, Typography } from "antd";
+import { Col, Row, Tag, Typography } from "antd";
 
 const PostBody = ({ postData }) => {
   return (
     <div style={{ margin: "8px" }}>
       <Row>
         <Col span={24}>
-          <Typography.Title level={4}>{postData?.title}</Typography.Title>
+          <Typography.Title style={{ margin: "0px" }} level={4}>
+            {postData?.title}
+          </Typography.Title>
         </Col>
       </Row>
       <Row>
         <Col span={24}>
-          {postData?.tags?.length > 0 && (
-            <List
-              dataSource={postData.tags}
-              renderItem={(item) => (
-                <List.Item style={{ padding: "0px", margin: "0px" }}>
-                  <Tag color="blue">#{item.tag_name}</Tag>
-                </List.Item>
-              )}
-            />
-          )}
+          {postData?.tags?.length > 0 &&
+            postData.tags.map((tag) => (
+              <Tag key={tag.tag_name} color="blue">
+                #{tag.tag_name}
+              </Tag>
+            ))}
         </Col>
       </Row>
       <Row>
