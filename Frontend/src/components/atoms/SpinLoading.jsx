@@ -1,23 +1,22 @@
 import { Spin } from "antd";
-import { CenterOutlined } from "@ant-design/icons";
 
-const SpinLoading = ({ spinning }) => {
+const SpinLoading = () => {
   return (
     <div
       style={{
-        display: spinning ? "flex" : "none",
+        display: "flex",
         position: "fixed",
         top: 0,
         left: 0,
         width: "100%",
         height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.5)", // Màu mờ
+        backgroundColor: "rgba(0, 0, 0, 0.2)", // Màu mờ
         justifyContent: "center",
         alignItems: "center",
         zIndex: 9999, // Đảm bảo lớp phủ ở trên cùng
       }}
     >
-      <Spin size="large" indicator={<CenterOutlined />} />
+      <Spin size="large" />
     </div>
   );
 };

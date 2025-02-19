@@ -72,9 +72,7 @@ const ModalUploadPost = ({
       },
     });
   };
-  // if (true) {
-  //   return <SpinLoading />;
-  // }
+
   return (
     <Modal
       title={
@@ -98,6 +96,7 @@ const ModalUploadPost = ({
       centered
       style={{ minWidth: "50%" }}
     >
+      {isPending && <SpinLoading />}
       <Row>
         <Col span={2}>
           <Avatar
