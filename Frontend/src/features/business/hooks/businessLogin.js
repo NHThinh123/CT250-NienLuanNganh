@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useContext } from "react";
 import { BusinessContext } from "../../../contexts/business.context";
-import { loginBusiness } from "../services/businessApi";
+import { loginBusinessApi } from "../services/businessApi";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
 
@@ -11,7 +11,7 @@ const useBusinessLogin = () => {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (a) => loginBusiness(a),
+    mutationFn: (a) => loginBusinessApi(a),
     onSuccess: (data) => {
       console.log("✅ API trả về dữ liệu:", data);
 
