@@ -77,12 +77,12 @@ const updateBusiness = async (req, res, next) => {
             }
         }
 
-        // Cập nhật thông tin user
+        // Cập nhật thông tin business
         const updateBusiness = await Business.findByIdAndUpdate(id, updateData, { new: true });
 
         res.status(200).json({
             message: "Cập nhật thông tin thành công",
-            data: {
+            business: {
                 id: updateBusiness._id,
                 business_name: updateBusiness.business_name,
                 email: updateBusiness.email,
@@ -95,8 +95,8 @@ const updateBusiness = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error("Lỗi khi cập nhật user:", error);
-        return res.status(500).json({ message: "Lỗi! Không thể cập nhật thông tin user" });
+        console.error("Lỗi khi cập nhật business:", error);
+        return res.status(500).json({ message: "Lỗi! Không thể cập nhật thông tin business" });
     }
 };
 
@@ -150,6 +150,7 @@ const signupBusiness = async (req, res, next) => {
         res.status(500).json({ message: error.message });
     }
 };
+//Đăng nhập
 const loginBusiness = async (req, res, next) => {
     const { email, password } = req.body;
 
