@@ -22,13 +22,13 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-      ? business.business?.avatar  // 🔥 Đảm bảo lấy đúng avatar
+      ? business.business?.avatar
       : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-      ? business.business?.business_name  // 🔥 Đảm bảo lấy đúng tên
+      ? business.business?.business_name
       : "";
 
   // Xử lý đăng xuất
