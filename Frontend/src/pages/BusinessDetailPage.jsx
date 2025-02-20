@@ -1,28 +1,32 @@
 import { useParams } from "react-router-dom";
 import useBusinessById from "../features/business/hooks/useBusinessById";
 import BusinessDetail from "../features/business/components/templates/BusinessDetail";
-
-// import useMenuById from "../features/menu/hooks/useMenuById";
 import MenuDetail from "../features/menu/components/templates/MenuDetail";
+import useMenuByBusinessId from "../features/menu/hooks/useMenuByBusinessId";
 
 const BusinessDetailPage = () => {
   const { id } = useParams();
-  const { businessData, isLoading, isError } = useBusinessById(id);
-  // const { menuData, isLoading, isError } = useMenuById(id);
-  console.log(businessData, isLoading, isError);
+  const { businessData, isLoadingBusiness, isErrorBusiness } =
+    useBusinessById(id);
+  const { menuData, isLoadingMenu, isErrorMenu } = useMenuByBusinessId(id);
+  console.log(businessData, isLoadingBusiness, isErrorBusiness);
+  console.log(menuData, isLoadingMenu, isErrorMenu);
   return (
     <>
-      {/* <ButtonCustomize margin={"8px 0px"} to={"/posts/create"}>
-        Thêm bài đăng
-      </ButtonCustomize> */}
       <div>
-        <BusinessDetail businessData={businessData} isLoading={isLoading} isError={isError}/>
+        <BusinessDetail
+          businessData={businessData}
+          isLoadingBusiness={isLoadingBusiness}
+          isErrorBusiness={isErrorBusiness}
+        />
       </div>
       <div>
-        <MenuDetail/>
+        <MenuDetail
+          menuData={menuData}
+          isLoadingMenu={isLoadingMenu}
+          isErrorMenu={isErrorMenu}
+        />
       </div>
-      
-      
     </>
   );
 };

@@ -9,7 +9,7 @@ function App() {
   const navigate = useNavigate(); // Hook để chuyển trang
 
   return (
-    <Layout style={{ padding: "10px" }}>
+    <Layout style={{ margin: 0 }}>
       <div
         style={{
           display: "flex",

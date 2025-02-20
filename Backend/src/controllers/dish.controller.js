@@ -4,8 +4,8 @@ const {
   getDishByIdService,
   updateDishService,
   deleteDishService,
+  getDishesByMenuIdService,
 } = require("../services/dish.service");
-
 
 const getListDish = async (req, res, next) => {
   try {
@@ -85,10 +85,21 @@ const deleteDish = async (req, res, next) => {
   }
 };
 
+const getDishesByMenuId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await getDishesByMenuIdService(id);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getListDish,
   getDishById,
   createDish,
   updateDish,
   deleteDish,
+  getDishesByMenuId,
 };

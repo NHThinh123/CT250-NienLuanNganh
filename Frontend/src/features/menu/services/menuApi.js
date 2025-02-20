@@ -25,10 +25,16 @@ const deleteMenuApi = (id) => {
     return axios.delete(URL_API);
 }
 
+const getMenusByBusinessIdApi = (id) => {
+    const URL_API = `/api/menus/getMenusByBusinessId/${id}`;
+    return axios.get(URL_API);
+}
+
 export {
     getMenuApi,
     getMenuByIdApi,
     createMenuApi,
     updateMenuApi,
     deleteMenuApi,
+    getMenusByBusinessIdApi
 }
