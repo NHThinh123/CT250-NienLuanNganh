@@ -1,12 +1,14 @@
-import { Layout } from 'antd'
-import React from 'react'
+import AuthLayout from "../features/auth/components/templates/AuthLayout";
+import LoginForm from "../features/auth/components/templates/LoginForm";
+import SocialLogin from "../features/auth/components/templates/SocialLogin";
 
-const Loginpage = () => {
+const LoginPage = () => {
     return (
-        <Layout>
-            <h1>Login Page</h1>
-        </Layout>
-    )
-}
+        <AuthLayout>
+            <LoginForm />
+            <SocialLogin />
+        </AuthLayout>
+    );
+};
 
-export default Loginpage
+export default LoginPage;

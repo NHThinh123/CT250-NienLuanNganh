@@ -18,6 +18,11 @@ import Loginpage from "./pages/Loginpage.jsx";
 import DishDetailPage from "./pages/DishDetailPage.jsx";
 import BusinessDetailPage from "./pages/BusinessDetailPage.jsx";
 import BusinessListPage from "./pages/BusinessListPage.jsx";
+import LoginBusinessPage from "./pages/LoginBusinessPage.jsx";
+import SignupBusinessPage from "./pages/SignupBusinessPage.jsx";
+import { AuthWrapper } from "./contexts/auth.context.jsx";
+import ProfilePage from "./pages/PageProfile.jsx";
+
 
 const queryClient = new QueryClient();
 
@@ -29,6 +34,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />
       },
       // {
       //   path: "/users",
@@ -91,11 +100,21 @@ const router = createBrowserRouter([
     path: "login",
     element: <Loginpage />,
   },
+  {
+    path: "signupBusiness",
+    element: <SignupBusinessPage />,
+  },
+  {
+    path: "loginBusiness",
+    element: <LoginBusinessPage />,
+  }
 ]);
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <AuthWrapper> {/* Bọc ứng dụng bằng AuthWrapper */}
+        <RouterProvider router={router} />
+      </AuthWrapper>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </StrictMode>

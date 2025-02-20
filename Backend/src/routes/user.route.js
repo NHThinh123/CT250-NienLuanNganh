@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const path = require('path');
-const { signup, signin, getUserById, getListUser, updateUser } = require("../controllers/user.controller");
+const { signup, signin, getUserById, getListUser, updateUser, uploadAvatar } = require("../controllers/user.controller");
 const { verifyEmail } = require("../controllers/user.verifiEmail");
 const upload = require("../middleware/uploadAvatar");
 
@@ -19,7 +19,7 @@ router.get('/verified', (req, res) => {
 router.get('/id/:id', getUserById);
 router.put('/update/:id', upload.single('avatar'), updateUser);
 
-
+router.post("/upload-avatar", upload.single('avatar'), uploadAvatar);
 router.post("/login", signin);
 
 module.exports = router;

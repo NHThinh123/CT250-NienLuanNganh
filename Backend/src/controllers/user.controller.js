@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
-const User = require("../models/user.model");
+
 const path = require('path');
+const jwt = require("jsonwebtoken");
 const router = require("express").Router();
 const { sendVerificationEmail } = require("../services/email.service");
 const moment = require('moment');
@@ -11,6 +12,7 @@ const {
   getUserByIdService,
   updateUserService,
 } = require("../services/user.service");
+const User = require("../models/user.model");
 
 const getListUser = async (req, res, next) => {
   try {
@@ -42,13 +44,27 @@ const helloUser = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const data = await getUserByIdService(id);
+    const user = await getUserByIdService(id);
 
-    res.status(200).json(data);
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    }
+
+    res.status(200).json({
+      message: "Thông tin người dùng",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        dateOfBirth: user.dateOfBirth,
+      }
+    });
   } catch (error) {
     next(error);
   }
 };
+
 //cập nhật thông tin người dùng
 const updateUser = async (req, res, next) => {
   try {
@@ -78,7 +94,7 @@ const updateUser = async (req, res, next) => {
 
     res.status(200).json({
       message: "Cập nhật thông tin thành công",
-      data: {
+      user: {
         id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
@@ -184,9 +200,11 @@ const signup = async (req, res) => {
 //singin
 const signin = async (req, res) => {
   const { email, password } = req.body;
+  // email = email.trim();
+  // password = password.trim();
 
   if (!email || !password) {
-    return res.json({
+    return res.status(400).json({
       status: "FAILED",
       message: "Thông tin đăng nhập trống"
     });
@@ -194,16 +212,15 @@ const signin = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res.json({
+      return res.status(401).json({
         status: "FAILED",
-        message: "Thông tin đăng nhập không hợp lệ"
+        message: "Email không tồn tại"
       });
     }
 
     if (!user.verified) {
-      return res.json({
+      return res.status(403).json({
         status: "FAILED",
         message: "Email chưa được xác minh. Vui lòng kiểm tra hộp thư của bạn."
       });
@@ -212,32 +229,53 @@ const signin = async (req, res) => {
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (!isPasswordCorrect) {
-      return res.json({
+      return res.status(401).json({
         status: "FAILED",
         message: "Mật khẩu không hợp lệ"
       });
     }
 
-    return res.json({
+    // Tạo JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET, // Chuỗi bí mật để mã hóa token
+      { expiresIn: "1h" } // Thời gian hết hạn của token
+    );
+
+    return res.status(200).json({
       status: "SUCCESS",
       message: "Đăng nhập thành công",
-      data: {
+      user: {
         id: user._id,
         email: user.email,
         name: user.name,
         avatar: user.avatar,
         dateOfBirth: user.dateOfBirth,
-        role: user.role
+        role: user.role,
+        token: token // Trả về token cho client
       }
     });
   } catch (err) {
     console.error(err);
-    return res.json({
+    return res.status(500).json({
       status: "FAILED",
       message: "Đã xảy ra lỗi khi kiểm tra người dùng hiện tại"
     });
   }
 };
-// Route này cần để hiển thị trang xác minh
+// upload avatar
+const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Không có file nào được tải lên" });
+    }
 
-module.exports = { helloUser, getListUser, updateUser, signup, signin, getUserById };
+    console.log("File đã upload:", req.file.path);
+    res.json({ secure_url: req.file.path }); // Trả về URL ảnh sau khi upload lên Cloudinary
+  } catch (error) {
+    console.error("Lỗi upload ảnh:", error);
+    res.status(500).json({ message: "Lỗi upload ảnh", error });
+  }
+}
+
+module.exports = { helloUser, getListUser, updateUser, signup, signin, getUserById, uploadAvatar };
