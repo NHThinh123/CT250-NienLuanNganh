@@ -6,6 +6,11 @@ const loginUser = (data) => {
   console.log("api", data);
   return axios.post(URL_API, data);
 };
+//api đăng kí
+const signupUser = (data) => {
+  const URL_API = "/api/user/signup";
+  return axios.post(URL_API, data);
+};
 //api cập nhật thông tin người dùng
 const updateUser = (id, data) => {
   const URL_API = `/api/user/update/${id}`;
@@ -18,4 +23,4 @@ const getUserProfile = (id) => {
   const URL_API = `/api/user/id/${id}`;
   return axios.get(URL_API);
 };
-export { loginUser, updateUser, getUserProfile };
+export { loginUser, updateUser, getUserProfile, signupUser };
