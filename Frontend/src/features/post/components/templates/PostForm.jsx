@@ -2,8 +2,11 @@ import { Button, Form, Input, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import useCreatePost from "../../hooks/useCreatePost";
 import useUpdatePost from "../../hooks/useUpdatePost";
+import { useContext } from "react";
+import { AuthContext } from "../../../../contexts/auth.context";
 
 const PostForm = ({ initialValues, mode = "create" }) => {
+  const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
   const { mutate: createPost } = useCreatePost();
   const { mutate: updatePost } = useUpdatePost();
@@ -21,7 +24,7 @@ const PostForm = ({ initialValues, mode = "create" }) => {
     if (mode === "create") {
       createPost(
         {
-          user_id: "678b2f5ffc88df85ce348612",
+          user_id: auth?.user?.id,
           title: values.title,
           content: values.content,
         },

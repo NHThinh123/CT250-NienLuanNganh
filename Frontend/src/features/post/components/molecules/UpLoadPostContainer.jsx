@@ -1,10 +1,12 @@
 import { Avatar, Button, Col, Form, Row } from "antd";
 import { ChefHat, Utensils } from "lucide-react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ModalUploadPost from "./ModalUploadPost";
+import { AuthContext } from "../../../../contexts/auth.context";
 
 const UpLoadPostContainer = () => {
+  const { auth } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const showModal = () => {
@@ -22,11 +24,7 @@ const UpLoadPostContainer = () => {
     <BoxContainer>
       <Row>
         <Col span={4}>
-          <Avatar
-            src={
-              "https://anhnail.com/wp-content/uploads/2024/11/Hinh-gai-xinh-2k4.jpg"
-            }
-          ></Avatar>
+          <Avatar src={auth?.user?.avatar}></Avatar>
         </Col>
         <Col span={20}>
           <Button type="default" style={{ width: "100%" }} onClick={showModal}>

@@ -79,6 +79,7 @@ const getListPostService = async (user_id) => {
         user_id: 1,
         "user.name": 1,
         "user.email": 1,
+        "user.avatar": 1,
         title: 1, // Tiêu đề bài viết
         content: 1, // Nội dung bài viết
         createdAt: 1, // Ngày tạo

@@ -4,18 +4,20 @@ import {
   ShareAltOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Row, Typography } from "antd";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import useLikePost from "../../hooks/useLikePost";
 import useUnlikePost from "../../hooks/useUnLikePost";
+import { AuthContext } from "../../../../contexts/auth.context";
 
 const PostFooter = ({ postData }) => {
+  const { auth } = useContext(AuthContext);
   const { mutate: likePost } = useLikePost();
   const { mutate: unlikePost } = useUnlikePost();
 
   const [isLiked, setIsLiked] = useState(postData?.isLike || false);
   const [likeCount, setLikeCount] = useState(postData?.likeCount || 0);
 
-  const user_id = "678b2f5ffc88df85ce348612";
+  const user_id = auth?.user?.id;
 
   const handleLike = () => {
     if (!isLiked) {
