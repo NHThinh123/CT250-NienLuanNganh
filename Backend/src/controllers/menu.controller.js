@@ -4,6 +4,7 @@ const {
   getMenuByIdService,
   updateMenuService,
   deleteMenuService,
+  getMenusByBusinessIdService,
 } = require("../services/menu.service");
 
 const getListMenu = async (req, res, next) => {
@@ -58,10 +59,21 @@ const deleteMenu = async (req, res, next) => {
   }
 };
 
+const getMenusByBusinessId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await getMenusByBusinessIdService(id);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getListMenu,
   getMenuById,
   createMenu,
   updateMenu,
   deleteMenu,
+  getMenusByBusinessId,
 };

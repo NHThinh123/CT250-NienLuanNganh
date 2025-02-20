@@ -41,10 +41,20 @@ const deleteMenuService = async (id) => {
   return await Menu.delete({ _id: id });
 };
 
+const getMenusByBusinessIdService = async (businessId) => {
+    try {
+        const menus = await Menu.find({ business_id: businessId });
+        return menus;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 module.exports = {
   getListMenuService,
   getMenuByIdService,
   createMenuService,
   updateMenuService,
   deleteMenuService,
+  getMenusByBusinessIdService
 };

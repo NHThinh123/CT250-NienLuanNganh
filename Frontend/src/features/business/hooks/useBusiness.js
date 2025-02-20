@@ -1,17 +1,12 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getBusinessApi } from "../services/businessApi";
 
 const useBusiness = () => {
-    const {
-    data: businessData = [],
-    isLoading: loading,
-    isError,
-  } = useQuery({
+  const { data: businessData = [] } = useQuery({
     queryKey: ["businesses"],
     queryFn: getBusinessApi,
   });
-
-  return { businessData, loading, isError };
+  return { businessData };
 };
 
 export default useBusiness;

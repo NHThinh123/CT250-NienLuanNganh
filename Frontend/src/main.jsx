@@ -17,6 +17,7 @@ import SignupPage from "./pages/SignupPage.jsx";
 import Loginpage from "./pages/Loginpage.jsx";
 import DishDetailPage from "./pages/DishDetailPage.jsx";
 import BusinessDetailPage from "./pages/BusinessDetailPage.jsx";
+import BusinessListPage from "./pages/BusinessListPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -54,7 +55,6 @@ const router = createBrowserRouter([
         path: "/posts/create",
         element: <PostCreatePage />,
       },
-
       {
         path: "/dishes",
         children: [
@@ -65,21 +65,21 @@ const router = createBrowserRouter([
           {
             path: ":id",
             element: <DishDetailPage />,
-          }
-        ]
+          },
+        ],
       },
       {
-        path: "/business",
+        path: "/businesses",
         children: [
-          // {
-          //   index: true,
-          //   element: <BusinessPage />,
-          // },
+          {
+            index: true,
+            element: <BusinessListPage />,
+          },
           {
             path: ":id",
             element: <BusinessDetailPage />,
-          }
-        ]
+          },
+        ],
       },
     ],
   },
@@ -90,7 +90,7 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <Loginpage />,
-  }
+  },
 ]);
 createRoot(document.getElementById("root")).render(
   <StrictMode>

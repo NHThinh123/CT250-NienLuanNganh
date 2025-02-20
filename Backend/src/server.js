@@ -5,7 +5,6 @@ const cors = require("cors");
 const configViewEngine = require("./config/viewEngine");
 const connection = require("./config/database");
 
-
 const userRoutes = require("./routes/user.route");
 const dishRoutes = require("./routes/dish.route");
 const businessRoutes = require("./routes/business.route");

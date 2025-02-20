@@ -81,6 +81,15 @@ const updateDishService = async (id, dataUpdate, imagePaths) => {
   );
 };
 
+const getDishesByMenuIdService = async (menuId) => {
+    try {
+        const dishes = await Dish.find({ menu_id: menuId });
+        return dishes;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 
 module.exports = {
   getListDishService,
@@ -89,4 +98,5 @@ module.exports = {
   createDishService,
   updateDishService,
   deleteDishService,
+  getDishesByMenuIdService
 };
