@@ -2,7 +2,9 @@ const Review = require("../models/review.model");
 
 const getListReviewService = async (page = 1, limit = 10, search = "") => {
   const skip = (page - 1) * limit;
-  const query = search ? { review_contents: { $regex: search, $options: "i" } } : {};
+  const query = search
+    ? { review_contents: { $regex: search, $options: "i" } }
+    : {};
 
   const reviews = await Review.find(query)
     .populate("user_id", "user_name email") // Lấy thông tin user liên quan
@@ -38,10 +40,20 @@ const deleteReviewService = async (id) => {
   return await Review.delete({ _id: id });
 };
 
+const getReviewsByBusinessIdService = async (businessId) => {
+  try {
+    const reviews = await Review.find({ business_id: businessId });
+    return reviews;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   getListReviewService,
   getReviewByIdService,
   createReviewService,
   // updateReviewService,
   deleteReviewService,
+  getReviewsByBusinessIdService,
 };

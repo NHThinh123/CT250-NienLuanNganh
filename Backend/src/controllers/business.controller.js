@@ -1,5 +1,5 @@
 const {
-  createBusinessService,
+  // createBusinessService,
   getBusinessService,
   getBusinessByIdService,
   updateBusinessService,
@@ -10,26 +10,26 @@ const jwt = require("jsonwebtoken");
 const Business = require("../models/business.model");
 const cloudinary = require("cloudinary").v2;
 
-//Tạo một business
-const createBusiness = async (req, res, next) => {
-  try {
-    const {
-      business_name,
-      open_hours,
-      close_hours,
-      location,
-      contact_info,
-      email,
-      password,
-    } = req.body;
-    //const data = await createBusinessService(business_name, open_hours, close_hours, location, contact_info, email, password);
-    const data = await createBusinessService(req, res);
+// //Tạo một business
+// const createBusiness = async (req, res, next) => {
+//   try {
+//     const {
+//       business_name,
+//       open_hours,
+//       close_hours,
+//       location,
+//       contact_info,
+//       email,
+//       password,
+//     } = req.body;
+//     //const data = await createBusinessService(business_name, open_hours, close_hours, location, contact_info, email, password);
+//     const data = await createBusinessService(req, res);
 
-    res.status(200).json(data);
-  } catch (error) {
-    return next(new AppError(500, "Lỗi! Không thể tạo business"));
-  }
-};
+//     res.status(200).json(data);
+//   } catch (error) {
+//     return next(new AppError(500, "Lỗi! Không thể tạo business"));
+//   }
+// };
 const getBusiness = async (req, res, next) => {
   try {
     const data = await getBusinessService();
@@ -213,7 +213,7 @@ const loginBusiness = async (req, res, next) => {
 };
 
 module.exports = {
-  createBusiness,
+  // createBusiness,
   getBusiness,
   getBusinessById,
   updateBusiness,

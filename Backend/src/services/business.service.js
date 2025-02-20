@@ -1,32 +1,32 @@
 const { get } = require("../config/emailConfig");
 const Business = require("../models/business.model");
 
-const createBusinessService = async (req, res) => {
-  const {
-    business_name,
-    open_hours,
-    close_hours,
-    location,
-    contact_info,
-    email,
-    password,
-  } = req.body;
-  const business = new Business({
-    business_name,
-    open_hours,
-    close_hours,
-    location,
-    contact_info,
-    email,
-    password,
-  });
-  try {
-    const savedBusiness = await business.save();
-    res.json(savedBusiness);
-  } catch (error) {
-    res.status(400).json({ message: error });
-  }
-};
+// const createBusinessService = async (req, res) => {
+//   const {
+//     business_name,
+//     open_hours,
+//     close_hours,
+//     location,
+//     contact_info,
+//     email,
+//     password,
+//   } = req.body;
+//   const business = new Business({
+//     business_name,
+//     open_hours,
+//     close_hours,
+//     location,
+//     contact_info,
+//     email,
+//     password,
+//   });
+//   try {
+//     const savedBusiness = await business.save();
+//     res.json(savedBusiness);
+//   } catch (error) {
+//     res.status(400).json({ message: error });
+//   }
+// };
 const getBusinessService = async (req, res) => {
   try {
     const business = await Business.find();
@@ -64,7 +64,7 @@ const updateBusinessService = async (id, updateData) => {
 };
 
 module.exports = {
-  createBusinessService,
+  // createBusinessService,
   getBusinessService,
   getBusinessByIdService,
   updateBusinessService,

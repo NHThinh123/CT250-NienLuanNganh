@@ -4,12 +4,17 @@ const {
   getReviewByIdService,
   // updateReviewService,
   deleteReviewService,
+  getReviewsByBusinessIdService,
 } = require("../services/review.service");
 
 const getListReview = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
-    const data = await getListReviewService(Number(page), Number(limit), search);
+    const data = await getListReviewService(
+      Number(page),
+      Number(limit),
+      search
+    );
     res.status(200).json(data);
   } catch (error) {
     next(error);
@@ -57,10 +62,21 @@ const deleteReview = async (req, res, next) => {
   }
 };
 
+const getReviewsByBusinessId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await getReviewsByBusinessIdService(id);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getListReview,
   getReviewById,
   createReview,
   // updateReview,
   deleteReview,
+  getReviewsByBusinessId,
 };

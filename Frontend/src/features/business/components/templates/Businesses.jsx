@@ -1,24 +1,12 @@
 import { Col, Row, Card } from "antd";
+import { Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Business = ({ businessData }) => {
   const navigate = useNavigate();
   return (
     <>
-      <Row>
-        <div style={{ textAlign: "center", width: "100%", margin: "20px 0" }}>
-          <h1>Danh sách quán ăn</h1>
-        </div>
-      </Row>
-      <Row>
-        <Col span={3}></Col>
-        <Col span={18}>
-          <hr style={{ border: "no", opacity: "1", marginBottom: "10px" }} />
-        </Col>
-        <Col span={3}></Col>
-      </Row>
       <Row gutter={[16, 16]}>
-        <Col span={3}></Col>
         {businessData.map((business) => (
           <Col
             key={business._id}
@@ -26,7 +14,7 @@ const Business = ({ businessData }) => {
             sm={12}
             md={8}
             lg={6}
-            xl={4}
+            xl={6}
             style={{ padding: "10px" }}
           >
             <Card
@@ -42,7 +30,18 @@ const Business = ({ businessData }) => {
             >
               <Card.Meta
                 title={business.business_name}
-                description={business.location}
+                description={
+                  <div>
+                    <p>{business.location}</p>
+                    <p>
+                      <Clock
+                        size={17}
+                        style={{ marginRight: "8px", marginBottom: "-3px" }}
+                      />
+                      {business.open_hours} - {business.close_hours}
+                    </p>
+                  </div>
+                }
               />
             </Card>
           </Col>

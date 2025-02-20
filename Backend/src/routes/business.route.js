@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  createBusiness,
+  // createBusiness,
   updateBusiness,
   getBusiness,
   getBusinessById,
@@ -10,7 +10,7 @@ const {
 const router = express.Router();
 const upload = require("../middleware/uploadAvatar");
 
-router.post("/", createBusiness);
+// router.post("/", createBusiness);
 router.get("/", getBusiness);
 router.get("/id/:id", getBusinessById);
 router.put("/id/:id", upload.single("avatar"), updateBusiness);

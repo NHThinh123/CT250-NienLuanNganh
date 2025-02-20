@@ -66,7 +66,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
             </div>
           </Col>
           <Col
-            span={9}
+            span={8}
             style={{
               backgroundColor: "#ffffff",
               padding: "6px 15px",
@@ -97,23 +97,14 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
               )}
             />
           </Col>
-          <Col span={5}>
+          <Col span={6}>
             <div
               style={{
                 backgroundColor: "#ffffff",
                 height: "300px",
                 marginLeft: "20px",
               }}
-            >
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                style={{ border: 0 }}
-                src="https://www.google.com/maps/embed/v1/place?q=Ho%20Chi%20Minh%20City,Vietnam&key=YOUR_GOOGLE_MAPS_API_KEY"
-                allowFullScreen
-              ></iframe>
-            </div>
+            ></div>
           </Col>
 
           <Col span={3}></Col>
