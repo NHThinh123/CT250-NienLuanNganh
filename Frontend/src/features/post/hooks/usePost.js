@@ -1,14 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { getPostApi } from "../services/postApi";
+import { useContext } from "react";
+import { AuthContext } from "../../../contexts/auth.context";
 
 const usePost = () => {
+  const { auth } = useContext(AuthContext);
   const {
     data: postData = [],
     isLoading: loading,
     isError,
   } = useQuery({
     queryKey: ["posts"],
-    queryFn: () => getPostApi("678b2f5ffc88df85ce348612"),
+    queryFn: () => getPostApi(auth?.user?.id),
   });
 
   return { postData, loading, isError };

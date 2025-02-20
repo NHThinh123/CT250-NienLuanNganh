@@ -25,7 +25,10 @@ const PostImages = ({ imagesData }) => {
             className="mySwiper2"
           >
             {imagesData.map((image, index) => (
-              <SwiperSlide key={index}>
+              <SwiperSlide
+                key={index}
+                style={{ maxHeight: "500px", overflow: "cover" }}
+              >
                 <img
                   src={image?.url}
                   alt={`Slide ${index}`}
@@ -47,7 +50,7 @@ const PostImages = ({ imagesData }) => {
               className="mySwiper"
             >
               {imagesData.map((image, index) => (
-                <SwiperSlide key={index}>
+                <SwiperSlide key={index} style={{ maxHeight: "100px" }}>
                   <img src={image?.url} alt={`Slide ${index}`} />
                 </SwiperSlide>
               ))}

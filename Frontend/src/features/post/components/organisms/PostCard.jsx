@@ -7,9 +7,17 @@ const PostCard = ({ post }) => {
   return (
     <BoxContainer style={{ padding: "0px" }}>
       <Row>
-        <Col span={10}>
+        <Col
+          span={10}
+          style={{
+            maxWidth: 400,
+            maxHeight: 250,
+            overflow: "hidden",
+            marginRight: "32px",
+          }}
+        >
           <img
-            src={post.images[0].url ? post.images[0].url : logo}
+            src={post.images[0]?.url ? post.images[0].url : logo}
             alt=""
             style={{ maxWidth: 400 }}
           />
@@ -37,12 +45,7 @@ const PostCard = ({ post }) => {
 
             <div style={{ marginTop: "8px" }}>
               <Space>
-                <Avatar
-                  src={
-                    "https://anhnail.com/wp-content/uploads/2024/11/Hinh-gai-xinh-2k4.jpg"
-                  }
-                  size={20}
-                ></Avatar>
+                <Avatar src={post.user.avatar} size={20}></Avatar>
                 <p>{post.user.name}</p>
               </Space>
             </div>

@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { Layout, Button, Space, Avatar, Dropdown, Menu } from "antd";
+import { Layout, Button, Space, Avatar, Dropdown } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useContext } from "react";
 import { AuthContext } from "./contexts/auth.context";
@@ -22,14 +22,14 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-      ? business.business?.avatar
-      : null;
+    ? business.business?.avatar // 🔥 Đảm bảo lấy đúng avatar
+    : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-      ? business.business?.business_name
-      : "";
+    ? business.business?.business_name // 🔥 Đảm bảo lấy đúng tên
+    : "";
 
   // Xử lý đăng xuất
   const handleLogout = () => {
@@ -49,7 +49,8 @@ function App() {
     {
       key: "profile",
       label: isUserLoggedIn ? "Hồ sơ cá nhân" : "Hồ sơ doanh nghiệp",
-      onClick: () => navigate(isUserLoggedIn ? "/profile" : "/business-profile"),
+      onClick: () =>
+        navigate(isUserLoggedIn ? "/profile" : "/business-profile"),
     },
     {
       key: "logout",
@@ -77,7 +78,6 @@ function App() {
                 <span>{displayName}</span>
               </Space>
             </Dropdown>
-
           ) : (
             <>
               <Button type="primary" onClick={() => navigate("/login")}>
