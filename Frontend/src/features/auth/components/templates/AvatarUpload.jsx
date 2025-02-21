@@ -24,6 +24,11 @@ const AvatarUpload = ({ avatar, onUpdate }) => {
             const res = await axios.put(`/api/user/update/${userId}`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
+            console.log("API Response:", res.data);
+
+            if (!res.data || !res.data.user || !res.data.user.avatar) {
+                throw new Error("Dữ liệu API không hợp lệ!");
+            }
 
             console.log("Upload thành công:", res.data);
 
