@@ -11,7 +11,7 @@ export const useSignup = () => {
             return await signupUser(payload);
         },
         onSuccess: () => {
-            message.success("Đăng ký thành công!");
+            message.success("Vui lòng kiểm tra email để xác nhận tài khoản!");
             navigate("/login");
         },
         onError: (error) => {

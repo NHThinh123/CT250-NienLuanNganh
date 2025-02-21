@@ -17,7 +17,12 @@ router.get('/verified', (req, res) => {
   }
 });
 router.get('/id/:id', getUserById);
-router.put('/update/:id', upload.single('avatar'), updateUser);
+router.put('/update/:id', upload.single('avatar'), updateUser, (req, res) => {
+  console.log("👉 Request received at /api/user/update/:id");
+  console.log("🔹 Headers:", req.headers);
+  console.log("🔹 Body:", req.body);
+  console.log("🔹 File:", req.file);  // Kiểm tra ảnh có được gửi không
+});
 
 router.post("/upload-avatar", upload.single('avatar'), uploadAvatar);
 router.post("/login", signin);

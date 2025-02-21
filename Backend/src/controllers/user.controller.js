@@ -68,30 +68,40 @@ const getUserById = async (req, res, next) => {
 //cập nhật thông tin người dùng
 const updateUser = async (req, res, next) => {
   try {
-    const { id } = req.params;  // Lấy ID user từ params
-    const updateData = req.body;
+    const { id } = req.params;
+    let updateData = {}; // Dữ liệu cập nhật user
 
-    // Kiểm tra user có tồn tại không
+    // Tìm user trước khi cập nhật
     const user = await User.findById(id);
     if (!user) {
-      return next(new AppError(404, "Người dùng không tồn tại"));
+      return res.status(404).json({ error: "Người dùng không tồn tại!" });
     }
 
     // Nếu có file ảnh mới => upload lên Cloudinary
     if (req.file) {
-      const avatarUrl = req.file.path;  // URL ảnh từ Cloudinary
-      updateData.avatar = avatarUrl; // Thêm avatar mới vào updateData
+      const avatarUrl = req.file.path;
+      updateData.avatar = avatarUrl;
 
-      // Nếu user có avatar cũ => Xóa ảnh cũ trên Cloudinary (nếu cần)
+      // Nếu user có avatar cũ => Xóa ảnh cũ trên Cloudinary
       if (user.avatar) {
-        const publicId = user.avatar.split('/').pop().split('.')[0]; // Lấy public_id từ URL cũ
-        await cloudinary.uploader.destroy(publicId); // Xóa ảnh cũ trên Cloudinary
+        try {
+          const publicId = user.avatar.split('/').pop().split('.')[0];
+          await cloudinary.uploader.destroy(publicId); // Xóa ảnh cũ trên Cloudinary
+        } catch (err) {
+          console.error("Lỗi khi xóa ảnh cũ trên Cloudinary:", err);
+        }
       }
     }
 
     // Cập nhật thông tin user
     const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
 
+    // Kiểm tra nếu cập nhật thất bại
+    if (!updatedUser) {
+      return res.status(500).json({ error: "Cập nhật thông tin thất bại!" });
+    }
+
+    // Trả về thông tin user sau khi cập nhật
     res.status(200).json({
       message: "Cập nhật thông tin thành công",
       user: {
@@ -102,11 +112,11 @@ const updateUser = async (req, res, next) => {
         dateOfBirth: updatedUser.dateOfBirth,
       }
     });
-
   } catch (error) {
-    console.error("Lỗi khi cập nhật user:", error);
-    return res.status(500).json({ message: "Lỗi! Không thể cập nhật thông tin user" });
+    console.error("Lỗi server khi cập nhật user:", error);
+    res.status(500).json({ error: "Lỗi server. Vui lòng thử lại!" });
   }
+
 };
 
 //singup

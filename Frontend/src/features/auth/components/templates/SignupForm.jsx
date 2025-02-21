@@ -1,6 +1,6 @@
 import { Form, Input, Button, Checkbox, Card, Row, Col, DatePicker } from "antd";
 import { useSignup } from "../../hooks/useSignup";
-
+import dayjs from "dayjs"; // Thay thế moment bằng dayjs
 
 const SignupForm = () => {
     const { mutate: signupMutation } = useSignup();
@@ -10,9 +10,14 @@ const SignupForm = () => {
             email: values.email,
             password: values.password,
             name: values.name,
-            dateOfBirth: values.dateOfBirth,
+            dateOfBirth: values.dateOfBirth.format("YYYY-MM-DD"), // Chuyển đổi sang chuỗi trước khi gửi
             role: values.role,
         });
+    };
+
+    // Chặn ngày sinh lớn hơn ngày hiện tại
+    const disabledDate = (current) => {
+        return current && current.isAfter(dayjs().endOf("day"));
     };
 
     return (
@@ -65,18 +70,17 @@ const SignupForm = () => {
                             <Input.Password size="large" />
                         </Form.Item>
 
-
+                        {/* Ngày sinh với DatePicker + disabledDate */}
                         <Form.Item
                             label="Ngày sinh"
                             name="dateOfBirth"
-                            rules={[
-                                { required: true, message: "Hãy nhập ngày sinh" }
-                            ]}
+                            rules={[{ required: true, message: "Hãy nhập ngày sinh" }]}
                         >
                             <DatePicker
                                 format="YYYY-MM-DD"
                                 placeholder="Chọn ngày sinh"
                                 style={{ width: "100%" }}
+                                disabledDate={disabledDate} // Sửa lỗi ở đây
                             />
                         </Form.Item>
 
