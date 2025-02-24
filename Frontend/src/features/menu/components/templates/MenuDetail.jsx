@@ -2,11 +2,9 @@ import { Col, Row } from "antd";
 import { MenuProvider } from "../molecules/MenuContext";
 import MenuList from "../organisms/MenuList";
 import MenuDetailList from "../organisms/MenuDetailList";
-// import ReviewList from "../../../review/components/templates/ReviewList";
+import ReviewList from "../../../review/components/templates/ReviewList";
 
 const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
-  // const menuRefs = useRef({}); // Lưu trữ ref của từng menu
-
   if (isLoadingMenu) {
     return <h1>Loading...</h1>;
   }
@@ -15,28 +13,10 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
     return <h1>Error...</h1>;
   }
 
-  // Khi nhấn vào menu => Cuộn trang web đến vị trí menu tương ứng
-  // const handleMenuClick = (e) => {
-  //   const menuId = e.key;
-  //   const element = menuRefs.current[menuId];
-
-  //   if (element) {
-  //     const offsetTop =
-  //       element.getBoundingClientRect().top + window.scrollY - 50; // 50px để tránh bị che
-  //     window.scrollTo({ top: offsetTop, behavior: "smooth" });
-  //   }
-  // };
-
   //In hoa tên menu
   const capitalizeMenuName = (name) => {
     return name.toUpperCase();
   };
-
-  //Duyệt qua mảng menuData để tạo ra mảng items
-  // const items = menuData.map((menu) => ({
-  //   key: menu._id,
-  //   label: capitalizeMenuName(menu.menu_name),
-  // }));
 
   return (
     <>
@@ -79,7 +59,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
                 marginLeft: "20px",
               }}
             >
-              {/* <ReviewList businessId={businessId}></ReviewList> */}
+              <ReviewList businessId={menuData.business_id}></ReviewList>
             </div>
           </Col>
 
