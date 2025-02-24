@@ -21,8 +21,7 @@ const getListDishService = async (page = 1, limit = 10, search = "") => {
 };
 
 const getDishByIdService = async (id) => {
-  return await Dish.findById(id)
-    .populate("menu_id", "menu_name");
+  return await Dish.findById(id).populate("menu_id", "menu_name");
 };
 
 const deleteDishService = async (id) => {
@@ -64,7 +63,7 @@ const updateDishService = async (id, dataUpdate, imagePaths) => {
   let imageUrls = existingDish.dish_url || []; // Giữ ảnh cũ
 
   // Kiểm tra số lượng ảnh
-  if(imageUrls.length = 5) {
+  if (imageUrls.length == 5) {
     throw new Error("Cannot upload more than images for this dish");
   }
 
@@ -82,14 +81,13 @@ const updateDishService = async (id, dataUpdate, imagePaths) => {
 };
 
 const getDishesByMenuIdService = async (menuId) => {
-    try {
-        const dishes = await Dish.find({ menu_id: menuId });
-        return dishes;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+  try {
+    const dishes = await Dish.find({ menu_id: menuId });
+    return dishes;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
-
 
 module.exports = {
   getListDishService,
@@ -98,5 +96,5 @@ module.exports = {
   createDishService,
   updateDishService,
   deleteDishService,
-  getDishesByMenuIdService
+  getDishesByMenuIdService,
 };

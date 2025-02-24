@@ -16,4 +16,5 @@ router.get("/getMenusByBusinessId/:id", getMenusByBusinessId);
 router.get("/:id", getMenuById);
 router.put("/:id", updateMenu);
 router.delete("/:id", deleteMenu);
-router.module.exports = router;
+
+module.exports = router;
