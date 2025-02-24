@@ -1,9 +1,8 @@
 import { Form, Input, Button, Checkbox, Card, Row, Col } from "antd";
 import { useLogin } from "../../hooks/useLogin";
 
-
 const LoginForm = () => {
-    const { mutate: loginMutation } = useLogin();
+    const { mutate: loginMutation, isLoading } = useLogin(); // Thêm isLoading để kiểm tra trạng thái đăng nhập
 
     const onFinish = (values) => {
         loginMutation({
@@ -29,7 +28,8 @@ const LoginForm = () => {
                         Điền vào thông tin email và mật khẩu
                     </p>
 
-                    <Form name="login-form" layout="vertical" initialValues={{ remember: true }} onFinish={onFinish}>
+                    {/* Disabled form khi đang loading */}
+                    <Form name="login-form" layout="vertical" initialValues={{ remember: true }} onFinish={onFinish} disabled={isLoading}>
                         <Form.Item label="Email" name="email" rules={[{ required: true, message: "Hãy nhập số điện thoại hoặc email" }]}>
                             <Input size="large" />
                         </Form.Item>
@@ -40,13 +40,14 @@ const LoginForm = () => {
 
                         <Form.Item>
                             <Row justify="space-between">
-                                <Checkbox>Hãy Nhớ Tôi</Checkbox>
+                                <Checkbox disabled={isLoading}>Hãy Nhớ Tôi</Checkbox>
                             </Row>
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" block size="large" loading={loginMutation.isLoading}>
-                                Đăng Nhập
+                            {/* Nút đăng nhập hiển thị trạng thái loading */}
+                            <Button type="primary" htmlType="submit" block size="large" loading={isLoading} disabled={isLoading}>
+                                {isLoading ? "Đang đăng nhập..." : "Đăng Nhập"}
                             </Button>
                         </Form.Item>
 

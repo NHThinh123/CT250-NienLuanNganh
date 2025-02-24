@@ -69,7 +69,8 @@ const getUserById = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    let updateData = {}; // Dữ liệu cập nhật user
+    const { name, dateOfBirth } = req.body;
+    let updateData = {};
 
     // Tìm user trước khi cập nhật
     const user = await User.findById(id);
@@ -77,16 +78,29 @@ const updateUser = async (req, res, next) => {
       return res.status(404).json({ error: "Người dùng không tồn tại!" });
     }
 
+    // Nếu có tên mới, thêm vào dữ liệu cập nhật
+    if (name) {
+      updateData.name = name;
+    }
+
+    // Nếu có dateOfBirth, kiểm tra hợp lệ rồi thêm vào dữ liệu cập nhật
+    if (dateOfBirth) {
+      const dob = new Date(dateOfBirth);
+      if (isNaN(dob.getTime())) {
+        return res.status(400).json({ error: "Ngày sinh không hợp lệ!" });
+      }
+      updateData.dateOfBirth = dob;
+    }
+
     // Nếu có file ảnh mới => upload lên Cloudinary
     if (req.file) {
-      const avatarUrl = req.file.path;
-      updateData.avatar = avatarUrl;
+      updateData.avatar = req.file.path;
 
       // Nếu user có avatar cũ => Xóa ảnh cũ trên Cloudinary
-      if (user.avatar) {
+      if (user.avatar && user.avatar.includes("cloudinary.com")) {
         try {
-          const publicId = user.avatar.split('/').pop().split('.')[0];
-          await cloudinary.uploader.destroy(publicId); // Xóa ảnh cũ trên Cloudinary
+          const publicId = user.avatar.split("/").pop().split(".")[0];
+          await cloudinary.uploader.destroy(publicId);
         } catch (err) {
           console.error("Lỗi khi xóa ảnh cũ trên Cloudinary:", err);
         }
@@ -94,7 +108,10 @@ const updateUser = async (req, res, next) => {
     }
 
     // Cập nhật thông tin user
-    const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true, // Chạy validator để kiểm tra dữ liệu hợp lệ
+    });
 
     // Kiểm tra nếu cập nhật thất bại
     if (!updatedUser) {
@@ -110,14 +127,15 @@ const updateUser = async (req, res, next) => {
         email: updatedUser.email,
         avatar: updatedUser.avatar,
         dateOfBirth: updatedUser.dateOfBirth,
-      }
+      },
     });
   } catch (error) {
     console.error("Lỗi server khi cập nhật user:", error);
     res.status(500).json({ error: "Lỗi server. Vui lòng thử lại!" });
   }
-
 };
+
+
 
 //singup
 const signup = async (req, res) => {

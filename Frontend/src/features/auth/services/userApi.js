@@ -14,8 +14,9 @@ const signupUser = (data) => {
 //api cập nhật thông tin người dùng
 const updateUser = (id, data) => {
   const URL_API = `/api/user/update/${id}`;
-  console.log("api", data);
-  return axios.put(URL_API, data);
+  return axios.put(URL_API, data, {
+    headers: { "Content-Type": data instanceof FormData ? "multipart/form-data" : "application/json" },
+  });
 };
 //api lấy id người dùng
 const getUserProfile = (id) => {
