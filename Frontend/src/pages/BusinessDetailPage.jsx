@@ -9,8 +9,6 @@ const BusinessDetailPage = () => {
   const { businessData, isLoadingBusiness, isErrorBusiness } =
     useBusinessById(id);
   const { menuData, isLoadingMenu, isErrorMenu } = useMenuByBusinessId(id);
-  console.log(businessData, isLoadingBusiness, isErrorBusiness);
-  console.log(menuData, isLoadingMenu, isErrorMenu);
   return (
     <>
       <div>
@@ -25,6 +23,7 @@ const BusinessDetailPage = () => {
           menuData={menuData}
           isLoadingMenu={isLoadingMenu}
           isErrorMenu={isErrorMenu}
+          business_id={id}
         />
       </div>
     </>
