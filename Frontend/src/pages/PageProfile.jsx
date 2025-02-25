@@ -30,7 +30,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <Card title="Hồ sơ cá nhân" style={{ maxWidth: 600, margin: "auto" }}>
+        <Card title={<span style={{ fontWeight: 'bold' }}>Hồ sơ cá nhân</span>} style={{ maxWidth: 600, margin: "auto", textAlign: "center" }}>
             <AvatarUpload avatar={auth.user.avatar} onUpdate={handleUpdate} />
             {isEditing ? (
                 <ProfileForm user={auth.user} onSave={handleUpdate} onCancel={() => setIsEditing(false)} />

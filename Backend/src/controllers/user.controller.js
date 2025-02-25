@@ -1,10 +1,11 @@
 const bcrypt = require("bcrypt");
-
+const crypto = require("crypto");
 const path = require('path');
 const jwt = require("jsonwebtoken");
 const router = require("express").Router();
-const { sendVerificationEmail } = require("../services/email.service");
+const { sendVerificationEmail, sendResetPasswordEmail } = require("../services/email.service");
 const moment = require('moment');
+
 const cloudinary = require("../config/cloudinary");
 const {
   getListUserService,
@@ -13,6 +14,7 @@ const {
   updateUserService,
 } = require("../services/user.service");
 const User = require("../models/user.model");
+const ResetToken = require("../models/userResetpassword.model");
 
 const getListUser = async (req, res, next) => {
   try {
@@ -31,16 +33,7 @@ const helloUser = async (req, res, next) => {
   }
 };
 
-// const createUser = async (req, res, next) => {
-//   try {
-//     const { email, username, password, role } = req.body;
-//     const data = await createUserService(email, username, password, role);
-//     res.status(200).json(data);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-//lấy thông tin người dùng thông qua id
+
 const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -175,14 +168,6 @@ const signup = async (req, res) => {
       return res.status(400).json({ message: "Người dùng đã tồn tại" });
     }
 
-    // const isEmailValid = await verifyEmailExists(email);
-    // if (!isEmailValid) {
-    //   return res.status(400).json({
-    //     status: "FAILED",
-    //     message: "Email không tồn tại hoặc không thể gửi email xác thực"
-    //   });
-    // }
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Xử lý upload ảnh lên Cloudinary
@@ -305,5 +290,48 @@ const uploadAvatar = async (req, res) => {
     res.status(500).json({ message: "Lỗi upload ảnh", error });
   }
 }
+//Gửi yêu cầu đặt lại mật khẩu
+const requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "Email không được để trống!" });
+  }
 
-module.exports = { helloUser, getListUser, updateUser, signup, signin, getUserById, uploadAvatar };
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ message: "Email không tồn tại!" });
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const expiresAt = Date.now() + 15 * 60 * 1000; // Hết hạn sau 15 phút
+
+  await ResetToken.create({ userId: user._id, token: resetToken, expiresAt });
+
+  await sendResetPasswordEmail(user.email, resetToken);
+
+  res.status(200).json({ message: "Link đặt lại mật khẩu đã được gửi qua email!" });
+};
+//Đặt lại mật khẩu
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  if (!newPassword) {
+    return res.status(400).json({ message: "Mật khẩu không được để trống!" });
+  }
+
+  const resetToken = await ResetToken.findOne({ token });
+  if (!resetToken || resetToken.expiresAt < Date.now()) {
+    return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await User.findByIdAndUpdate(resetToken.userId, { password: hashedPassword });
+
+  await ResetToken.deleteOne({ token });
+
+  res.status(200).json({ message: "Mật khẩu đã được đặt lại thành công!" });
+};
+
+
+module.exports = { helloUser, getListUser, updateUser, signup, signin, getUserById, uploadAvatar, requestPasswordReset, resetPassword };

@@ -114,19 +114,20 @@ const AvatarUpload = ({ avatar }) => {
                     </div>
                 )}
             </div>
-            <Upload
-                showUploadList={false}
-                customRequest={({ file }) => handleUpload(file)}
-                disabled={isUploading}
-            >
-                <p style={{
-                    cursor: isUploading ? "not-allowed" : "pointer",
-                    color: isUploading ? "#999" : "blue",
-                    marginTop: 8
-                }}>
-                    <UploadOutlined /> {isUploading ? 'Đang tải lên...' : 'Đổi ảnh đại diện'}
-                </p>
-            </Upload>
+            <div style={{ marginTop: 8 }}>
+                <Upload
+                    showUploadList={false}
+                    customRequest={({ file }) => handleUpload(file)}
+                    disabled={isUploading}
+                >
+                    <p style={{
+                        cursor: isUploading ? "not-allowed" : "pointer",
+                        color: isUploading ? "#999" : "blue"
+                    }}>
+                        <UploadOutlined /> {isUploading ? 'Đang tải lên...' : 'Đổi ảnh đại diện'}
+                    </p>
+                </Upload>
+            </div>
         </div>
     );
 };

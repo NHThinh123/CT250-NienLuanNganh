@@ -1,7 +1,7 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { Layout, Button, Space, Avatar, Dropdown, Menu } from "antd";
+import { Layout, Button, Space, Avatar, Dropdown, Spin } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "./contexts/auth.context";
 import { BusinessContext } from "./contexts/business.context";
 import NavBar from "./components/templates/NavBar";
@@ -11,14 +11,14 @@ import ScrollToTop from "./components/atoms/ScrollToTop";
 
 function App() {
   const navigate = useNavigate();
-  const { auth, setAuth } = useContext(AuthContext); // User Context
-  const { business, setBusiness } = useContext(BusinessContext); // Business Context
+  const { auth, setAuth } = useContext(AuthContext);
+  const { business, setBusiness } = useContext(BusinessContext);
 
-  // Kiểm tra ai đang đăng nhập (User hay Business)
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // Trạng thái loading
+
   const isUserLoggedIn = auth?.isAuthenticated;
   const isBusinessLoggedIn = business?.isAuthenticated;
 
-  // Lấy thông tin avatar & tên theo loại tài khoản
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
@@ -31,20 +31,24 @@ function App() {
       ? business.business?.business_name
       : "";
 
-  // Xử lý đăng xuất
   const handleLogout = () => {
-    if (isUserLoggedIn) {
-      setAuth({ isAuthenticated: false, user: {} });
-      localStorage.removeItem("authUser");
-    }
-    if (isBusinessLoggedIn) {
-      setBusiness({ isAuthenticated: false, business: {} });
-      localStorage.removeItem("authBusiness");
-    }
-    navigate("/");
+    setIsLoggingOut(true); // Bật trạng thái loading
+
+    setTimeout(() => {
+      if (isUserLoggedIn) {
+        setAuth({ isAuthenticated: false, user: {} });
+        localStorage.removeItem("authUser");
+      }
+      if (isBusinessLoggedIn) {
+        setBusiness({ isAuthenticated: false, business: {} });
+        localStorage.removeItem("authBusiness");
+      }
+
+      setIsLoggingOut(false); // Tắt trạng thái loading
+      navigate("/");
+    }, 2000); // Giả lập loading 2 giây (có thể thay bằng API call)
   };
 
-  // Menu dropdown cho User hoặc Business
   const menuItems = [
     {
       key: "profile",
@@ -59,7 +63,26 @@ function App() {
   ];
 
   return (
-    <Layout style={{ margin: 0 }}>
+    <Layout style={{ margin: 0, position: "relative" }}>
+      {isLoggingOut && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <Spin size="large" tip="Đang đăng xuất..." />
+        </div>
+      )}
+
       <div
         style={{
           display: "flex",
@@ -77,7 +100,6 @@ function App() {
                 <span>{displayName}</span>
               </Space>
             </Dropdown>
-
           ) : (
             <>
               <Button type="primary" onClick={() => navigate("/login")}>

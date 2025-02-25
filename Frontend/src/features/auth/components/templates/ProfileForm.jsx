@@ -9,6 +9,9 @@ const ProfileForm = ({ user, onCancel }) => {
     const { auth, setAuth } = useContext(AuthContext);
     const updateProfile = useUpdateProfile();
 
+    const disabledDate = (current) => {
+        return current && current.isAfter(dayjs().endOf("day"));
+    };
     const handleSubmit = async (values) => {
         const updatedData = {
             name: values.name,
@@ -24,6 +27,7 @@ const ProfileForm = ({ user, onCancel }) => {
             localStorage.setItem("authUser", JSON.stringify(updatedUser));
 
             message.success("Cập nhật thông tin thành công!");
+            onCancel();
         } catch (error) {
             message.error("Cập nhật thất bại, vui lòng thử lại.");
             console.error("Lỗi cập nhật user:", error);
@@ -41,13 +45,17 @@ const ProfileForm = ({ user, onCancel }) => {
                 <Input />
             </Form.Item>
             <Form.Item label="Ngày sinh" name="dateOfBirth">
-                <DatePicker />
+                <DatePicker
+                    format="YYYY-MM-DD"
+                    style={{ width: "100%" }}
+                    disabledDate={disabledDate} // Sửa lỗi ở đây
+                />
             </Form.Item>
             <Button type="primary" htmlType="submit" loading={updateProfile.isLoading}>
                 Lưu
             </Button>
             <Button onClick={onCancel} style={{ marginLeft: 8 }}>
-                Hủy
+                Thoát
             </Button>
         </Form>
     );
