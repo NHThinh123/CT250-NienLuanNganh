@@ -2,7 +2,9 @@ import { Button, Col, List, Row } from "antd";
 
 import usePost from "../../../post/hooks/usePost";
 import PostCard from "../../../post/components/organisms/PostCard";
+import { useNavigate } from "react-router-dom";
 const ListPostHome = () => {
+  const navigate = useNavigate();
   const { postData, loading } = usePost();
   if (loading) {
     return <div>Loading...</div>;
@@ -20,7 +22,11 @@ const ListPostHome = () => {
           )}
         />
         <div style={{ margin: "8px" }}>
-          <Button type="dashed" style={{ width: "100%", padding: "16px" }}>
+          <Button
+            onClick={() => navigate("/posts")}
+            type="dashed"
+            style={{ width: "100%", padding: "16px" }}
+          >
             Xem thêm
           </Button>
         </div>

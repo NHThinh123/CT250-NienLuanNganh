@@ -9,7 +9,7 @@ import useLikePost from "../../hooks/useLikePost";
 import useUnlikePost from "../../hooks/useUnLikePost";
 import { AuthContext } from "../../../../contexts/auth.context";
 
-const PostFooter = ({ postData }) => {
+const PostFooter = ({ postData, showModal }) => {
   const { auth } = useContext(AuthContext);
   const { mutate: likePost } = useLikePost();
   const { mutate: unlikePost } = useUnlikePost();
@@ -66,7 +66,7 @@ const PostFooter = ({ postData }) => {
           </Button>
         </Col>
         <Col span={8}>
-          <Button type="text">
+          <Button type="text" onClick={showModal}>
             <MessageOutlined />
             <Typography.Text> Bình luận</Typography.Text>
           </Button>

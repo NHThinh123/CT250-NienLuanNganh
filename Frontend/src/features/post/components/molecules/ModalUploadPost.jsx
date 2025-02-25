@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import {
   Avatar,
   Button,
@@ -11,12 +10,12 @@ import {
   Row,
   Typography,
 } from "antd";
-import { CloudLightning, Images, MapPinned, Tags } from "lucide-react";
+import { Images, MapPinned, Tags } from "lucide-react";
 import UploadImage from "../atoms/UploadImage";
 import { useContext, useState } from "react";
 import UploadTag from "../atoms/UploadTag";
 import useCreatePost from "../../hooks/useCreatePost";
-import { Navigate, useNavigate } from "react-router-dom";
+
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import { AuthContext } from "../../../../contexts/auth.context";
 
@@ -27,14 +26,14 @@ const ModalUploadPost = ({
   form,
   setIsModalOpen,
 }) => {
-  const { auth, setAuth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
   const { mutate: createPost, isPending } = useCreatePost();
   const [tags, setTags] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [isShowUploadImage, setIsShowUploadImage] = useState(false);
   const [isShowUploadTag, setIsShowUploadTag] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
-  const navigate = useNavigate();
 
   const handleShowUploadImage = () => {
     setIsShowUploadImage(true);

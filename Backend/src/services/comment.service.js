@@ -27,7 +27,7 @@ const getListCommentByPostService = async (post_id) => {
   }
   // Lấy tất cả comment của bài post
   let comments = await Comment.find({ post_id: post_id })
-    .populate("user_id", "name _id")
+    .populate("user_id", "name _id avatar")
     .lean();
 
   // Tạo danh sách comment cha

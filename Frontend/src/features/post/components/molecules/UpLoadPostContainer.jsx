@@ -1,12 +1,10 @@
-import { Avatar, Button, Col, Form, Row } from "antd";
+import { Button, Col, Form, Row, Typography } from "antd";
 import { ChefHat, Utensils } from "lucide-react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import ModalUploadPost from "./ModalUploadPost";
-import { AuthContext } from "../../../../contexts/auth.context";
 
 const UpLoadPostContainer = () => {
-  const { auth } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const showModal = () => {
@@ -23,10 +21,8 @@ const UpLoadPostContainer = () => {
   return (
     <BoxContainer>
       <Row>
-        <Col span={4}>
-          <Avatar src={auth?.user?.avatar}></Avatar>
-        </Col>
-        <Col span={20}>
+        <Col span={24}>
+          <Typography.Title level={4}>Bài viết</Typography.Title>
           <Button type="default" style={{ width: "100%" }} onClick={showModal}>
             Đăng tải bài viết
           </Button>

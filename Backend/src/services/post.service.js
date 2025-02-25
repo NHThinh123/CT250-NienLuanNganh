@@ -11,9 +11,15 @@ const Tag = require("../models/tag.model");
 require("dotenv").config();
 
 const getListPostService = async (user_id) => {
+  // Kiểm tra user_id có hợp lệ không
+  const isValidUserId = mongoose.Types.ObjectId.isValid(user_id);
+  const userObjectId = isValidUserId
+    ? new mongoose.Types.ObjectId(user_id)
+    : null;
+
   let result = await Post.aggregate([
     {
-      //tìm kiếm thông tin user tác giả
+      // Tìm kiếm thông tin user tác giả
       $lookup: {
         from: "users",
         localField: "user_id",
@@ -21,10 +27,9 @@ const getListPostService = async (user_id) => {
         as: "user",
       },
     },
-    //chuyển user từ mảng object về object
     { $unwind: "$user" },
     {
-      // tìm kiếm ảnh của bài viết
+      // Tìm kiếm ảnh của bài viết
       $lookup: {
         from: "assets",
         localField: "_id",
@@ -33,7 +38,7 @@ const getListPostService = async (user_id) => {
       },
     },
     {
-      // tìm kiếm tag của bài viết
+      // Tìm kiếm tag của bài viết
       $lookup: {
         from: "post_tags",
         localField: "_id",
@@ -50,7 +55,7 @@ const getListPostService = async (user_id) => {
       },
     },
     {
-      // tìm danh sách id người like bài viết
+      // Tìm danh sách id người like bài viết
       $lookup: {
         from: "user_like_posts",
         localField: "_id",
@@ -59,31 +64,31 @@ const getListPostService = async (user_id) => {
       },
     },
     {
-      //tính số lượt like và user đang đăng nhập có like bài viết không
+      // Tính số lượt like và kiểm tra user có like bài viết không
       $addFields: {
         likeCount: { $size: "$likes" },
-        isLike: {
-          $cond: {
-            if: {
-              $in: [new mongoose.Types.ObjectId(user_id), "$likes.user_id"],
-            },
-            then: 1,
-            else: 0,
-          },
-        },
+        isLike: isValidUserId
+          ? {
+              $cond: {
+                if: { $in: [userObjectId, "$likes.user_id"] },
+                then: 1,
+                else: 0,
+              },
+            }
+          : 0, // Nếu user_id không hợp lệ thì isLike = 0
       },
     },
     {
-      // chọn ra những trường cần thiết
+      // Chọn ra những trường cần thiết
       $project: {
         user_id: 1,
         "user.name": 1,
         "user.email": 1,
         "user.avatar": 1,
-        title: 1, // Tiêu đề bài viết
-        content: 1, // Nội dung bài viết
-        createdAt: 1, // Ngày tạo
-        updatedAt: 1, // Ngày cập nhật
+        title: 1,
+        content: 1,
+        createdAt: 1,
+        updatedAt: 1,
         images: 1,
         tags: 1,
         likeCount: 1,
