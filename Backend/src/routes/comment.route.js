@@ -11,7 +11,7 @@ const router = express.Router();
 
 //Public routes
 router.post("/create", createComment);
-router.get("/post/:post_id", getListCommentByPost);
+router.get("/", getListCommentByPost);
 router.get("/reply/:comment_id", getReplyByComment);
 router.get("/:id", getCommentById);
 router.put("/:id", updateComment);

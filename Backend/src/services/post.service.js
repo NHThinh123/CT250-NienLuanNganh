@@ -64,9 +64,19 @@ const getListPostService = async (user_id) => {
       },
     },
     {
+      // Tìm danh sách comment của bài viết
+      $lookup: {
+        from: "comments",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "comments",
+      },
+    },
+    {
       // Tính số lượt like và kiểm tra user có like bài viết không
       $addFields: {
         likeCount: { $size: "$likes" },
+        commentCount: { $size: "$comments" },
         isLike: isValidUserId
           ? {
               $cond: {
@@ -92,6 +102,7 @@ const getListPostService = async (user_id) => {
         images: 1,
         tags: 1,
         likeCount: 1,
+        commentCount: 1,
         isLike: 1,
       },
     },

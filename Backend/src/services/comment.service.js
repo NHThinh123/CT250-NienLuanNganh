@@ -21,13 +21,15 @@ const createCommentService = async (
   return result;
 };
 
-const getListCommentByPostService = async (post_id) => {
+const getListCommentByPostService = async (query) => {
+  const { post_id } = query;
   if (!mongoose.Types.ObjectId.isValid(post_id)) {
     throw new AppError("Invalid post ID", 400);
   }
   // Lấy tất cả comment của bài post
   let comments = await Comment.find({ post_id: post_id })
     .populate("user_id", "name _id avatar")
+    .sort({ createdAt: -1 })
     .lean();
 
   // Tạo danh sách comment cha

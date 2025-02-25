@@ -24,8 +24,7 @@ const createComment = async (req, res, next) => {
 
 const getListCommentByPost = async (req, res, next) => {
   try {
-    const { post_id } = req.params;
-    const data = await getListCommentByPostService(post_id);
+    const data = await getListCommentByPostService(req.query);
     res.status(200).json(data);
   } catch (error) {
     next(error);

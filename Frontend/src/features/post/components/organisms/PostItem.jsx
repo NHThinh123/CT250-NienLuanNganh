@@ -18,7 +18,11 @@ const PostItem = ({ postData }) => {
       <PostHeader userData={postData?.user}></PostHeader>
       <PostBody postData={postData}></PostBody>
       <PostImages imagesData={postData?.images}></PostImages>
-      <PostFooter postData={postData} showModal={showModal}></PostFooter>
+      <PostFooter
+        postData={postData}
+        showModal={showModal}
+        commentCount={postData?.commentCount}
+      ></PostFooter>
       <CommentModal
         post_id={postData?._id}
         isModalOpen={isModalOpen}

@@ -7,7 +7,7 @@ const useComment = (post_id) => {
     isLoading: loading,
     isError,
   } = useQuery({
-    queryKey: ["posts", post_id],
+    queryKey: ["comments", post_id],
     queryFn: () => getCommentApi(post_id),
   });
 
