@@ -292,6 +292,7 @@ const uploadAvatar = async (req, res) => {
 }
 //Gửi yêu cầu đặt lại mật khẩu
 const requestPasswordReset = async (req, res) => {
+  console.log("Request body received:", req.body);
   const { email } = req.body;
   if (!email) {
     return res.status(400).json({ message: "Email không được để trống!" });
@@ -313,25 +314,68 @@ const requestPasswordReset = async (req, res) => {
 };
 //Đặt lại mật khẩu
 const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ message: "Mật khẩu không được để trống!" });
+    }
+
+    const resetToken = await ResetToken.findOne({ token });
+
+    if (!resetToken || !resetToken.userId || resetToken.expiresAt < Date.now()) {
+      return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
+    }
+
+    // Mã hóa mật khẩu mới
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Cập nhật mật khẩu của user
+    const updatedUser = await User.findByIdAndUpdate(
+      resetToken.userId,
+      { password: hashedPassword },
+      { new: true } // Trả về user đã được cập nhật
+    );
+
+    if (!updatedUser) {
+      return res.status(400).json({ message: "Không tìm thấy người dùng, đặt lại mật khẩu thất bại!" });
+    }
+
+    // Xóa token đặt lại mật khẩu sau khi sử dụng
+    await ResetToken.findOneAndDelete({ token });
+
+    res.status(200).json({ message: "Mật khẩu đã được đặt lại thành công! Vui lòng đăng nhập lại." });
+  } catch (error) {
+    console.error("Lỗi đặt lại mật khẩu:", error);
+    res.status(500).json({ message: "Lỗi server khi đặt lại mật khẩu" });
+  }
+};
+//Lấy email
+const getEmail = async (req, res) => {
   const { token } = req.params;
-  const { newPassword } = req.body;
 
-  if (!newPassword) {
-    return res.status(400).json({ message: "Mật khẩu không được để trống!" });
+  try {
+    // Tìm token trong bảng ResetToken
+    const resetRequest = await ResetToken.findOne({ token });
+
+    if (!resetRequest) {
+      return res.status(404).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+    }
+
+    // Dùng userId để tìm user trong bảng Users
+    const user = await User.findById(resetRequest.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+
+    // Trả về email của người dùng
+    res.json({ email: user.email });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server, vui lòng thử lại" });
   }
-
-  const resetToken = await ResetToken.findOne({ token });
-  if (!resetToken || resetToken.expiresAt < Date.now()) {
-    return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
-  }
-
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await User.findByIdAndUpdate(resetToken.userId, { password: hashedPassword });
-
-  await ResetToken.deleteOne({ token });
-
-  res.status(200).json({ message: "Mật khẩu đã được đặt lại thành công!" });
 };
 
 
-module.exports = { helloUser, getListUser, updateUser, signup, signin, getUserById, uploadAvatar, requestPasswordReset, resetPassword };
+module.exports = { helloUser, getListUser, updateUser, signup, signin, getUserById, uploadAvatar, requestPasswordReset, resetPassword, getEmail };

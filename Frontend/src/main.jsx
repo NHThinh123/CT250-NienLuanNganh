@@ -22,6 +22,7 @@ import LoginBusinessPage from "./pages/LoginBusinessPage.jsx";
 import SignupBusinessPage from "./pages/SignupBusinessPage.jsx";
 import { AuthWrapper } from "./contexts/auth.context.jsx";
 import ProfilePage from "./pages/PageProfile.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 
 
 const queryClient = new QueryClient();
@@ -107,7 +108,11 @@ const router = createBrowserRouter([
   {
     path: "loginBusiness",
     element: <LoginBusinessPage />,
-  }
+  },
+  {
+    path: "resetpassword",
+    element: <ResetPasswordPage />,
+  },
 ]);
 createRoot(document.getElementById("root")).render(
   <StrictMode>

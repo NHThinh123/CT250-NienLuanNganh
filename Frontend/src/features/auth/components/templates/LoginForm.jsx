@@ -1,10 +1,12 @@
 import { Form, Input, Button, Checkbox, Card, Row, Col, Spin } from "antd";
 import { useLogin } from "../../hooks/useLogin";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
     const { mutate: loginMutation, isLoading } = useLogin();
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const onFinish = (values) => {
         setLoading(true); // Hiển thị loading khi bắt đầu đăng nhập
@@ -66,12 +68,21 @@ const LoginForm = () => {
                                 {loading ? "Đang đăng nhập..." : "Đăng Nhập"}
                             </Button>
                         </Form.Item>
+                        <Button
+                            type="default"
+                            block
+                            size="large"
+                            onClick={() => navigate("/")}
+                            style={{ marginTop: "10px" }}
+                        >
+                            Quay về trang chủ
+                        </Button>
 
                         <p style={{ textAlign: "center", marginTop: "20px" }}>
                             Nếu bạn không có tài khoản? <a href="/signup">Đăng Kí</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "20px" }}>
-                            Nếu bạn quên mật khẩu? <a href="/forgot-password">Đặt lại mật khẩu</a>
+                            Nếu bạn quên mật khẩu? <a href="/resetpassword">Đặt lại mật khẩu</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "20px" }}>
                             Nếu bạn là chủ doanh nghiệp ẩm thực? <a href="/loginBusiness">Đăng nhập Business</a>

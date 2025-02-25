@@ -24,4 +24,9 @@ const getUserProfile = (id) => {
   const URL_API = `/api/user/id/${id}`;
   return axios.get(URL_API);
 };
-export { loginUser, updateUser, getUserProfile, signupUser };
+//api gửi yêu cầu đặt lại mật khẩu
+const requestResetPassword = (email) => {
+  const URL_API = `/api/user/reset-password-request`;
+  return axios.post(URL_API, email);
+};
+export { loginUser, updateUser, getUserProfile, signupUser, requestResetPassword };

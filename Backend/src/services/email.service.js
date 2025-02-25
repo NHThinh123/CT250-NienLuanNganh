@@ -19,8 +19,10 @@ const sendVerificationEmail = async (user) => {
     const mailOptions = {
         from: process.env.AUTH_EMAIL,
         to: email,
-        subject: "Xác thực tài khoản",
-        html: `<p>Nhấn vào <a href="http://localhost:8080/api/user/verify/${_id}/${uniqueString}">đây</a> để xác thực tài khoản.</p>`,
+        subject: "Xác thực tài khoản Yumzy",
+        html: `<h1>Yumzy</h1>
+        <p>Chào mừng bạn đến với Yumzy! Cảm ơn bạn đã đăng kí tài khoản.</p>
+        <p>Nhấn vào <a href="http://localhost:8080/api/user/verify/${_id}/${uniqueString}">đây</a> để xác thực tài khoản.</p>`,
     };
 
     await transporter.sendMail(mailOptions);
@@ -32,9 +34,10 @@ const sendResetPasswordEmail = async (email, resetToken) => {
     const mailOptions = {
         from: process.env.AUTH_EMAIL,
         to: email,
-        subject: "Đặt lại mật khẩu",
-        html: `<p>Bạn đã yêu cầu đặt lại mật khẩu. Nhấn vào link bên dưới để tiếp tục:</p>
-             <a href="${resetLink}">${resetLink}</a>
+        subject: "Đặt lại mật khẩu Yumzy",
+        html: `<h1>Yumzy</h1>
+            <p>Bạn đã yêu cầu đặt lại mật khẩu. Nhấn vào link bên dưới để tiếp tục:</p>
+             <a href="${resetLink}">Đặt lại mật khẩu</a>
              <p>Liên kết này sẽ hết hạn sau 15 phút.</p>`,
     };
 
