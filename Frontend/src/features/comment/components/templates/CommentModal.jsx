@@ -19,6 +19,8 @@ const { TextArea } = Input;
 
 const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
   const { auth } = useContext(AuthContext);
+
+  const user_id = auth?.user?.id;
   const [form] = Form.useForm();
   const { commentData } = useComment(post_id);
   const { mutate: createComment } = useCreateComment();
@@ -75,45 +77,53 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
       onCancel={() => setIsModalOpen(false)}
       width={600}
       footer={
-        <Form form={form} onFinish={handleSubmit}>
-          <Row>
-            <Col span={20}>
-              <Form.Item name="comment_content">
-                <TextArea
-                  ref={inputRef}
-                  placeholder="Bình luận về bài viết này"
-                  autoSize={{ minRows: 1, maxRows: 5 }} // Mở rộng khi nhập dài
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleKeyDown} // Xử lý Enter
-                />
-              </Form.Item>
-            </Col>
-            <Col
-              span={4}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Form.Item>
-                <Button
-                  type="text"
-                  htmlType="submit"
-                  disabled={!inputValue.trim()} // Disable khi input rỗng
-                >
-                  <SendOutlined
-                    style={{
-                      fontSize: "20px",
-                      color: !inputValue.trim() ? "gray" : "#1890ff",
-                    }}
+        user_id ? (
+          <Form form={form} onFinish={handleSubmit}>
+            <Row>
+              <Col span={20}>
+                <Form.Item name="comment_content">
+                  <TextArea
+                    ref={inputRef}
+                    placeholder="Bình luận về bài viết này"
+                    autoSize={{ minRows: 1, maxRows: 5 }} // Mở rộng khi nhập dài
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown} // Xử lý Enter
                   />
-                </Button>
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
+                </Form.Item>
+              </Col>
+              <Col
+                span={4}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Form.Item>
+                  <Button
+                    type="text"
+                    htmlType="submit"
+                    disabled={!inputValue.trim()} // Disable khi input rỗng
+                  >
+                    <SendOutlined
+                      style={{
+                        fontSize: "20px",
+                        color: !inputValue.trim() ? "gray" : "#1890ff",
+                      }}
+                    />
+                  </Button>
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+        ) : (
+          <Typography.Text
+            style={{ textAlign: "center", width: "100%", display: "block" }}
+          >
+            Vui lòng đăng nhập để bình luận
+          </Typography.Text>
+        )
       }
     >
       <CommentList commentData={commentData} />

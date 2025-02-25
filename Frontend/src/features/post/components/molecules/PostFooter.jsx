@@ -8,6 +8,7 @@ import { useContext, useState } from "react";
 import useLikePost from "../../hooks/useLikePost";
 import useUnlikePost from "../../hooks/useUnLikePost";
 import { AuthContext } from "../../../../contexts/auth.context";
+import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
 
 const PostFooter = ({ postData, showModal, commentCount }) => {
   const { auth } = useContext(AuthContext);
@@ -16,9 +17,24 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
 
   const [isLiked, setIsLiked] = useState(postData?.isLike || false);
   const [likeCount, setLikeCount] = useState(postData?.likeCount || 0);
-
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
+    useState(false);
   const user_id = auth?.user?.id;
+  const showLoginRequiredModal = () => {
+    setIsLoginRequiredModalOpen(true);
+  };
 
+  const handleCancel = () => {
+    setIsLoginRequiredModalOpen(false);
+  };
+  // Hành động được bảo vệ (yêu cầu đăng nhập)
+  const handleAction = (action) => {
+    if (!user_id) {
+      showLoginRequiredModal();
+    } else {
+      action();
+    }
+  };
   const handleLike = () => {
     if (!isLiked) {
       likePost(
@@ -58,7 +74,7 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
     <>
       <Row style={{ textAlign: "center", marginTop: "16px" }}>
         <Col span={8}>
-          <Button type="text" onClick={handleLike}>
+          <Button type="text" onClick={() => handleAction(handleLike)}>
             <HeartFilled style={{ color: isLiked ? "#ff4d4f" : "gray" }} />
             <Typography.Text style={{ color: isLiked ? "#ff4d4f" : "black" }}>
               {likeCount} Yêu thích
@@ -78,6 +94,10 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
           </Button>
         </Col>
       </Row>
+      <LoginRequiredModal
+        isModalOpen={isLoginRequiredModalOpen}
+        handleCancel={handleCancel}
+      />
     </>
   );
 };
