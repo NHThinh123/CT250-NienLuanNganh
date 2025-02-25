@@ -25,5 +25,20 @@ const sendVerificationEmail = async (user) => {
 
     await transporter.sendMail(mailOptions);
 };
+const sendResetPasswordEmail = async (email, resetToken) => {
+    const resetLink = `http://localhost:8080/api/user/reset-password/${resetToken}`;
 
-module.exports = { sendVerificationEmail };
+
+    const mailOptions = {
+        from: process.env.AUTH_EMAIL,
+        to: email,
+        subject: "Đặt lại mật khẩu",
+        html: `<p>Bạn đã yêu cầu đặt lại mật khẩu. Nhấn vào link bên dưới để tiếp tục:</p>
+             <a href="${resetLink}">${resetLink}</a>
+             <p>Liên kết này sẽ hết hạn sau 15 phút.</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
+module.exports = { sendVerificationEmail, sendResetPasswordEmail };

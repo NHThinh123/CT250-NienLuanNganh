@@ -1,12 +1,9 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-const passwordResetSchema = new Schema({
-    userId: String,
-    resetString: String,
-    createAt: Date,
-    expriseAt: Date
+const resetTokenSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    token: { type: String, required: true },
+    expiresAt: { type: Date, required: true },
 });
 
-const passwordReset = mongoose.model('passwordReset', passwordResetSchema);
-module.exports = passwordReset;
+module.exports = mongoose.model("ResetToken", resetTokenSchema);

@@ -36,11 +36,16 @@ const helloUserService = async () => {
 //câp nhật thông tin người dùng
 const updateUserService = async (id, updateData) => {
   try {
-    const updateUser = await Business.findByIdAndUpdate(id, updateData, { new: true });
-    if (!updatedBusiness) {
-      throw new Error("Business không tồn tại");
+    const user = await User.findByIdAndUpdate(id, updateData, {
+      new: true, // Trả về dữ liệu mới sau khi cập nhật
+      runValidators: true, // Chạy validator để kiểm tra dữ liệu hợp lệ
+    });
+
+    if (!user) {
+      throw new Error("User not found");
     }
-    return updatedBusiness;
+
+    return user;
   } catch (error) {
     throw new Error(error.message);
   }
