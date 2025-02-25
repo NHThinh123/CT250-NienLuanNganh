@@ -3,8 +3,10 @@ import { MenuProvider } from "../molecules/MenuContext";
 import MenuList from "../organisms/MenuList";
 import MenuDetailList from "../organisms/MenuDetailList";
 import ReviewList from "../../../review/components/templates/ReviewList";
+import useReviewByBusinessId from "../../../review/hooks/useReviewByBusinessId";
 
-const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
+const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
+  const reviewData = useReviewByBusinessId(business_id);
   if (isLoadingMenu) {
     return <h1>Loading...</h1>;
   }
@@ -17,7 +19,6 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
   const capitalizeMenuName = (name) => {
     return name.toUpperCase();
   };
-
   return (
     <>
       <div style={styles.menuPage}>
@@ -26,6 +27,12 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
           <Col span={4}>
             <div style={{ padding: "13px 26px" }}>
               <p style={styles.titleMenu}>THỰC ĐƠN</p>
+            </div>
+          </Col>
+          <Col span={8}></Col>
+          <Col span={8}>
+            <div style={{ padding: "13px 26px" }}>
+              <p style={styles.titleMenu}>ĐÁNH GIÁ</p>
             </div>
           </Col>
         </Row>
@@ -55,11 +62,12 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
             <div
               style={{
                 backgroundColor: "#ffffff",
-                height: "300px",
                 marginLeft: "20px",
               }}
             >
-              <ReviewList businessId={menuData.business_id}></ReviewList>
+              <div>
+                <ReviewList reviewData={reviewData.reviewData}></ReviewList>
+              </div>
             </div>
           </Col>
 

@@ -42,7 +42,10 @@ const deleteReviewService = async (id) => {
 
 const getReviewsByBusinessIdService = async (businessId) => {
   try {
-    const reviews = await Review.find({ business_id: businessId });
+    const reviews = await Review.find({ business_id: businessId }).populate(
+      "user_id",
+      "avatar name"
+    );
     return reviews;
   } catch (error) {
     throw new Error(error.message);

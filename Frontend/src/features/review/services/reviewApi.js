@@ -15,11 +15,6 @@ const createReviewApi = (data) => {
   return axios.post(URL_API, data);
 };
 
-// const updateMenuApi = (id, data) => {
-//   const URL_API = `/api/menus/${id}`;
-//   return axios.put(URL_API, data);
-// };
-
 const deleteReviewApi = (id) => {
   const URL_API = `/api/reviews/${id}`;
   return axios.delete(URL_API);

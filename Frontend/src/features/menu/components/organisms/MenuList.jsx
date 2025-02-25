@@ -2,11 +2,11 @@ import { Menu } from "antd";
 import { useContext } from "react";
 import { MenuContext } from "../molecules/MenuContext";
 
-const MenuList = (menuData) => {
+const MenuList = ({ menuData }) => {
   const { handleMenuClick } = useContext(MenuContext);
 
   //Duyệt qua mảng menuData để tạo ra mảng items
-  const items = menuData.menuData.map((menu) => ({
+  const items = menuData.map((menu) => ({
     key: menu._id,
     label: menu.menu_name.toUpperCase(),
   }));
