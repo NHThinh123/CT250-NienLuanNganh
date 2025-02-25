@@ -1,10 +1,12 @@
-import { Col, Row, Menu, List } from "antd";
-import DisplayDishesByMenu from "../organisms/DisplayDishesByMenu";
-import { useRef } from "react";
+import { Col, Row } from "antd";
+import { MenuProvider } from "../molecules/MenuContext";
+import MenuList from "../organisms/MenuList";
+import MenuDetailList from "../organisms/MenuDetailList";
+import ReviewList from "../../../review/components/templates/ReviewList";
+import useReviewByBusinessId from "../../../review/hooks/useReviewByBusinessId";
 
-const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
-  const menuRefs = useRef({}); // Lưu trữ ref của từng menu
-
+const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
+  const reviewData = useReviewByBusinessId(business_id);
   if (isLoadingMenu) {
     return <h1>Loading...</h1>;
   }
@@ -13,29 +15,10 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
     return <h1>Error...</h1>;
   }
 
-  // Khi nhấn vào menu => Cuộn trang web đến vị trí menu tương ứng
-  const handleMenuClick = (e) => {
-    const menuId = e.key;
-    const element = menuRefs.current[menuId];
-
-    if (element) {
-      const offsetTop =
-        element.getBoundingClientRect().top + window.scrollY - 50; // 50px để tránh bị che
-      window.scrollTo({ top: offsetTop, behavior: "smooth" });
-    }
-  };
-
   //In hoa tên menu
   const capitalizeMenuName = (name) => {
     return name.toUpperCase();
   };
-
-  //Duyệt qua mảng menuData để tạo ra mảng items
-  const items = menuData.map((menu) => ({
-    key: menu._id,
-    label: capitalizeMenuName(menu.menu_name),
-  }));
-
   return (
     <>
       <div style={styles.menuPage}>
@@ -46,65 +29,46 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu }) => {
               <p style={styles.titleMenu}>THỰC ĐƠN</p>
             </div>
           </Col>
+          <Col span={8}></Col>
+          <Col span={8}>
+            <div style={{ padding: "13px 26px" }}>
+              <p style={styles.titleMenu}>ĐÁNH GIÁ</p>
+            </div>
+          </Col>
         </Row>
         <Row>
           <Col span={3}></Col>
-          <Col span={4}>
-            <div style={{ marginRight: "20px" }}>
-              <Menu
-                style={{
-                  borderRadius: "5px",
-                  fontSize: "13px",
-                  color: "#6D6f71",
-                  cursor: "pointer",
-                }}
-                defaultSelectedKeys={[items[0]?.key]}
-                mode="inline"
-                items={items}
-                onClick={handleMenuClick}
-              ></Menu>
-            </div>
-          </Col>
-          <Col
-            span={8}
-            style={{
-              backgroundColor: "#ffffff",
-              padding: "6px 15px",
-              borderRadius: "5px",
-            }}
-          >
-            <List
-              grid={{ gutter: 16, column: 1 }}
-              dataSource={menuData}
-              renderItem={(menu) => (
-                <List.Item>
-                  <div
-                    ref={(el) => (menuRefs.current[menu._id] = el)}
-                    style={styles.twocol}
-                  >
-                    <div
-                      style={{
-                        color: "#6D6f71",
-                        fontSize: "14px",
-                        paddingBottom: "20px",
-                      }}
-                    >
-                      {capitalizeMenuName(menu.menu_name)}
-                    </div>
-                    <DisplayDishesByMenu menuId={menu._id} />
-                  </div>
-                </List.Item>
-              )}
-            />
-          </Col>
+          <MenuProvider>
+            <Col span={4}>
+              <div style={{ marginRight: "20px" }}>
+                <MenuList menuData={menuData}></MenuList>
+              </div>
+            </Col>
+            <Col
+              span={8}
+              style={{
+                backgroundColor: "#ffffff",
+                padding: "6px 15px",
+                borderRadius: "5px",
+              }}
+            >
+              <MenuDetailList
+                menuData={menuData}
+                capitalizeMenuName={capitalizeMenuName}
+              ></MenuDetailList>
+            </Col>
+          </MenuProvider>
           <Col span={6}>
             <div
               style={{
                 backgroundColor: "#ffffff",
-                height: "300px",
                 marginLeft: "20px",
               }}
-            ></div>
+            >
+              <div>
+                <ReviewList reviewData={reviewData.reviewData}></ReviewList>
+              </div>
+            </div>
           </Col>
 
           <Col span={3}></Col>

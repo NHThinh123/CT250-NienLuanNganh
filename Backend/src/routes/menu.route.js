@@ -5,7 +5,7 @@ const {
   createMenu,
   updateMenu,
   deleteMenu,
-  getMenusByBusinessId
+  getMenusByBusinessId,
 } = require("../controllers/menu.controller");
 
 const router = express.Router();

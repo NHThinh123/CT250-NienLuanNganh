@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getMenusByBusinessIdApi } from "../services/menuApi";
 
 const useMenuByBusinessId = (id) => {
-    const {
+  const {
     data: menuData = [],
     isLoading: isLoadingMenu,
     isError: isErrorMenu,
@@ -10,7 +10,6 @@ const useMenuByBusinessId = (id) => {
     queryKey: ["menus", id],
     queryFn: () => getMenusByBusinessIdApi(id),
   });
-  console.log(menuData);
   return { menuData, isLoadingMenu, isErrorMenu };
 };
 
