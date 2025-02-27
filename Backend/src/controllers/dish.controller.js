@@ -1,3 +1,4 @@
+const Menu = require("../models/menu.model");
 const {
   getListDishService,
   createDishService,
@@ -5,6 +6,7 @@ const {
   updateDishService,
   deleteDishService,
   getDishesByMenuIdService,
+  getListDishByBusinessIdService,
 } = require("../services/dish.service");
 
 const getListDish = async (req, res, next) => {
@@ -44,6 +46,12 @@ const createDish = async (req, res) => {
 
     const newDish = await createDishService(dishData, imagePaths);
 
+    // Lấy business_id từ menu_id
+    const menu = await Menu.findById(dishData.menu_id);
+    if (menu) {
+      await updateDishCostBusinessService(menu.business_id); // Cập nhật giá món thấp nhất và cao nhất
+    }
+
     res.status(201).json({ success: true, data: newDish });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -68,6 +76,15 @@ const updateDish = async (req, res) => {
     const imagePaths = req.files?.map((file) => file.path) || [];
 
     const updatedDish = await updateDishService(id, dataUpdate, imagePaths);
+    console.log(updateDish);
+
+    // Lấy business_id từ menu_id
+    if (dataUpdate.dish_price !== undefined) {
+      const menu = await Menu.findById(updateDish.menu_id);
+      if (menu) {
+        await updateDishCostBusinessService(menu.business_id); // Cập nhật giá món thấp nhất và cao nhất
+      }
+    }
 
     res.json({ success: true, data: updatedDish });
   } catch (error) {
@@ -79,6 +96,13 @@ const deleteDish = async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = await deleteDishService(id);
+
+    // Lấy business_id từ menu_id
+    const menu = await Menu.findById(dishData.menu_id);
+    if (menu) {
+      await updateDishCostBusinessService(menu.business_id); // Cập nhật giá món thấp nhất và cao nhất
+    }
+
     res.status(200).json(data);
   } catch (error) {
     next(error);
@@ -95,6 +119,16 @@ const getDishesByMenuId = async (req, res, next) => {
   }
 };
 
+const getListDishByBusinessId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await getListDishByBusinessIdService(id);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getListDish,
   getDishById,
@@ -102,4 +136,5 @@ module.exports = {
   updateDish,
   deleteDish,
   getDishesByMenuId,
+  getListDishByBusinessId,
 };

@@ -3,6 +3,7 @@ const {
   getBusinessByIdService,
   updateBusinessService,
   updateRatingAverageService,
+  updateDishCostBusinessService,
 } = require("../services/business.service");
 const AppError = require("../utils/AppError");
 const bcrypt = require("bcryptjs");
@@ -192,6 +193,16 @@ const updateRatingAverage = async (req, res, next) => {
   }
 };
 
+const updateDishCostBusiness = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updatedBusiness = await updateDishCostBusinessService(id);
+    res.status(200).json(updatedBusiness);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getBusiness,
   getBusinessById,
@@ -199,4 +210,5 @@ module.exports = {
   signupBusiness,
   loginBusiness,
   updateRatingAverage,
+  updateDishCostBusiness,
 };
