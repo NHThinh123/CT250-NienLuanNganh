@@ -1,7 +1,30 @@
 import { HeartFilled } from "@ant-design/icons";
 import { Avatar, Button, Typography } from "antd";
+import useLikeComment from "../../hooks/useLikeComment";
+import useUnlikeComment from "../../hooks/useUnlikeComment";
+import { useContext } from "react";
+import { AuthContext } from "../../../../contexts/auth.context";
 
-const Comment = ({ commentData }) => {
+const Comment = ({ commentData, post_id }) => {
+  const { auth } = useContext(AuthContext);
+
+  const user_id = auth?.user?.id;
+  const { mutate: likeComment } = useLikeComment(post_id);
+  const { mutate: unlikeComment } = useUnlikeComment(post_id);
+
+  const handleLike = () => {
+    if (!commentData?.isLike)
+      likeComment({
+        user_id: user_id,
+        comment_id: commentData?._id,
+      });
+    else
+      unlikeComment({
+        user_id: user_id,
+        comment_id: commentData?._id,
+      });
+  };
+
   return (
     <div style={{ display: "flex", gap: "16px" }}>
       <div style={{ textAlign: "center" }}>
@@ -20,14 +43,20 @@ const Comment = ({ commentData }) => {
           <Typography.Text>{commentData?.comment_content}</Typography.Text>
         </div>
         <div style={{ display: "flex", gap: "4px" }}>
-          <Button type="link" style={{ padding: "0px 4px" }}>
-            <HeartFilled style={{ color: "gray" }} />
-            <Typography.Text>Yêu thích</Typography.Text>
+          <Button
+            type="link"
+            style={{ padding: "0px 4px", fontSize: "12px" }}
+            onClick={handleLike}
+          >
+            <HeartFilled
+              style={{ color: !commentData?.isLike ? "gray" : "#ff4d4f" }}
+            />
+            <p style={{ color: !commentData?.isLike ? "gray" : "#ff4d4f" }}>
+              {commentData?.likeCount} Yêu thích
+            </p>
           </Button>
-          <Button type="link" style={{ padding: "0px 4px" }}>
-            <Typography.Text style={{ fontWeight: "normal" }}>
-              Phản hồi
-            </Typography.Text>
+          <Button type="link" style={{ padding: "0px 4px", fontSize: "12px" }}>
+            <p style={{ fontWeight: "bold", color: "gray" }}>Phản hồi</p>
           </Button>
         </div>
       </div>

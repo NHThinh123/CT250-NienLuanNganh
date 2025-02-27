@@ -1,7 +1,7 @@
 import { Col, List, Row } from "antd";
 import Comment from "../organisms/Comment";
 
-const CommentList = ({ commentData }) => {
+const CommentList = ({ commentData, post_id }) => {
   if (commentData?.length < 1)
     return (
       <Row
@@ -36,7 +36,7 @@ const CommentList = ({ commentData }) => {
           <List.Item>
             <Row>
               <Col span={24}>
-                <Comment commentData={comment} />
+                <Comment commentData={comment} post_id={post_id} />
               </Col>
             </Row>
           </List.Item>
