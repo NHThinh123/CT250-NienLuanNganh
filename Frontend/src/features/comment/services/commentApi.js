@@ -32,7 +32,6 @@ const getReplyCommentApi = (comment_id, user_id) => {
 };
 const createReplyApi = (data) => {
   const URL_API = `/api/comments/create`;
-  console.log(data);
   return axios.post(URL_API, data);
 };
 export {

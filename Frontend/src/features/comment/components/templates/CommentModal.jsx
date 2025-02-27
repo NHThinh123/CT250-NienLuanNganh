@@ -23,7 +23,7 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
   const user_id = auth?.user?.id;
   const [form] = Form.useForm();
   const { commentData } = useComment(post_id);
-  const { mutate: createComment } = useCreateComment();
+  const { mutate: createComment, isPending } = useCreateComment();
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef(null);
 
@@ -126,7 +126,11 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
         )
       }
     >
-      <CommentList commentData={commentData} post_id={post_id} />
+      <CommentList
+        isPending={isPending}
+        commentData={commentData}
+        post_id={post_id}
+      />
     </Modal>
   );
 };

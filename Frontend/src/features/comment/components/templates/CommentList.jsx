@@ -1,7 +1,30 @@
 import { Col, List, Row } from "antd";
 import Comment from "../organisms/Comment";
+import { useEffect, useRef } from "react";
 
-const CommentList = ({ commentData, post_id, minWidth, height }) => {
+const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
+  const listRef = useRef(null); // Tạo ref để tham chiếu đến danh sách bình luận
+
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollTop = 0; // Cuộn lên đầu khi commentData thay đổi
+    }
+  }, [commentData]); // Theo dõi sự thay đổi của commentData
+
+  if (isPending)
+    return (
+      <Row
+        style={{
+          height: height || "380px",
+          padding: "0px 16px",
+          textAlign: "center",
+        }}
+        justify={"center"}
+        align={"middle"}
+      >
+        <p>Loading...</p>
+      </Row>
+    );
   if (commentData?.length < 1)
     return (
       <Row
