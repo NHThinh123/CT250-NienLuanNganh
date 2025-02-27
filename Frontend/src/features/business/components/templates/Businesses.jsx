@@ -1,9 +1,11 @@
-import { Col, Row, Card } from "antd";
+import { Col, Row, Card, Tooltip } from "antd";
 import { Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Business = ({ businessData }) => {
   const navigate = useNavigate();
+  const maxTitleLength = 20; // Giới hạn ký tự tiêu đề trước khi cắt
+  const maxDescriptionLength = 30; // Giới hạn ký tự mô tả trước khi cắt
   return (
     <>
       <Row gutter={[16, 16]}>
@@ -28,21 +30,45 @@ const Business = ({ businessData }) => {
               }
               onClick={() => navigate(`/businesses/${business._id}`)}
             >
-              <Card.Meta
-                title={business.business_name}
-                description={
-                  <div>
-                    <p>{business.location}</p>
-                    <p>
-                      <Clock
-                        size={17}
-                        style={{ marginRight: "8px", marginBottom: "-3px" }}
-                      />
-                      {business.open_hours} - {business.close_hours}
+              <div style={{ display: "inline-block" }}>
+                <Tooltip title={business.business_name}>
+                  <Card.Meta
+                    title={
+                      business.business_name.length > maxTitleLength
+                        ? business.business_name.slice(0, maxTitleLength) +
+                          "..."
+                        : business.business_name
+                    }
+                    style={{ marginBottom: 8 }}
+                  />
+                </Tooltip>
+              </div>
+              <div>
+                <div style={{ display: "inline-block" }}>
+                  <Tooltip title={`${business.location}`}>
+                    <p
+                      style={{
+                        marginBottom: 8,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {business.location.length > maxDescriptionLength
+                        ? business.location.slice(0, maxDescriptionLength) +
+                          "..."
+                        : business.location}
                     </p>
-                  </div>
-                }
-              />
+                  </Tooltip>
+                </div>
+              </div>
+              <p>
+                <Clock
+                  size={17}
+                  style={{ marginRight: "8px", marginBottom: "-3px" }}
+                />
+                {business.open_hours} - {business.close_hours}
+              </p>
             </Card>
           </Col>
         ))}
