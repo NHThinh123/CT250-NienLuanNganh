@@ -5,7 +5,7 @@ import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 
-import { FreeMode, Navigation, Thumbs } from "swiper/modules";
+import { FreeMode, Navigation, Thumbs, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 const BannerHome = () => {
   return (
@@ -15,8 +15,13 @@ const BannerHome = () => {
           "--swiper-navigation-size": "30px",
           marginBottom: "10px",
         }}
+        autoplay={{
+          delay: 2000,
+          disableOnInteraction: false,
+        }}
+        loop={true}
         spaceBetween={10}
-        modules={[FreeMode, Navigation, Thumbs]}
+        modules={[FreeMode, Navigation, Thumbs, Autoplay]}
         navigation
         className="mySwiper2"
       >

@@ -2,8 +2,9 @@ import { HeartFilled } from "@ant-design/icons";
 import { Avatar, Button, Typography } from "antd";
 import useLikeComment from "../../hooks/useLikeComment";
 import useUnlikeComment from "../../hooks/useUnlikeComment";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../../../contexts/auth.context";
+import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
 
 const Comment = ({ commentData, post_id }) => {
   const { auth } = useContext(AuthContext);
@@ -11,7 +12,24 @@ const Comment = ({ commentData, post_id }) => {
   const user_id = auth?.user?.id;
   const { mutate: likeComment } = useLikeComment(post_id);
   const { mutate: unlikeComment } = useUnlikeComment(post_id);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
+    useState(false);
 
+  const showLoginRequiredModal = () => {
+    setIsLoginRequiredModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsLoginRequiredModalOpen(false);
+  };
+  // Hành động được bảo vệ (yêu cầu đăng nhập)
+  const handleAction = (action) => {
+    if (!user_id) {
+      showLoginRequiredModal();
+    } else {
+      action();
+    }
+  };
   const handleLike = () => {
     if (!commentData?.isLike)
       likeComment({
@@ -46,7 +64,7 @@ const Comment = ({ commentData, post_id }) => {
           <Button
             type="link"
             style={{ padding: "0px 4px", fontSize: "12px" }}
-            onClick={handleLike}
+            onClick={() => handleAction(handleLike)}
           >
             <HeartFilled
               style={{ color: !commentData?.isLike ? "gray" : "#ff4d4f" }}
@@ -60,6 +78,10 @@ const Comment = ({ commentData, post_id }) => {
           </Button>
         </div>
       </div>
+      <LoginRequiredModal
+        isModalOpen={isLoginRequiredModalOpen}
+        handleCancel={handleCancel}
+      />
     </div>
   );
 };

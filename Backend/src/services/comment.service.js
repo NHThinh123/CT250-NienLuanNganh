@@ -26,7 +26,6 @@ const getListCommentByPostService = async (query) => {
   if (!mongoose.Types.ObjectId.isValid(post_id)) {
     throw new AppError("Invalid post ID", 400);
   }
-
   let comments = await Comment.aggregate([
     { $match: { post_id: new mongoose.Types.ObjectId(post_id) } },
     {
