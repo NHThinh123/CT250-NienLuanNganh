@@ -1,6 +1,12 @@
-import { Col, Row } from "antd";
+import { Breadcrumb, Col, Row } from "antd";
+import Rating from "react-rating";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
+import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
+import { BookUser, CircleDollarSign, Clock, MapPinHouse } from "lucide-react";
 
 const BusinessDetail = ({ businessData, isLoading, isError }) => {
+  console.log("businessData", businessData.rating_average);
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
@@ -15,7 +21,7 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
           <Col span={9}>
             <div style={styles.businessAva}>
               <img
-                style={{ width: "85%", height: "85%" }}
+                style={{ width: "500px", height: "250px" }}
                 src={businessData.avatar}
                 alt="Ảnh"
               ></img>
@@ -24,19 +30,93 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
           <Col span={9}>
             <div style={styles.businessDetail}>
               <br />
-              <p style={styles.businessName}>{businessData.business_name}</p>
-              <p style={styles.businessLocation}>
-                Địa chỉ: {businessData.location}
-              </p>
-              <p style={styles.businessContactInfo}>
-                Số điện thoại: {businessData.contact_info}
-              </p>
-              <p style={styles.businessTime}>
-                Giờ mở cửa: {businessData.open_hours} -{" "}
-                {businessData.close_hours}
-              </p>
+              <div style={styles.businessBreadcrumb}>
+                <Breadcrumb
+                  separator=">"
+                  items={[
+                    {
+                      title: "Trang chủ",
+                    },
+                    {
+                      title: "Quán ăn",
+                      href: "/businesses",
+                    },
+                    {
+                      title: `${businessData.business_name}`,
+                    },
+                  ]}
+                />
+              </div>
+              <div>
+                <p style={styles.businessName}>{businessData.business_name}</p>
+              </div>
+              <div style={styles.businessRating}>
+                <Rating
+                  initialRating={businessData.rating_average}
+                  readonly
+                  emptySymbol={
+                    <FontAwesomeIcon
+                      icon={regularStar}
+                      style={{ fontSize: 20, color: "#ccc" }}
+                    />
+                  }
+                  fullSymbol={
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 20, color: "#FFD700" }}
+                    />
+                  }
+                  fractions={10} // Hiển thị giá trị chính xác đến 0.1
+                  quiet={true}
+                />
+                <div
+                  style={{
+                    fontSize: 15,
+                    marginLeft: 6,
+                    fontWeight: "bold",
+                  }}
+                >
+                  <p>{businessData.rating_average}/5</p>
+                </div>
+              </div>
+              <div style={styles.businessLocation}>
+                <p>
+                  <MapPinHouse
+                    size={20}
+                    style={{ marginRight: "5px", marginBottom: "-3px" }}
+                  />
+                  {businessData.location}
+                </p>
+              </div>
+              <div style={styles.businessContactInfo}>
+                <p>
+                  <BookUser
+                    size={20}
+                    style={{ marginRight: "5px", marginBottom: "-3px" }}
+                  />
+                  {businessData.contact_info}
+                </p>
+              </div>
+              <div style={styles.businessTime}>
+                <p>
+                  <Clock
+                    size={20}
+                    style={{ marginRight: "5px", marginBottom: "-3px" }}
+                  />
+                  {businessData.open_hours} - {businessData.close_hours}
+                </p>
+              </div>
+              <div>
+                <p>
+                  <CircleDollarSign
+                    size={20}
+                    style={{ marginRight: "5px", marginBottom: "-3px" }}
+                  />
+                  20.000đ - 30.000đ
+                </p>
+              </div>
               <br />
-              <hr style={{ height: "2px", border: "no", opacity: "0.5" }} />
+              {/* <hr style={{ height: "2px", border: "no", opacity: "0.5" }} /> */}
             </div>
           </Col>
           <Col span={3}></Col>
@@ -55,28 +135,37 @@ const styles = {
   },
   businessDetail: {
     margin: "0px",
-    cursor: "text",
+  },
+  businessBreadcrumb: {
+    marginBottom: "7px",
   },
   businessName: {
     fontSize: "25px",
     fontWeight: "bold",
     color: "#464646",
-    marginBottom: "5px",
+    marginBottom: "10px",
+    cursor: "text",
+  },
+  businessRating: {
+    display: "flex",
+    marginBottom: "14px",
   },
   businessTime: {
     fontSize: "15px",
     color: "#252525",
-    marginBottom: "5px",
+    marginBottom: "14px",
   },
   businessLocation: {
     fontSize: "15px",
     color: "#252525",
-    marginBottom: "5px",
+    marginBottom: "14px",
+    cursor: "text",
   },
   businessContactInfo: {
     fontSize: "15px",
     color: "#252525",
-    marginBottom: "5px",
+    marginBottom: "14px",
+    cursor: "text",
   },
 };
 
