@@ -13,7 +13,7 @@ const LoginRequiredModal = ({ isModalOpen, handleCancel }) => {
         }}
       >
         <p style={{ margin: "32px 0px" }}>
-          Vui lòng đăng nhập để thực hiện hành động này!!!!!
+          Vui lòng đăng nhập để thực hiện hành động này!
         </p>
       </Modal>
     </>

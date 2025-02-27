@@ -4,7 +4,7 @@ import { createContext, useRef } from "react";
 export const MenuContext = createContext();
 
 export const MenuProvider = ({ children }) => {
-  const menuRefs = useRef({});
+  const menuRefs = useRef(null);
 
   // Hàm xử lý cuộn đến menu
   const handleMenuClick = (menuId) => {

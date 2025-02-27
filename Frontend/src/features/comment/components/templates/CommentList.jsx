@@ -30,6 +30,7 @@ const CommentList = ({ commentData, post_id }) => {
       }}
     >
       <List
+        grid={{ gutter: 16, column: 1 }}
         split={false}
         dataSource={commentData}
         renderItem={(comment) => (

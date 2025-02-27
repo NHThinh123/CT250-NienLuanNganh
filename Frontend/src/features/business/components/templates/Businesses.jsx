@@ -31,35 +31,29 @@ const Business = ({ businessData }) => {
               onClick={() => navigate(`/businesses/${business._id}`)}
             >
               <div style={{ display: "inline-block" }}>
-                <Tooltip title={business.business_name}>
-                  <Card.Meta
-                    title={
-                      business.business_name.length > maxTitleLength
-                        ? business.business_name.slice(0, maxTitleLength) +
-                          "..."
-                        : business.business_name
-                    }
-                    style={{ marginBottom: 8 }}
-                  />
-                </Tooltip>
+                <Card.Meta
+                  title={
+                    business.business_name.length > maxTitleLength
+                      ? business.business_name.slice(0, maxTitleLength) + "..."
+                      : business.business_name
+                  }
+                  style={{ marginBottom: 8 }}
+                />
               </div>
               <div>
                 <div style={{ display: "inline-block" }}>
-                  <Tooltip title={`${business.location}`}>
-                    <p
-                      style={{
-                        marginBottom: 8,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {business.location.length > maxDescriptionLength
-                        ? business.location.slice(0, maxDescriptionLength) +
-                          "..."
-                        : business.location}
-                    </p>
-                  </Tooltip>
+                  <p
+                    style={{
+                      marginBottom: 8,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {business.location.length > maxDescriptionLength
+                      ? business.location.slice(0, maxDescriptionLength) + "..."
+                      : business.location}
+                  </p>
                 </div>
               </div>
               <p>

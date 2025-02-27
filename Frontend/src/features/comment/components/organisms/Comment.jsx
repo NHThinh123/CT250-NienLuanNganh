@@ -1,5 +1,5 @@
 import { HeartFilled } from "@ant-design/icons";
-import { Avatar, Button, Typography } from "antd";
+import { Avatar, Button, Col, Form, Input, Row, Typography } from "antd";
 import useLikeComment from "../../hooks/useLikeComment";
 import useUnlikeComment from "../../hooks/useUnlikeComment";
 import { useContext, useState } from "react";
@@ -44,16 +44,18 @@ const Comment = ({ commentData, post_id }) => {
   };
 
   return (
-    <div style={{ display: "flex", gap: "16px" }}>
-      <div style={{ textAlign: "center" }}>
+    <Row>
+      <Col span={2}>
         <Avatar src={commentData?.user_id?.avatar}></Avatar>
-      </div>
-      <div>
+      </Col>
+      <Col span={22}>
         <div
           style={{
             backgroundColor: "#f0f2f5",
             padding: "10px",
             borderRadius: "10px",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Typography.Text strong>{commentData?.user_id?.name}</Typography.Text>
@@ -77,12 +79,25 @@ const Comment = ({ commentData, post_id }) => {
             <p style={{ fontWeight: "bold", color: "gray" }}>Phản hồi</p>
           </Button>
         </div>
-      </div>
+        {/* phần phản hồi */}
+        <div style={{ display: "flex", gap: "16px" }}>
+          <div style={{ textAlign: "center" }}>
+            <Avatar size={"small"} src={commentData?.user_id?.avatar}></Avatar>
+          </div>
+          <div>
+            <Form>
+              <Form.Item noStyle>
+                <Input />
+              </Form.Item>
+            </Form>
+          </div>
+        </div>
+      </Col>
       <LoginRequiredModal
         isModalOpen={isLoginRequiredModalOpen}
         handleCancel={handleCancel}
       />
-    </div>
+    </Row>
   );
 };
 

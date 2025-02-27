@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -24,7 +23,6 @@ import { AuthWrapper } from "./contexts/auth.context.jsx";
 import ProfilePage from "./pages/PageProfile.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 
-
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
@@ -38,7 +36,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/profile",
-        element: <ProfilePage />
+        element: <ProfilePage />,
       },
       // {
       //   path: "/users",
@@ -115,12 +113,12 @@ const router = createBrowserRouter([
   },
 ]);
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <AuthWrapper> {/* Bọc ứng dụng bằng AuthWrapper */}
-        <RouterProvider router={router} />
-      </AuthWrapper>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
-  </StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <AuthWrapper>
+      {" "}
+      {/* Bọc ứng dụng bằng AuthWrapper */}
+      <RouterProvider router={router} />
+    </AuthWrapper>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>
 );
