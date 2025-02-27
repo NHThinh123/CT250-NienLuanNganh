@@ -1,5 +1,6 @@
 const { get } = require("../config/emailConfig");
 const Business = require("../models/business.model");
+const Review = require("../models/review.model");
 
 // const createBusinessService = async (req, res) => {
 //   const {
@@ -63,9 +64,40 @@ const updateBusinessService = async (id, updateData) => {
   }
 };
 
+const updateRatingAverageService = async (businessId) => {
+  try {
+    const reviews = await Review.find({ business_id: businessId });
+    if (reviews.length === 0) {
+      throw new Error("No reviews found for this business");
+    }
+
+    const totalRating = reviews.reduce(
+      (sum, review) => sum + review.review_rating,
+      0
+    );
+    let ratingAverage = totalRating / reviews.length;
+    ratingAverage = Math.round(ratingAverage * 10) / 10;
+
+    const updatedBusiness = await Business.findByIdAndUpdate(
+      businessId,
+      { rating_average: ratingAverage },
+      { new: true }
+    );
+
+    if (!updatedBusiness) {
+      throw new Error("Business not found");
+    }
+
+    return updatedBusiness;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   // createBusinessService,
   getBusinessService,
   getBusinessByIdService,
   updateBusinessService,
+  updateRatingAverageService,
 };

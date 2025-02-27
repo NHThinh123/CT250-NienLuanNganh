@@ -12,6 +12,7 @@ const BusinessSchema = new mongoose.Schema(
     avatar: { type: String, default: "" },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    rating_average: { type: Number, default: 5, min: 1, max: 5 },
   },
   { timestamps: true }
 );
