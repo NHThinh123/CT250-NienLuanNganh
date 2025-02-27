@@ -126,7 +126,7 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
         )
       }
     >
-      <CommentList commentData={commentData} />
+      <CommentList commentData={commentData} post_id={post_id} />
     </Modal>
   );
 };

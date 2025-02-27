@@ -10,7 +10,7 @@ const usePost = () => {
     isLoading: loading,
     isError,
   } = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["posts", auth?.user?.id],
     queryFn: () => getPostApi(auth?.user?.id),
   });
 

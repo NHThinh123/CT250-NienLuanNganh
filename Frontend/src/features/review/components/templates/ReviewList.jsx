@@ -1,4 +1,4 @@
-import { Avatar, Flex, List, Rate } from "antd";
+import { Avatar, List, Rate } from "antd";
 
 const ReviewList = ({ reviewData }) => {
   return (

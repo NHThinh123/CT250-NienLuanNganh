@@ -22,20 +22,56 @@ const createCommentService = async (
 };
 
 const getListCommentByPostService = async (query) => {
-  const { post_id } = query;
+  const { post_id, user_id } = query;
   if (!mongoose.Types.ObjectId.isValid(post_id)) {
     throw new AppError("Invalid post ID", 400);
   }
-  // Lấy tất cả comment của bài post
-  let comments = await Comment.find({ post_id: post_id })
-    .populate("user_id", "name _id avatar")
-    .sort({ createdAt: -1 })
-    .lean();
 
-  // Tạo danh sách comment cha
-  let parentComments = comments.filter((comment) => !comment.parent_comment_id);
+  let comments = await Comment.aggregate([
+    { $match: { post_id: new mongoose.Types.ObjectId(post_id) } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user_id",
+      },
+    },
+    { $unwind: "$user_id" },
+    {
+      $lookup: {
+        from: "user_like_comments",
+        localField: "_id",
+        foreignField: "comment_id",
+        as: "likes",
+      },
+    },
+    {
+      $addFields: {
+        likeCount: { $size: "$likes" },
+        isLike: {
+          $in: [new mongoose.Types.ObjectId(user_id), "$likes.user_id"],
+        },
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    {
+      $project: {
+        user_id: {
+          _id: 1,
+          name: 1,
+          avatar: 1,
+        },
+        comment_content: 1,
+        createdAt: 1,
+        likeCount: 1,
+        isLike: 1,
+        parent_comment_id: 1,
+      },
+    },
+  ]);
 
-  // Đếm số lượng reply của từng comment cha
+  let parentComments = comments.filter((c) => !c.parent_comment_id);
   let result = parentComments.map((comment) => ({
     ...comment,
     replyCount: comments.filter(
