@@ -101,15 +101,64 @@ const getCommentByIdService = async (comment_id) => {
   return { ...result._doc, replies };
 };
 
-const getReplyByCommentService = async (comment_id) => {
+const getReplyByCommentService = async (query) => {
+  const { comment_id, user_id } = query;
   if (!mongoose.Types.ObjectId.isValid(comment_id)) {
     throw new AppError("Invalid comment ID", 400);
   }
-  let result = await Comment.find({ parent_comment_id: comment_id }).populate(
-    "user_id",
-    "name _id"
-  );
-  return result;
+
+  let replies = await Comment.aggregate([
+    { $match: { parent_comment_id: new mongoose.Types.ObjectId(comment_id) } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user_id",
+      },
+    },
+    { $unwind: "$user_id" },
+    {
+      $lookup: {
+        from: "user_like_comments",
+        localField: "_id",
+        foreignField: "comment_id",
+        as: "likes",
+      },
+    },
+    {
+      $addFields: {
+        likeCount: { $size: "$likes" },
+        isLike: {
+          $in: [new mongoose.Types.ObjectId(user_id), "$likes.user_id"],
+        },
+      },
+    },
+    {
+      $project: {
+        user_id: {
+          _id: 1,
+          name: 1,
+          avatar: 1,
+        },
+        comment_content: 1,
+        createdAt: 1,
+        likeCount: 1,
+        isLike: 1,
+        parent_comment_id: 1,
+      },
+    },
+  ]);
+
+  // Đếm số lượng reply con cho từng reply
+  for (let reply of replies) {
+    let replyCount = await Comment.countDocuments({
+      parent_comment_id: reply._id,
+    });
+    reply.replyCount = replyCount;
+  }
+
+  return replies;
 };
 
 const updateCommentService = async (comment_id, dataUpdate) => {

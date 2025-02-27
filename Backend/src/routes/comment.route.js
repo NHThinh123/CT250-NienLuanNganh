@@ -12,7 +12,7 @@ const router = express.Router();
 //Public routes
 router.post("/create", createComment);
 router.get("/", getListCommentByPost);
-router.get("/reply/:comment_id", getReplyByComment);
+router.get("/reply", getReplyByComment);
 router.get("/:id", getCommentById);
 router.put("/:id", updateComment);
 router.delete("/:id", deleteComment);

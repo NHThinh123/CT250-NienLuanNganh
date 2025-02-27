@@ -43,8 +43,7 @@ const getCommentById = async (req, res, next) => {
 
 const getReplyByComment = async (req, res, next) => {
   try {
-    const { comment_id } = req.params;
-    const data = await getReplyByCommentService(comment_id);
+    const data = await getReplyByCommentService(req.query);
     res.status(200).json(data);
   } catch (error) {
     next(error);

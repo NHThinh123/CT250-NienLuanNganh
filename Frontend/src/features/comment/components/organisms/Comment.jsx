@@ -1,20 +1,37 @@
-import { HeartFilled } from "@ant-design/icons";
-import { Avatar, Button, Col, Form, Input, Row, Typography } from "antd";
+import {
+  CaretDownOutlined,
+  HeartFilled,
+  SendOutlined,
+} from "@ant-design/icons";
+import { Avatar, Button, Col, Form, message, Row, Typography } from "antd";
 import useLikeComment from "../../hooks/useLikeComment";
 import useUnlikeComment from "../../hooks/useUnlikeComment";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../../../contexts/auth.context";
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
+import TextArea from "antd/es/input/TextArea";
+import CommentList from "../templates/CommentList";
+import useReplyComment from "../../hooks/useReplyComment";
+import useCreateReply from "../../hooks/useCreateReply";
 
-const Comment = ({ commentData, post_id }) => {
+const Comment = ({ commentData, post_id, minWidth }) => {
   const { auth } = useContext(AuthContext);
-
+  const [form] = Form.useForm();
   const user_id = auth?.user?.id;
+  const { mutate: createReply } = useCreateReply(commentData?._id);
   const { mutate: likeComment } = useLikeComment(post_id);
   const { mutate: unlikeComment } = useUnlikeComment(post_id);
   const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
     useState(false);
-
+  const [isShowReply, setIsShowReply] = useState(false);
+  const [isShowListReply, setIsShowListReply] = useState(false);
+  const { replyData, loading } = useReplyComment(
+    commentData?._id,
+    isShowListReply
+  );
+  const handleShowReply = () => {
+    setIsShowReply(!isShowReply);
+  };
   const showLoginRequiredModal = () => {
     setIsLoginRequiredModalOpen(true);
   };
@@ -42,20 +59,43 @@ const Comment = ({ commentData, post_id }) => {
         comment_id: commentData?._id,
       });
   };
-
+  const handleReply = (values) => {
+    // if (!values.comment_content.trim()) return;
+    createReply(
+      {
+        user_id: auth?.user?.id,
+        post_id: post_id,
+        parent_comment_id: commentData?._id,
+        comment_content: values.comment_content,
+      },
+      {
+        onSuccess: () => {
+          form.resetFields();
+          setIsShowReply(false);
+        },
+        onError: () => {
+          message.error("Error creating reply");
+        },
+      }
+    );
+  };
+  const replyInputRef = useRef(null);
+  useEffect(() => {
+    if (isShowReply && replyInputRef.current) {
+      replyInputRef.current.focus();
+    }
+  }, [isShowReply]);
   return (
-    <Row>
-      <Col span={2}>
+    <Row style={{ minWidth: minWidth || "380px" }}>
+      <Col style={{ marginRight: "10px" }}>
         <Avatar src={commentData?.user_id?.avatar}></Avatar>
       </Col>
-      <Col span={22}>
+      <Col>
         <div
           style={{
             backgroundColor: "#f0f2f5",
             padding: "10px",
             borderRadius: "10px",
-            display: "flex",
-            flexDirection: "column",
           }}
         >
           <Typography.Text strong>{commentData?.user_id?.name}</Typography.Text>
@@ -65,7 +105,7 @@ const Comment = ({ commentData, post_id }) => {
         <div style={{ display: "flex", gap: "4px" }}>
           <Button
             type="link"
-            style={{ padding: "0px 4px", fontSize: "12px" }}
+            style={{ padding: "0px", fontSize: "12px" }}
             onClick={() => handleAction(handleLike)}
           >
             <HeartFilled
@@ -75,24 +115,100 @@ const Comment = ({ commentData, post_id }) => {
               {commentData?.likeCount} Yêu thích
             </p>
           </Button>
-          <Button type="link" style={{ padding: "0px 4px", fontSize: "12px" }}>
+          <Button
+            type="link"
+            style={{ padding: "0px", fontSize: "12px" }}
+            onClick={handleShowReply}
+          >
             <p style={{ fontWeight: "bold", color: "gray" }}>Phản hồi</p>
           </Button>
         </div>
-        {/* phần phản hồi */}
-        <div style={{ display: "flex", gap: "16px" }}>
-          <div style={{ textAlign: "center" }}>
-            <Avatar size={"small"} src={commentData?.user_id?.avatar}></Avatar>
-          </div>
-          <div>
-            <Form>
-              <Form.Item noStyle>
-                <Input />
-              </Form.Item>
-            </Form>
-          </div>
-        </div>
       </Col>
+
+      {commentData?.replyCount > 0 && (
+        <Col span={24} style={{ marginBottom: "4px" }}>
+          <Row>
+            <Col span={2}></Col>
+            <Col span={22}>
+              <Button
+                type="link"
+                style={{ padding: "0px", fontSize: "12px" }}
+                onClick={() => setIsShowListReply(!isShowListReply)}
+              >
+                <p>
+                  <CaretDownOutlined /> Xem {commentData.replyCount} phản hồi
+                </p>
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+      )}
+      {isShowListReply && (
+        <Col span={24}>
+          {loading ? (
+            <> đang tải phản hồi</>
+          ) : (
+            <Row>
+              <Col span={2}></Col>
+              <Col span={22}>
+                <CommentList
+                  commentData={replyData}
+                  post_id={post_id}
+                  height={"auto"}
+                  minWidth={100}
+                />
+              </Col>
+            </Row>
+          )}
+        </Col>
+      )}
+      {isShowReply && (
+        <Col span={24}>
+          <Row>
+            <Col span={1}></Col>
+            <Col span={2} style={{ textAlign: "center" }}>
+              <Avatar size={"small"} src={auth.user.avatar}></Avatar>
+            </Col>
+            <Col span={20}>
+              <div
+                style={{
+                  backgroundColor: "#f0f2f5",
+                  borderRadius: "10px",
+                  padding: "4px",
+                }}
+              >
+                <Form form={form} onFinish={handleReply}>
+                  <Row>
+                    <Col span={21}>
+                      <Form.Item noStyle name={"comment_content"}>
+                        <TextArea
+                          ref={replyInputRef}
+                          autoSize={{ minRows: 1, maxRows: 5 }}
+                          variant="borderless"
+                          placeholder={`Phản hồi cho ${commentData?.user_id?.name}`}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={3}>
+                      <Form.Item noStyle>
+                        <Button type="text" htmlType="submit">
+                          <SendOutlined
+                            style={{
+                              fontSize: "20px",
+                              color: "#1890ff",
+                            }}
+                          />
+                        </Button>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </Form>
+              </div>
+            </Col>
+          </Row>
+        </Col>
+      )}
+
       <LoginRequiredModal
         isModalOpen={isLoginRequiredModalOpen}
         handleCancel={handleCancel}

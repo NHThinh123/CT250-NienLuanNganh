@@ -75,7 +75,7 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
       }
       open={isModalOpen}
       onCancel={() => setIsModalOpen(false)}
-      width={600}
+      width={700}
       footer={
         user_id ? (
           <Form form={form} onFinish={handleSubmit}>
