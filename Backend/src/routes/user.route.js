@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const path = require('path');
-const { signup, signin, getUserById, getListUser, updateUser, uploadAvatar, requestPasswordReset, resetPassword, } = require("../controllers/user.controller");
+const { signup, signin, getUserById, getListUser, updateUser, uploadAvatar, requestPasswordReset, resetPassword, getEmail } = require("../controllers/user.controller");
 const { verifyEmail } = require("../controllers/user.verifiEmail");
 const upload = require("../middleware/uploadAvatar");
 
@@ -35,5 +35,7 @@ router.get("/reset-password/:token", (req, res) => {
 });
 //Đặt lại mật khẩu
 router.post("/reset-password/:token", resetPassword);
+//Lấy email
+router.get("/get-email/:token", getEmail);
 
 module.exports = router;

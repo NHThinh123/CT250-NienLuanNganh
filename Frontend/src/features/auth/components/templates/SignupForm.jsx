@@ -2,11 +2,12 @@ import { Form, Input, Button, Checkbox, Card, Row, Col, DatePicker, Spin } from 
 import { useSignup } from "../../hooks/useSignup";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
     const { mutate: signupMutation } = useSignup();
     const [loading, setLoading] = useState(false);
-
+    const navigate = useNavigate();
     const onFinish = (values) => {
         setLoading(true); // Hiển thị loading toàn màn hình
         signupMutation(
@@ -117,6 +118,15 @@ const SignupForm = () => {
                                 {loading ? "Đang đăng kí..." : "Đăng Kí"}
                             </Button>
                         </Form.Item>
+                        <Button
+                            type="default"
+                            block
+                            size="large"
+                            onClick={() => navigate("/")}
+                            style={{ marginTop: "10px" }}
+                        >
+                            Quay về trang chủ
+                        </Button>
 
                         <p style={{ textAlign: "center", marginTop: "20px" }}>
                             Nếu bạn có tài khoản? <a href="/login">Đăng Nhập</a>
