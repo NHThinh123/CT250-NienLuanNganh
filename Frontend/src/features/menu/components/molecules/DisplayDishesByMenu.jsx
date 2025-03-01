@@ -4,6 +4,8 @@ import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 const DisplayDishesByMenu = ({ menuId }) => {
   const { dishData } = useDishByMenuId(menuId);
 
+  console.log("dishData in " + menuId + ": " + dishData);
+
   //Hàm định dạng giá tiền
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN"); // Thêm dấu chấm ngăn cách hàng nghìn

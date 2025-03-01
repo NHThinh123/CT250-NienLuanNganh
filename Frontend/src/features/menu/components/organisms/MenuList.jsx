@@ -3,7 +3,14 @@ import { useContext } from "react";
 import { MenuContext } from "../molecules/MenuContext";
 
 const MenuList = ({ menuData }) => {
-  const { handleMenuClick } = useContext(MenuContext);
+  const menuContext = useContext(MenuContext);
+
+  if (!menuContext) {
+    console.error("MenuList must be used within a MenuProvider");
+    return null;
+  }
+
+  const { handleMenuClick } = menuContext;
 
   //Duyệt qua mảng menuData để tạo ra mảng items
   const items = menuData.map((menu) => ({
@@ -21,7 +28,7 @@ const MenuList = ({ menuData }) => {
       defaultSelectedKeys={[items[0]?.key]}
       mode="inline"
       items={items}
-      onClick={(e) => handleMenuClick(e.key)}
+      onClick={(e) => handleMenuClick?.(e.key)}
     />
   );
 };
