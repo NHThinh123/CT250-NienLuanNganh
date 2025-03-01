@@ -3,38 +3,42 @@ import axios from "../../../services/axios.customize";
 const getDishApi = () => {
   const URL_API = "/api/dishes";
   return axios.get(URL_API);
-}
+};
 
 const getDishByIdApi = (id) => {
-    const URL_API = `/api/dishes/${id}`;
-    return axios.get(URL_API);
-}
+  const URL_API = `/api/dishes/${id}`;
+  return axios.get(URL_API);
+};
 
-const createDishApi = (data) => {
-    const URL_API = "/api/dishes";
-    return axios.post(URL_API, data);
-}
+const createDishApi = async (formData) => {
+  const response = await axios.post("/api/dishes", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
 
 const updateDishApi = (id, data) => {
-    const URL_API = `/api/dishes/${id}`;
-    return axios.put(URL_API, data);
-}
+  const URL_API = `/api/dishes/${id}`;
+  return axios.put(URL_API, data);
+};
 
 const deleteDishApi = (id) => {
-    const URL_API = `/api/dishes/${id}`;
-    return axios.delete(URL_API);
-}
+  const URL_API = `/api/dishes/${id}`;
+  return axios.delete(URL_API);
+};
 
 const getDishesByMenuIdApi = (id) => {
-    const URL_API = `/api/dishes/getDishByMenuId/${id}`;
-    return axios.get(URL_API);
-}
+  const URL_API = `/api/dishes/getDishByMenuId/${id}`;
+  return axios.get(URL_API);
+};
 
 export {
-    getDishApi,
-    getDishByIdApi,
-    createDishApi,
-    updateDishApi,
-    deleteDishApi,
-    getDishesByMenuIdApi
-}
+  getDishApi,
+  getDishByIdApi,
+  createDishApi,
+  updateDishApi,
+  deleteDishApi,
+  getDishesByMenuIdApi,
+};

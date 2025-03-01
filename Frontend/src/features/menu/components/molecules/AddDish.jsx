@@ -1,20 +1,22 @@
-import { Button } from "antd";
+import { Button, Form } from "antd";
 import { SquarePlus } from "lucide-react";
 import { useState } from "react";
 import ModalAddDish from "../atoms/ModalAddDish";
 
-const AddDish = () => {
+const AddDish = ({ menuData }) => {
+  console.log("menuData in addDish: ", menuData);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [form] = Form.useForm();
+  const [form] = Form.useForm();
   const showModal = () => {
     setIsModalOpen(true);
   };
   const handleOk = () => {
-    // form.submit();
+    form.submit();
+    form.resetFields();
     setIsModalOpen(false);
   };
   const handleCancel = () => {
-    // form.resetFields();
+    form.resetFields();
     setIsModalOpen(false);
   };
 
@@ -38,11 +40,12 @@ const AddDish = () => {
         <SquarePlus />
       </Button>
       <ModalAddDish
-        // form={form}
+        form={form}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         handleOk={handleOk}
-        // setIsModalOpen={setIsModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        menuData={menuData}
       />
     </>
   );
