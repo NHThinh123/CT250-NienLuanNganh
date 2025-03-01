@@ -14,7 +14,11 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
       renderItem={(menu) => (
         <List.Item>
           <div
-            ref={(el) => (menuRefs.current[menu._id] = el)}
+            ref={(el) => {
+              if (menuRefs.current) {
+                menuRefs.current[menu._id] = el;
+              }
+            }}
             style={styles.twocol}
           >
             <div>

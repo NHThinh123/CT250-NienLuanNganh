@@ -1,4 +1,4 @@
-import { Button, Modal } from "antd";
+import { Button } from "antd";
 import { SquarePlus } from "lucide-react";
 import { useState } from "react";
 import ModalAddDish from "../atoms/ModalAddDish";
@@ -44,16 +44,6 @@ const AddDish = () => {
         handleOk={handleOk}
         // setIsModalOpen={setIsModalOpen}
       />
-      {/* <Modal
-        title="Basic Modal"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-      </Modal> */}
     </>
   );
 };
