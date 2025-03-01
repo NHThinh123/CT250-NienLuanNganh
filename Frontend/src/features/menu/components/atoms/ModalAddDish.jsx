@@ -1,34 +1,31 @@
 import {
-  Avatar,
-  Button,
+  // Avatar,
+  // Button,
   Col,
-  Form,
-  Input,
-  //   message,
+  // Form,
+  // Input,
+  // message,
   Modal,
-  Popover,
+  // Popover,
   Row,
   Typography,
 } from "antd";
-import { Images, MapPinned, Tags } from "lucide-react";
-// import UploadImage from "../atoms/UploadImage";
+// import { Images, MapPinned, Tags } from "lucide-react";
 // import { useContext, useState } from "react";
-// import UploadTag from "../atoms/UploadTag";
-// import useCreatePost from "../../hooks/useCreatePost";
+// import useCreateDish from "../../../dish/hooks/useCreateDish";
 
 // import SpinLoading from "../../../../components/atoms/SpinLoading";
-// import { AuthContext } from "../../../../contexts/auth.context";
+// import { BusinessContext } from "../../../../contexts/business.context";
 
 const ModalAddDish = ({
-  //   isModalOpen,
-  //   handleCancel,
-  //   handleOk,
-  form,
-  //   setIsModalOpen,
+  isModalOpen,
+  handleCancel,
+  handleOk,
+  // form,
+  // setIsModalOpen,
 }) => {
-  //   const { auth } = useContext(AuthContext);
-  //   const { mutate: createPost, isPending } = useCreatePost();
-  //   const [tags, setTags] = useState([]);
+  // const { business } = useContext(BusinessContext);
+  // const { mutate: createDish, isPending } = useCreateDish();
   //   const [fileList, setFileList] = useState([]);
   //   const [isShowUploadImage, setIsShowUploadImage] = useState(false);
   //   const [isShowUploadTag, setIsShowUploadTag] = useState(false);
@@ -45,68 +42,68 @@ const ModalAddDish = ({
   //     setIsShowUploadLocation(true);
   //   };
 
-  //   const onFinish = (values) => {
-  //     const formData = new FormData();
-  //     formData.append("user_id", auth?.user?.id);
-  //     formData.append("title", values.title);
-  //     formData.append("content", values.content);
-  //     formData.append("tags", JSON.stringify(tags));
-  //     fileList.forEach((file) => {
-  //       formData.append("images", file.originFileObj);
-  //     });
-  //     // formData.forEach((value, key) => {
-  //     //   console.log(key, value);
-  //     // });
-  //     createPost(formData, {
-  //       onSuccess: () => {
-  //         message.success("Bài viết đã được tạo thành công!");
-  //         form.resetFields();
-  //         setIsShowUploadImage(false);
-  //         setIsShowUploadTag(false);
-  //         setIsShowUploadLocation(false);
-  //         setFileList([]);
-  //         setTags([]);
-  //         setIsModalOpen(false);
-  //       },
-  //       onError: () => {
-  //         message.error("Lỗi khi tạo bài viết!");
-  //       },
-  //     });
-  //   };
+  // const onFinish = (values) => {
+  //   const formData = new FormData();
+  //   formData.append("user_id", business?.user?.id); //hakfhakffsaf
+  //   formData.append("title", values.title);
+  //   //     formData.append("content", values.content);
+  //   //     formData.append("tags", JSON.stringify(tags));
+  //   //     fileList.forEach((file) => {
+  //   //       formData.append("images", file.originFileObj);
+  //   //     });
+  //   //     // formData.forEach((value, key) => {
+  //   //     //   console.log(key, value);
+  //   //     // });
+  //   createDish(formData, {
+  //     onSuccess: () => {
+  //       message.success("Món ăn đã được tạo thành công!");
+  //       form.resetFields();
+  //       //         setIsShowUploadImage(false);
+  //       //         setIsShowUploadTag(false);
+  //       //         setIsShowUploadLocation(false);
+  //       //         setFileList([]);
+  //       //         setTags([]);
+  //       setIsModalOpen(false);
+  //     },
+  //     onError: () => {
+  //       message.error("Lỗi khi tạo bài viết!");
+  //     },
+  //   });
+  // };
 
   return (
     <Modal
-      title={
-        <Typography.Title level={4} style={{ textAlign: "center" }}>
-          Tạo bài viết
-        </Typography.Title>
-      }
-      //   open={isModalOpen}
-      //   onOk={handleOk}
-      //   onCancel={() => {
-      //     handleCancel();
-      //     setIsShowUploadImage(false);
-      //     setIsShowUploadTag(false);
-      //     setIsShowUploadLocation(false);
-      //     setFileList([]);
-      //     setTags([]);
-      //   }}
-      //   okText={isPending ? "Đang đăng..." : "Đăng tải"}
-      //   cancelText="Hủy"
-      //   maskClosable={false}
-      //   centered
-      //   style={{ minWidth: "50%" }}
+      title="Basic Modal"
+      // title={
+      //   <Typography.Title level={4} style={{ textAlign: "center" }}>
+      //     Tạo món ăn
+      //   </Typography.Title>
+      // }
+      open={isModalOpen}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      // onCancel={() => {
+      //   handleCancel();
+      //   //     setIsShowUploadImage(false);
+      //   //     setIsShowUploadTag(false);
+      //   //     setIsShowUploadLocation(false);
+      //   //     setFileList([]);
+      //   //     setTags([]);
+      // }}
+      // okText={isPending ? "Đang tạo..." : "Đăng tải"}
+      // cancelText="Hủy"
+      // maskClosable={false}
+      // centered
+      // style={{ minWidth: "50%" }}
     >
       {/* {isPending && <SpinLoading />} */}
       <Row>
-        <Col span={2}>
-          <Avatar></Avatar>
-        </Col>
+        <Col span={2}>{/* <Avatar></Avatar> */}</Col>
         <Col span={20}>
           <Typography.Text style={{ fontWeight: "bold" }}></Typography.Text>
         </Col>
       </Row>
-      <Row
+      {/* <Row
         style={{
           marginTop: "16px",
           maxHeight: "320px",
@@ -116,7 +113,7 @@ const ModalAddDish = ({
         }}
       >
         <Col span={24}>
-          <Form form={form}>
+          <Form form={form} onFinish={onFinish}>
             <Form.Item
               name="title"
               rules={[
@@ -145,19 +142,9 @@ const ModalAddDish = ({
             </Form.Item>
           </Form>
         </Col>
-        {/* {isShowUploadTag && (
-          <Col span={24}>
-            <UploadTag tags={tags} setTags={setTags} />
-          </Col>
-        )}
-        {isShowUploadImage && (
-          <Col span={24}>
-            <UploadImage fileList={fileList} setFileList={setFileList} />
-          </Col>
-        )} */}
-      </Row>
+      </Row> */}
 
-      <Row
+      {/* <Row
         style={{
           border: "1px solid #000",
           borderRadius: "8px",
@@ -205,7 +192,7 @@ const ModalAddDish = ({
             </Popover>
           </Button>
         </Col>
-      </Row>
+      </Row> */}
     </Modal>
   );
 };
