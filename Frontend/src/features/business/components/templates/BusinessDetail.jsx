@@ -6,7 +6,14 @@ import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { BookUser, CircleDollarSign, Clock, MapPinHouse } from "lucide-react";
 
 const BusinessDetail = ({ businessData, isLoading, isError }) => {
-  console.log("businessData", businessData.rating_average);
+  //Hàm định dạng giá tiền
+  const formatPrice = (price) => {
+    if (typeof price !== "number" || isNaN(price)) {
+      return "N/A"; // Hoặc trả về một giá trị mặc định
+    }
+    return price.toLocaleString("vi-VN"); // Thêm dấu chấm ngăn cách hàng nghìn
+  };
+
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
@@ -112,7 +119,8 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
                     size={20}
                     style={{ marginRight: "5px", marginBottom: "-3px" }}
                   />
-                  20.000đ - 30.000đ
+                  {formatPrice(businessData.dish_lowest_cost)}đ -{" "}
+                  {formatPrice(businessData.dish_highest_cost)}đ
                 </p>
               </div>
               <br />

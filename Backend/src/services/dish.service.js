@@ -1,5 +1,6 @@
 const Dish = require("../models/dish.model");
 const cloudinary = require("../config/cloudinary");
+const Menu = require("../models/menu.model");
 
 const getListDishService = async (page = 1, limit = 10, search = "") => {
   const skip = (page - 1) * limit;
@@ -89,6 +90,17 @@ const getDishesByMenuIdService = async (menuId) => {
   }
 };
 
+const getListDishByBusinessIdService = async (businessId) => {
+  try {
+    const menus = await Menu.find({ business_id: businessId });
+    const menuIds = menus.map((menu) => menu._id);
+    const dishes = await Dish.find({ menu_id: { $in: menuIds } });
+    return dishes;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   getListDishService,
   getDishByIdService,
@@ -97,4 +109,5 @@ module.exports = {
   updateDishService,
   deleteDishService,
   getDishesByMenuIdService,
+  getListDishByBusinessIdService,
 };

@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createDishApi } from "../services/dishApi";
 
 const useCreateDish = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createDishApi,
     onSuccess: () => {

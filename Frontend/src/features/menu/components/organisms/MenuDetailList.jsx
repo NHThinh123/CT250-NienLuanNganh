@@ -1,7 +1,8 @@
-import { List } from "antd";
+import { Col, List, Row } from "antd";
 import DisplayDishesByMenu from "../molecules/DisplayDishesByMenu";
 import { useContext } from "react";
 import { MenuContext } from "../molecules/MenuContext";
+import AddDish from "../molecules/AddDish";
 
 const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
   const { menuRefs } = useContext(MenuContext);
@@ -16,14 +17,25 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
             ref={(el) => (menuRefs.current[menu._id] = el)}
             style={styles.twocol}
           >
-            <div
-              style={{
-                color: "#6D6f71",
-                fontSize: "14px",
-                paddingBottom: "20px",
-              }}
-            >
-              {capitalizeMenuName(menu.menu_name)}
+            <div>
+              <Row>
+                <Col span={22}>
+                  <div
+                    style={{
+                      color: "#6D6f71",
+                      fontSize: "14px",
+                      paddingBottom: "20px",
+                    }}
+                  >
+                    {capitalizeMenuName(menu.menu_name)}
+                  </div>
+                </Col>
+                <Col span={2}>
+                  <div style={{ display: "inline-block" }}>
+                    <AddDish />
+                  </div>
+                </Col>
+              </Row>
             </div>
             <DisplayDishesByMenu menuId={menu._id} />
           </div>

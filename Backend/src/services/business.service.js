@@ -1,6 +1,9 @@
 const { get } = require("../config/emailConfig");
 const Business = require("../models/business.model");
+const Dish = require("../models/dish.model");
+const Menu = require("../models/menu.model");
 const Review = require("../models/review.model");
+const { getListDishByBusinessIdService } = require("./dish.service");
 
 // const createBusinessService = async (req, res) => {
 //   const {
@@ -94,10 +97,60 @@ const updateRatingAverageService = async (businessId) => {
   }
 };
 
+const getDishCostService = async (businessId) => {
+  try {
+    const dishes = await getListDishByBusinessIdService(businessId);
+
+    if (dishes.length === 0) {
+      throw new Error("No dishes found for this business");
+    }
+
+    const lowestCostDish = dishes.reduce((prev, curr) =>
+      prev.dish_price < curr.dish_price ? prev : curr
+    );
+    const highestCostDish = dishes.reduce((prev, curr) =>
+      prev.dish_price > curr.dish_price ? prev : curr
+    );
+
+    return {
+      lowestCostDish,
+      highestCostDish,
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+const updateDishCostBusinessService = async (businessId) => {
+  try {
+    const { lowestCostDish, highestCostDish } = await getDishCostService(
+      businessId
+    );
+
+    const updatedBusiness = await Business.findByIdAndUpdate(
+      businessId,
+      {
+        dish_lowest_cost: lowestCostDish.dish_price,
+        dish_highest_cost: highestCostDish.dish_price,
+      },
+      { new: true }
+    );
+
+    if (!updatedBusiness) {
+      throw new Error("Business not found");
+    }
+
+    return updatedBusiness;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   // createBusinessService,
   getBusinessService,
   getBusinessByIdService,
   updateBusinessService,
   updateRatingAverageService,
+  updateDishCostBusinessService,
 };
