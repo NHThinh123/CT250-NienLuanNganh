@@ -19,8 +19,6 @@ const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
           padding: "0px 16px",
           textAlign: "center",
         }}
-        justify={"center"}
-        align={"middle"}
       >
         <p>Loading...</p>
       </Row>
@@ -32,9 +30,9 @@ const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
           height: height || "380px",
           padding: "0px 16px",
           textAlign: "center",
+          lineHeight: "380px",
         }}
         justify={"center"}
-        align={"middle"}
       >
         <p>Không có bình luận</p>
       </Row>
@@ -50,7 +48,8 @@ const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
     >
       <Col span={24}>
         <List
-          grid={{ gutter: 16, column: 1 }}
+          ref={listRef}
+          grid={{ gutter: 0, column: 1 }}
           split={false}
           dataSource={commentData}
           renderItem={(comment) => (

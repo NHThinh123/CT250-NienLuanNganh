@@ -116,18 +116,110 @@ const getPostByIdService = async (post_id, user_id) => {
     throw new AppError("Invalid post ID", 400);
   }
 
-  let result = await Post.findById(post_id);
+  const isValidUserId = mongoose.Types.ObjectId.isValid(user_id);
+  const userObjectId = isValidUserId
+    ? new mongoose.Types.ObjectId(user_id)
+    : null;
 
-  const images = await Asset.find({ post_id });
+  let result = await Post.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(post_id) },
+    },
+    {
+      // Tìm kiếm thông tin user tác giả
+      $lookup: {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: "$user" },
+    {
+      // Tìm kiếm ảnh của bài viết
+      $lookup: {
+        from: "assets",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "images",
+      },
+    },
+    {
+      // Tìm kiếm tag của bài viết
+      $lookup: {
+        from: "post_tags",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "postTags",
+      },
+    },
+    {
+      $lookup: {
+        from: "tags", // Bảng chứa tên tags
+        localField: "postTags.tag_id",
+        foreignField: "_id",
+        as: "tags",
+      },
+    },
+    {
+      // Tìm danh sách id người like bài viết
+      $lookup: {
+        from: "user_like_posts",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "likes",
+      },
+    },
+    {
+      // Tìm danh sách comment của bài viết
+      $lookup: {
+        from: "comments",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "comments",
+      },
+    },
+    {
+      // Tính số lượt like và kiểm tra user có like bài viết không
+      $addFields: {
+        likeCount: { $size: "$likes" },
+        commentCount: { $size: "$comments" },
+        isLike: isValidUserId
+          ? {
+              $cond: {
+                if: { $in: [userObjectId, "$likes.user_id"] },
+                then: 1,
+                else: 0,
+              },
+            }
+          : 0, // Nếu user_id không hợp lệ thì isLike = 0
+      },
+    },
+    {
+      // Chọn ra những trường cần thiết
+      $project: {
+        user_id: 1,
+        "user.name": 1,
+        "user.email": 1,
+        "user.avatar": 1,
+        title: 1,
+        content: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        images: 1,
+        tags: 1,
+        likeCount: 1,
+        commentCount: 1,
+        isLike: 1,
+      },
+    },
+  ]);
 
-  const tags = await getTagByPostService(post_id);
-  const isLiked = await User_Like_Post.findOne({ user_id, post_id });
-  const likeCount = await User_Like_Post.find({ post_id }).countDocuments();
-  if (!result) {
+  if (!result || result.length === 0) {
     throw new AppError("Post not found", 404);
   }
 
-  return { ...result._doc, images, tags, isLike: isLiked ? 1 : 0, likeCount };
+  return result[0]; // Trả về object thay vì array
 };
 
 const createPostService = async (user_id, title, content, tags, files) => {

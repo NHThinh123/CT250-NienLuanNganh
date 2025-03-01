@@ -5,9 +5,9 @@ const getPostApi = (user_id) => {
   return axios.get(URL_API);
 };
 
-const getPostByIdApi = (id) => {
-  const URL_API = `/api/posts/${id}`;
-  return axios.get(URL_API);
+const getPostByIdApi = (id, user_id) => {
+  const URL_API = `/api/posts/detail/${id}`;
+  return axios.get(URL_API, { params: { user_id } });
 };
 const createPostApi = (formData) => {
   const URL_API = "/api/posts/create";

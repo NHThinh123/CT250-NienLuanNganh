@@ -72,6 +72,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
         onSuccess: () => {
           form.resetFields();
           setIsShowReply(false);
+          setIsShowListReply(true);
         },
         onError: () => {
           message.error("Error creating reply");
@@ -90,7 +91,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
       <Col style={{ marginRight: "10px" }}>
         <Avatar src={commentData?.user_id?.avatar}></Avatar>
       </Col>
-      <Col>
+      <Col style={{ maxWidth: "89%" }}>
         <div
           style={{
             backgroundColor: "#f0f2f5",
