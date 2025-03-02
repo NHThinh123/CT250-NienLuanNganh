@@ -1,37 +1,37 @@
-import { Col, List, Pagination, Row } from "antd";
+import { useState, useEffect } from "react";
+import { Col, List, Row, Spin } from "antd";
+import { useInView } from "react-intersection-observer";
+
 import usePost from "../../hooks/usePost";
-
 import PostItem from "../organisms/PostItem";
-
 import SideBar from "../organisms/SideBar";
-import { useState } from "react";
-
-import SpinLoading from "../../../../components/atoms/SpinLoading";
-
 import PostFilter from "../organisms/PostFilter";
 
 const PostList = () => {
   const [params, setParams] = useState({
     search: "",
     sort: "newest",
-    page: 1,
     limit: 5,
   });
 
-  const { data, isLoading } = usePost(params);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    usePost(params);
+  const { ref, inView } = useInView();
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage]);
 
   const handleSearch = (value) => {
-    setParams((prev) => ({ ...prev, search: value, page: 1 }));
+    setParams((prev) => ({ ...prev, search: value }));
   };
 
   const handleSortChange = (value) => {
     setParams((prev) => ({ ...prev, sort: value }));
   };
 
-  const handlePageChange = (page, pageSize) => {
-    setParams((prev) => ({ ...prev, page, limit: pageSize || 5 }));
-  };
-  if (isLoading) return <SpinLoading />;
   return (
     <>
       <Row style={{ minWidth: "800px" }} justify={"center"}>
@@ -41,21 +41,20 @@ const PostList = () => {
             handleSortChange={handleSortChange}
           />
           <List
-            dataSource={data.posts}
+            dataSource={data?.pages?.flatMap((page) => page.posts)}
             grid={{ gutter: 8, column: 1 }}
             renderItem={(item) => (
               <List.Item style={{ padding: "0px", margin: "0px" }}>
-                <PostItem postData={item}></PostItem>
+                <PostItem postData={item} />
               </List.Item>
             )}
           />
-          <Pagination
-            current={params.page}
-            total={data?.pagination.totalPosts}
-            pageSize={params.limit}
-            onChange={handlePageChange}
-            showSizeChanger
-          />
+          {isFetchingNextPage && (
+            <div style={{ textAlign: "center" }}>
+              <Spin />
+            </div>
+          )}
+          <div ref={ref} style={{ height: "20px" }} />
         </Col>
         <Col xs={24} sm={0} md={0} lg={6}>
           <SideBar />

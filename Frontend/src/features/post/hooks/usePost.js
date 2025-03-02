@@ -1,11 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getPostApi } from "../services/postApi";
 
 const usePost = (params) => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["posts", params],
-    queryFn: () => getPostApi(params),
-    keepPreviousData: true, // Giữ dữ liệu cũ trong khi tải dữ liệu mới
+    queryFn: getPostApi,
+    getNextPageParam: (lastPage) => {
+      return lastPage.pagination.page < lastPage.pagination.totalPages
+        ? lastPage.pagination.page + 1
+        : undefined;
+    },
   });
 };
 

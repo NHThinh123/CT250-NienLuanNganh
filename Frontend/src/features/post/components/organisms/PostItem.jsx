@@ -17,7 +17,9 @@ const PostItem = ({ postData }) => {
     <BoxContainer style={{ minWidth: "500px" }}>
       <PostHeader userData={postData?.user}></PostHeader>
       <PostBody postData={postData}></PostBody>
-      <PostImages imagesData={postData?.images}></PostImages>
+      {postData?.images.length > 0 && (
+        <PostImages imagesData={postData?.images}></PostImages>
+      )}
       <PostFooter
         postData={postData}
         showModal={showModal}
