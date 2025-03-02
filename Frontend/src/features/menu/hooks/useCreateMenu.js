@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createMenuApi } from "../services/menuApi";
 
 const useCreateMenu = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createMenuApi,
     onSuccess: () => {

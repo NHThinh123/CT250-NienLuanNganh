@@ -1,5 +1,6 @@
-import { List, Row, Col } from "antd";
+import { List, Row, Col, Button } from "antd";
 import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
+import { SquareX } from "lucide-react";
 
 const DisplayDishesByMenu = ({ menuId }) => {
   const { dishData } = useDishByMenuId(menuId);
@@ -17,7 +18,7 @@ const DisplayDishesByMenu = ({ menuId }) => {
         renderItem={(dish) => (
           <List.Item>
             <Row style={{ padding: "5px" }}>
-              <Col span={5}>
+              <Col span={4}>
                 <img
                   style={{ width: "60px", height: "60px" }}
                   src={dish.dish_url[0]}
@@ -44,10 +45,29 @@ const DisplayDishesByMenu = ({ menuId }) => {
                     fontSize: "16px",
                     color: "#0288D1",
                     fontWeight: "bold",
+                    display: "grid",
+                    placeItems: "center",
+                    height: "100%",
                   }}
                 >
                   {formatPrice(dish.dish_price)}đ
                 </div>
+              </Col>
+              <Col span={1}>
+                <Button
+                  type="link"
+                  danger
+                  style={{
+                    margin: 0,
+                    padding: 0,
+                    border: "none",
+                    display: "flex-box",
+                    placeItems: "center",
+                    height: "100%",
+                  }}
+                >
+                  <SquareX />
+                </Button>
               </Col>
             </Row>
             <hr style={{ height: "2px", border: "no", opacity: "0.2" }} />

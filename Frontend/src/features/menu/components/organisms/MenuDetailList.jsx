@@ -35,9 +35,7 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
                   </div>
                 </Col>
                 <Col span={2}>
-                  <div style={{ display: "inline-block" }}>
-                    <AddDish menuData={menu} />
-                  </div>
+                  <AddDish menuData={menu} />
                 </Col>
               </Row>
             </div>
