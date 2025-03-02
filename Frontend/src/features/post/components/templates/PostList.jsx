@@ -1,47 +1,60 @@
-/* eslint-disable no-unused-vars */
-import { Col, List, Row, Space, Table } from "antd";
+import { Col, List, Pagination, Row } from "antd";
 import usePost from "../../hooks/usePost";
-import { Link } from "react-router-dom";
-import BoxContainer from "../../../../components/atoms/BoxContainer";
+
 import PostItem from "../organisms/PostItem";
 
 import SideBar from "../organisms/SideBar";
-//import useDeletePost from "../../hooks/useDeletePost";
+import { useState } from "react";
+
+import SpinLoading from "../../../../components/atoms/SpinLoading";
+
+import PostFilter from "../organisms/PostFilter";
 
 const PostList = () => {
-  //const { mutate } = useDeletePost();
+  const [params, setParams] = useState({
+    search: "",
+    sort: "newest",
+    page: 1,
+    limit: 5,
+  });
 
-  // const handleDelete = (id) => {
-  //   mutate(id, {
-  //     onSuccess: () => {
-  //       message.success("Post deleted successfully");
-  //     },
-  //     onError: () => {
-  //       message.error("Error deleting post");
-  //     },
-  //   });
-  // };
-  const { postData, loading } = usePost();
+  const { data, isLoading } = usePost(params);
 
-  // const postDataWithKey = postData.map((post) => ({
-  //   ...post,
-  //   key: post._id,
-  //   username: post.user_id?.username || "Không có tên",
-  // }));
-  if (loading) return <p>Loading...</p>;
+  const handleSearch = (value) => {
+    setParams((prev) => ({ ...prev, search: value, page: 1 }));
+  };
 
+  const handleSortChange = (value) => {
+    setParams((prev) => ({ ...prev, sort: value }));
+  };
+
+  const handlePageChange = (page, pageSize) => {
+    setParams((prev) => ({ ...prev, page, limit: pageSize || 5 }));
+  };
+  if (isLoading) return <SpinLoading />;
   return (
     <>
       <Row style={{ minWidth: "800px" }} justify={"center"}>
         <Col xs={24} sm={24} md={24} lg={16}>
+          <PostFilter
+            handleSearch={handleSearch}
+            handleSortChange={handleSortChange}
+          />
           <List
-            dataSource={postData.posts}
+            dataSource={data.posts}
             grid={{ gutter: 8, column: 1 }}
             renderItem={(item) => (
               <List.Item style={{ padding: "0px", margin: "0px" }}>
                 <PostItem postData={item}></PostItem>
               </List.Item>
             )}
+          />
+          <Pagination
+            current={params.page}
+            total={data?.pagination.totalPosts}
+            pageSize={params.limit}
+            onChange={handlePageChange}
+            showSizeChanger
           />
         </Col>
         <Col xs={24} sm={0} md={0} lg={6}>

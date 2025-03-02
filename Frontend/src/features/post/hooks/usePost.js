@@ -1,20 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { getPostApi } from "../services/postApi";
-import { useContext } from "react";
-import { AuthContext } from "../../../contexts/auth.context";
 
-const usePost = () => {
-  const { auth } = useContext(AuthContext);
-  const {
-    data: postData = [],
-    isLoading: loading,
-    isError,
-  } = useQuery({
-    queryKey: ["posts", auth?.user?.id],
-    queryFn: () => getPostApi(auth?.user?.id),
+const usePost = (params) => {
+  return useQuery({
+    queryKey: ["posts", params],
+    queryFn: () => getPostApi(params),
+    keepPreviousData: true, // Giữ dữ liệu cũ trong khi tải dữ liệu mới
   });
-
-  return { postData, loading, isError };
 };
 
 export default usePost;
