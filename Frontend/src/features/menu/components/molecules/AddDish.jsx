@@ -2,43 +2,33 @@ import { Button, Form } from "antd";
 import { SquarePlus } from "lucide-react";
 import { useState } from "react";
 import ModalAddDish from "../atoms/ModalAddDish";
+// import { BusinessContext } from "../../../../contexts/business.context";
 
 const AddDish = ({ menuData }) => {
-  console.log("menuData in addDish: ", menuData);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
+
+  // const { business } = useContext(BusinessContext);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
+  const handleOk = async () => {
     form.submit();
-    form.resetFields();
-    setIsModalOpen(false);
+    // setIsModalOpen(false);
   };
   const handleCancel = () => {
     form.resetFields();
     setIsModalOpen(false);
   };
 
-  //   const showLoginRequiredModal = () => {
-  //     setIsLoginRequiredModalOpen(true);
-  //   };
-
-  //   const handleCancelLoginRequiredModal = () => {
-  //     setIsLoginRequiredModalOpen(false);
-  //   };
-  // const handleAction = (action) => {
-  //   // if (!user_id) {
-  //   //   showLoginRequiredModal();
-  //   // } else {
-  //   action();
-  //   // }
-  // };
   return (
     <>
+      {/* {business.isAuthenticated && ( */}
       <Button type="link" onClick={showModal}>
         <SquarePlus />
       </Button>
+      {/* )} */}
       <ModalAddDish
         form={form}
         isModalOpen={isModalOpen}

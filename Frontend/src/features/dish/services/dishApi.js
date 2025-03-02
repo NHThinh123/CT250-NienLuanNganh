@@ -10,13 +10,11 @@ const getDishByIdApi = (id) => {
   return axios.get(URL_API);
 };
 
-const createDishApi = async (formData) => {
-  const response = await axios.post("/api/dishes", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+const createDishApi = (formData) => {
+  const URL_API = "/api/dishes";
+  return axios.post(URL_API, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
-  return response.data;
 };
 
 const updateDishApi = (id, data) => {
