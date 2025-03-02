@@ -13,7 +13,7 @@ const ListPostHome = () => {
     <Row justify="center">
       <Col span={24}>
         <List
-          dataSource={postData}
+          dataSource={postData.posts}
           grid={{ gutter: 8, column: 1 }}
           renderItem={(item) => (
             <List.Item style={{ padding: "0px", margin: "0px" }}>

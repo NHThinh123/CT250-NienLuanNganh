@@ -1,5 +1,5 @@
 import { Row } from "antd";
-import banner1 from "../../../../assets/banner/banner1.jpg";
+import banner1 from "../../../../assets/banner/banner1.png";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
@@ -16,7 +16,7 @@ const BannerHome = () => {
           marginBottom: "10px",
         }}
         autoplay={{
-          delay: 2000,
+          delay: 3000,
           disableOnInteraction: false,
         }}
         loop={true}

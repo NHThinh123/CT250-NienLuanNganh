@@ -25,10 +25,12 @@ const Comment = ({ commentData, post_id, minWidth }) => {
     useState(false);
   const [isShowReply, setIsShowReply] = useState(false);
   const [isShowListReply, setIsShowListReply] = useState(false);
+
   const { replyData, loading } = useReplyComment(
     commentData?._id,
     isShowListReply
   );
+
   const handleShowReply = () => {
     setIsShowReply(!isShowReply);
   };
@@ -134,7 +136,9 @@ const Comment = ({ commentData, post_id, minWidth }) => {
               <Button
                 type="link"
                 style={{ padding: "0px", fontSize: "12px" }}
-                onClick={() => setIsShowListReply(!isShowListReply)}
+                onClick={() => {
+                  setIsShowListReply(!isShowListReply);
+                }}
               >
                 <p>
                   <CaretDownOutlined /> Xem {commentData.replyCount} phản hồi

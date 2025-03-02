@@ -28,13 +28,14 @@ const PostList = () => {
   //   key: post._id,
   //   username: post.user_id?.username || "Không có tên",
   // }));
+  if (loading) return <p>Loading...</p>;
 
   return (
     <>
       <Row style={{ minWidth: "800px" }} justify={"center"}>
         <Col xs={24} sm={24} md={24} lg={16}>
           <List
-            dataSource={postData}
+            dataSource={postData.posts}
             grid={{ gutter: 8, column: 1 }}
             renderItem={(item) => (
               <List.Item style={{ padding: "0px", margin: "0px" }}>

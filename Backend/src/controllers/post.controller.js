@@ -8,8 +8,16 @@ const {
 
 const getListPost = async (req, res, next) => {
   try {
-    const { user_id } = req.params;
-    const data = await getListPostService(user_id);
+    const { user_id, search, sort, filter, page, limit } = req.query;
+    const filterObj = filter ? JSON.parse(filter) : {};
+    const data = await getListPostService({
+      user_id,
+      search,
+      sort,
+      filter: filterObj,
+      page,
+      limit,
+    });
     res.status(200).json(data);
   } catch (error) {
     next(error);

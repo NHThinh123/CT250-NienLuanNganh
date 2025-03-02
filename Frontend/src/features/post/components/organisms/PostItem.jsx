@@ -23,11 +23,13 @@ const PostItem = ({ postData }) => {
         showModal={showModal}
         commentCount={postData?.commentCount}
       ></PostFooter>
-      <CommentModal
-        post_id={postData?._id}
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-      ></CommentModal>
+      {isModalOpen && (
+        <CommentModal
+          post_id={postData?._id}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        ></CommentModal>
+      )}
     </BoxContainer>
   );
 };
