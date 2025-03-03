@@ -89,7 +89,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
     }
   }, [isShowReply]);
   return (
-    <Row style={{ minWidth: minWidth || "380px" }}>
+    <Row style={{ minWidth: minWidth || "380px", margin: 0 }}>
       <Col style={{ marginRight: "10px" }}>
         <Avatar src={commentData?.user_id?.avatar}></Avatar>
       </Col>

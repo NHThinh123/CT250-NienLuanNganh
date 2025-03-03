@@ -44,6 +44,7 @@ const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
         overflowY: "auto",
         scrollbarWidth: "thin",
         padding: "0px 8px",
+        margin: "0px",
       }}
     >
       <Col span={24}>
@@ -51,6 +52,7 @@ const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
           ref={listRef}
           grid={{ gutter: 0, column: 1 }}
           split={false}
+          style={{ padding: "0px", margin: "0px" }}
           dataSource={commentData}
           renderItem={(comment) => (
             <List.Item>

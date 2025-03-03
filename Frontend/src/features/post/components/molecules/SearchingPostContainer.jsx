@@ -1,15 +1,10 @@
-import { Button, Input, Typography } from "antd";
+import { Button, Typography } from "antd";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import { MessageCircleMore, ThumbsUp, UserPen } from "lucide-react";
 
 const SearchingPostContainer = () => {
   return (
     <BoxContainer>
-      <Typography.Title level={4}>Tìm kiếm</Typography.Title>
-      <Input.Search
-        placeholder="Nhập từ khóa liên quan tới bài viết"
-        allowClear
-      />
       <Typography.Title level={4} style={{ marginTop: "16px" }}>
         Phân loại
       </Typography.Title>

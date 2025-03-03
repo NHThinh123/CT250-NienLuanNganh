@@ -1,14 +1,27 @@
+import { useState } from "react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import { Select } from "antd";
-import Search from "antd/es/input/Search";
-import { Option } from "antd/es/mentions";
+import { Select, Input } from "antd";
+
+const { Option } = Select;
 
 const PostFilter = ({ handleSearch, handleSortChange }) => {
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleInputChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSearchClick = () => {
+    handleSearch(searchValue);
+  };
+
   return (
-    <BoxContainer style={{ marginBottom: 16, display: "flex", gap: 10 }}>
-      <Search
+    <BoxContainer style={{ display: "flex", gap: 10 }}>
+      <Input.Search
         placeholder="Tìm kiếm bài viết"
-        onSearch={handleSearch}
+        value={searchValue}
+        onChange={handleInputChange}
+        onSearch={handleSearchClick}
         enterButton
       />
       <Select
