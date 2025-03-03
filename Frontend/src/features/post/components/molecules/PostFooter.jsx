@@ -4,7 +4,7 @@ import {
   ShareAltOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Row, Typography } from "antd";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useLikePost from "../../hooks/useLikePost";
 import useUnlikePost from "../../hooks/useUnLikePost";
 import { AuthContext } from "../../../../contexts/auth.context";
@@ -70,6 +70,10 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
       );
     }
   };
+  useEffect(() => {
+    setIsLiked(postData?.isLike || false);
+    setLikeCount(postData?.likeCount || 0);
+  }, [postData]); // Khi postData thay đổi, state sẽ được cập nhật lại
   return (
     <>
       <Row style={{ textAlign: "center", marginTop: "16px" }}>

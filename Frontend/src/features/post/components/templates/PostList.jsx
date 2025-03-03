@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Col, List, Row, Spin } from "antd";
 import { useInView } from "react-intersection-observer";
 
@@ -6,12 +6,15 @@ import usePost from "../../hooks/usePost";
 import PostItem from "../organisms/PostItem";
 import SideBar from "../organisms/SideBar";
 import PostFilter from "../organisms/PostFilter";
+import { AuthContext } from "../../../../contexts/auth.context";
 
 const PostList = () => {
+  const { auth } = useContext(AuthContext);
   const [params, setParams] = useState({
     search: "",
-    sort: "newest",
+    sort: "most_likes",
     limit: 5,
+    user_id: auth?.user?.id,
   });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -50,7 +53,7 @@ const PostList = () => {
             )}
           />
           {isFetchingNextPage && (
-            <div style={{ textAlign: "center" }}>
+            <div style={{ textAlign: "center", padding: "10px" }}>
               <Spin />
             </div>
           )}

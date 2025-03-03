@@ -12,13 +12,13 @@ const PostFilter = ({ handleSearch, handleSortChange }) => {
         enterButton
       />
       <Select
-        defaultValue="most_comments"
+        defaultValue="most_likes"
         style={{ width: 150 }}
         onChange={handleSortChange}
       >
         <Option value="newest">Mới nhất</Option>
         <Option value="oldest">Cũ nhất</Option>
-        <Option value="most_likes">Nhiều lượt thích</Option>
+        <Option value="most_likes">Phù hợp nhất</Option>
         <Option value="most_comments">Nhiều bình luận</Option>
       </Select>
     </BoxContainer>
