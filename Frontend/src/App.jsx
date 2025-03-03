@@ -9,12 +9,14 @@ import logo from "../src/assets/logo/logo.png";
 import Footer from "./components/templates/Footer";
 import ScrollToTop from "./components/atoms/ScrollToTop";
 
+const { Header, Content } = Layout;
+
 function App() {
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
   const { business, setBusiness } = useContext(BusinessContext);
 
-  const [isLoggingOut, setIsLoggingOut] = useState(false); // Trạng thái loading
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isUserLoggedIn = auth?.isAuthenticated;
   const isBusinessLoggedIn = business?.isAuthenticated;
@@ -22,18 +24,17 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-      ? business.business?.avatar // 🔥 Đảm bảo lấy đúng avatar
-      : null;
+    ? business.business?.avatar
+    : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-      ? business.business?.business_name // 🔥 Đảm bảo lấy đúng tên
-      : "";
+    ? business.business?.business_name
+    : "";
 
   const handleLogout = () => {
-    setIsLoggingOut(true); // Bật trạng thái loading
-
+    setIsLoggingOut(true);
     setTimeout(() => {
       if (isUserLoggedIn) {
         setAuth({ isAuthenticated: false, user: {} });
@@ -43,10 +44,9 @@ function App() {
         setBusiness({ isAuthenticated: false, business: {} });
         localStorage.removeItem("authBusiness");
       }
-
-      setIsLoggingOut(false); // Tắt trạng thái loading
+      setIsLoggingOut(false);
       navigate("/");
-    }, 2000); // Giả lập loading 2 giây (có thể thay bằng API call)
+    }, 2000);
   };
 
   const menuItems = [
@@ -84,36 +84,81 @@ function App() {
         </div>
       )}
 
-      <div
+      {/* Header cố định */}
+      <Header
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          zIndex: 1000,
+          backgroundColor: "#fff",
           padding: "0 20px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+          height: "64px", // Chiều cao cố định
+          lineHeight: "64px", // Căn giữa theo chiều dọc
         }}
       >
-        <img src={logo} style={{ width: "12vw", height: "12vh" }} alt="logo" />
-        <Space>
-          {isUserLoggedIn || isBusinessLoggedIn ? (
-            <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow>
-              <Space style={{ cursor: "pointer" }}>
-                <Avatar src={avatarSrc} icon={!avatarSrc && <UserOutlined />} />
-                <span>{displayName}</span>
-              </Space>
-            </Dropdown>
-          ) : (
-            <>
-              <Button type="primary" onClick={() => navigate("/login")}>
-                Đăng nhập
-              </Button>
-              <Button onClick={() => navigate("/signup")}>Đăng ký</Button>
-            </>
-          )}
-        </Space>
-      </div>
-      <NavBar />
-      <ScrollToTop />
-      <Outlet />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "100%", // Đảm bảo chiếm toàn bộ chiều cao của header
+          }}
+        >
+          {/* Logo */}
+          <div style={{ flexShrink: 0, marginTop: "16px" }}>
+            <img
+              src={logo}
+              style={{ height: "60px", width: "auto" }} // Điều chỉnh kích thước logo
+              alt="logo"
+            />
+          </div>
+
+          {/* NavBar */}
+          <div style={{ flexGrow: 1, padding: 20 }}>
+            <NavBar />
+          </div>
+
+          {/* Đăng nhập/Đăng ký hoặc Avatar */}
+          <div style={{ flexShrink: 0 }}>
+            <Space>
+              {isUserLoggedIn || isBusinessLoggedIn ? (
+                <Dropdown
+                  menu={{ items: menuItems }}
+                  placement="bottomRight"
+                  arrow
+                >
+                  <Space style={{ cursor: "pointer" }}>
+                    <Avatar
+                      src={avatarSrc}
+                      icon={!avatarSrc && <UserOutlined />}
+                    />
+                    <span>{displayName}</span>
+                  </Space>
+                </Dropdown>
+              ) : (
+                <>
+                  <Button type="primary" onClick={() => navigate("/login")}>
+                    Đăng nhập
+                  </Button>
+                  <Button onClick={() => navigate("/signup")}>Đăng ký</Button>
+                </>
+              )}
+            </Space>
+          </div>
+        </div>
+      </Header>
+
+      {/* Nội dung chính */}
+      <Content style={{ paddingTop: "64px" }}>
+        {" "}
+        {/* Padding dựa trên chiều cao header */}
+        <ScrollToTop />
+        <Outlet />
+      </Content>
+
       <Footer />
     </Layout>
   );

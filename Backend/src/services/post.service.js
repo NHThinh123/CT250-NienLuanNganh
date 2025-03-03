@@ -21,29 +21,23 @@ const getListPostService = async ({
     ? new mongoose.Types.ObjectId(user_id)
     : null;
 
-  // Giai đoạn pipeline (các bước xử lý)
   let pipeline = [];
 
-  /** 1. MATCH - Áp dụng bộ lọc */
-  let matchConditions = {};
-
+  /** 1. MATCH - Áp dụng bộ lọc không liên quan đến tags trước */
+  let initialMatchConditions = {};
   if (filter?.user_id) {
-    matchConditions.user_id = new mongoose.Types.ObjectId(filter.user_id);
+    initialMatchConditions.user_id = new mongoose.Types.ObjectId(
+      filter.user_id
+    );
   }
-
-  if (filter?.tags) {
-    matchConditions["tags.name"] = { $in: filter.tags };
-  }
-
   if (search) {
-    matchConditions.$or = [
+    initialMatchConditions.$or = [
       { title: { $regex: search, $options: "i" } },
       { content: { $regex: search, $options: "i" } },
     ];
   }
-
-  if (Object.keys(matchConditions).length > 0) {
-    pipeline.push({ $match: matchConditions });
+  if (Object.keys(initialMatchConditions).length > 0) {
+    pipeline.push({ $match: initialMatchConditions });
   }
 
   /** 2. LOOKUP - Kết hợp dữ liệu từ các bảng liên quan */
@@ -99,7 +93,18 @@ const getListPostService = async ({
     }
   );
 
-  /** 3. ADD FIELDS - Tính toán số like, comment và kiểm tra user có like bài viết không */
+  /** 3. MATCH - Áp dụng bộ lọc tags nếu có */
+  let totalMatchConditions = { ...initialMatchConditions }; // Sao chép điều kiện ban đầu để đếm tổng
+  if (filter?.tags) {
+    pipeline.push({
+      $match: {
+        "tags.tag_name": { $in: filter.tags },
+      },
+    });
+    totalMatchConditions["tags.tag_name"] = { $in: filter.tags }; // Cập nhật điều kiện đếm tổng
+  }
+
+  /** 4. ADD FIELDS - Tính toán số like, comment và kiểm tra user có like bài viết không */
   pipeline.push({
     $addFields: {
       likeCount: { $size: "$likes" },
@@ -116,22 +121,20 @@ const getListPostService = async ({
     },
   });
 
-  /** 4. SORT - Sắp xếp theo yêu cầu */
+  /** 5. SORT - Sắp xếp theo yêu cầu */
   let sortOptions = { createdAt: -1 }; // Mặc định sắp xếp mới nhất
   if (sort === "oldest") sortOptions = { createdAt: 1 };
   if (sort === "most_likes") sortOptions = { likeCount: -1 };
   if (sort === "most_comments") sortOptions = { commentCount: -1 };
-
   pipeline.push({ $sort: sortOptions });
 
-  /** 5. PAGINATION - Phân trang */
+  /** 6. PAGINATION - Phân trang */
   page = parseInt(page);
   limit = parseInt(limit);
   const skip = (page - 1) * limit;
-
   pipeline.push({ $skip: skip }, { $limit: limit });
 
-  /** 6. PROJECT - Lựa chọn trường cần trả về */
+  /** 7. PROJECT - Lựa chọn trường cần trả về */
   pipeline.push({
     $project: {
       user_id: 1,
@@ -150,11 +153,42 @@ const getListPostService = async ({
     },
   });
 
-  /** 7. EXECUTE QUERY */
+  /** 8. EXECUTE QUERY */
   let result = await Post.aggregate(pipeline);
 
-  /** 8. Tính tổng số bài viết */
-  let totalPosts = await Post.countDocuments(matchConditions);
+  /** 9. Tính tổng số bài viết */
+  let countPipeline = [];
+  if (Object.keys(initialMatchConditions).length > 0) {
+    countPipeline.push({ $match: initialMatchConditions });
+  }
+  countPipeline.push(
+    {
+      $lookup: {
+        from: "post_tags",
+        localField: "_id",
+        foreignField: "post_id",
+        as: "postTags",
+      },
+    },
+    {
+      $lookup: {
+        from: "tags",
+        localField: "postTags.tag_id",
+        foreignField: "_id",
+        as: "tags",
+      },
+    }
+  );
+  if (filter?.tags) {
+    countPipeline.push({
+      $match: {
+        "tags.tag_name": { $in: filter.tags },
+      },
+    });
+  }
+  countPipeline.push({ $count: "totalPosts" });
+  let countResult = await Post.aggregate(countPipeline);
+  let totalPosts = countResult.length > 0 ? countResult[0].totalPosts : 0;
 
   return {
     posts: result,

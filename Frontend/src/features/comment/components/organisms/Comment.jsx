@@ -1,5 +1,6 @@
 import {
   CaretDownOutlined,
+  CaretUpOutlined,
   HeartFilled,
   SendOutlined,
 } from "@ant-design/icons";
@@ -140,9 +141,16 @@ const Comment = ({ commentData, post_id, minWidth }) => {
                   setIsShowListReply(!isShowListReply);
                 }}
               >
-                <p>
-                  <CaretDownOutlined /> Xem {commentData.replyCount} phản hồi
-                </p>
+                {!isShowListReply ? (
+                  <p>
+                    {" "}
+                    <CaretDownOutlined /> Xem {commentData.replyCount} phản hồi
+                  </p>
+                ) : (
+                  <p>
+                    <CaretUpOutlined /> Ẩn {commentData.replyCount} phản hồi
+                  </p>
+                )}
               </Button>
             </Col>
           </Row>
@@ -167,7 +175,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           )}
         </Col>
       )}
-      {isShowReply && (
+      {isShowReply && user_id && (
         <Col span={24}>
           <Row>
             <Col span={1}></Col>

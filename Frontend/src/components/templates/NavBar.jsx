@@ -24,7 +24,7 @@ const NavBar = () => {
       <Menu
         items={items}
         mode="horizontal"
-        style={{ paddingTop: 8, paddingBottom: 8 }}
+        // style={{ paddingTop: 8, paddingBottom: 8 }}
       ></Menu>
     </div>
   );

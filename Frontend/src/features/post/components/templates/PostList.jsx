@@ -15,6 +15,9 @@ const PostList = () => {
     sort: "most_likes",
     limit: 6,
     user_id: auth?.user?.id,
+    filter: {
+      tags: [],
+    },
   });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -35,6 +38,16 @@ const PostList = () => {
     setParams((prev) => ({ ...prev, sort: value }));
   };
 
+  const handleTagFilter = (selectedTags) => {
+    setParams((prev) => ({
+      ...prev,
+      filter: {
+        ...prev.filter,
+        tags: selectedTags,
+      },
+    }));
+  };
+
   return (
     <>
       <Row style={{ minWidth: "800px" }} justify={"center"}>
@@ -42,6 +55,7 @@ const PostList = () => {
           <PostFilter
             handleSearch={handleSearch}
             handleSortChange={handleSortChange}
+            handleTagFilter={handleTagFilter}
           />
           <List
             dataSource={data?.pages?.flatMap((page) => page.posts)}
@@ -59,9 +73,23 @@ const PostList = () => {
           )}
           <div ref={ref} style={{ height: "20px" }} />
         </Col>
-        <Col xs={24} sm={0} md={0} lg={6}>
-          <SideBar />
-        </Col>
+        {auth.user.id && (
+          <Col
+            xs={24}
+            sm={0}
+            md={0}
+            lg={6}
+            style={{
+              position: "sticky",
+              top: "65px",
+              height: "fit-content",
+              maxHeight: "calc(100vh - 40px)",
+              overflowY: "auto",
+            }}
+          >
+            <SideBar />
+          </Col>
+        )}
       </Row>
     </>
   );
