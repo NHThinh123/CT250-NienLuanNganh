@@ -15,7 +15,10 @@ const PostItem = ({ postData }) => {
   };
   return (
     <BoxContainer style={{ minWidth: "500px" }}>
-      <PostHeader userData={postData?.user}></PostHeader>
+      <PostHeader
+        userData={postData?.user}
+        createAt={postData.createdAt}
+      ></PostHeader>
       <PostBody postData={postData}></PostBody>
       {postData?.images.length > 0 && (
         <PostImages imagesData={postData?.images}></PostImages>
