@@ -1,17 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { getPostByIdApi } from "../services/postApi";
-import { useContext } from "react";
-import { AuthContext } from "../../../contexts/auth.context";
+import { useAuthEntity } from "../../../hooks/useAuthEntry";
 
 const usePostById = (postId) => {
-  const { auth } = useContext(AuthContext);
+  const { entity } = useAuthEntity();
   const {
     data: postData = {},
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["posts", postId, auth?.user?.id],
-    queryFn: () => getPostByIdApi(postId, auth?.user?.id),
+    queryKey: ["posts", postId, entity?.id],
+    queryFn: () => getPostByIdApi(postId, entity?.id),
   });
 
   return { postData, isLoading, isError };

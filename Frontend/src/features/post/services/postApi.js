@@ -27,13 +27,13 @@ const deletePostApi = (id) => {
   return axios.delete(URL_API);
 };
 
-const likePostApi = (user_id, post_id) => {
+const likePostApi = (id, post_id) => {
   const URL_API = `api/user_like_post/like`;
-  return axios.put(URL_API, { user_id, post_id });
+  return axios.put(URL_API, { id, post_id });
 };
-const unlikePostApi = (user_id, post_id) => {
+const unlikePostApi = (id, post_id) => {
   const URL_API = `api/user_like_post/unlike`;
-  return axios.put(URL_API, { user_id, post_id });
+  return axios.put(URL_API, { id, post_id });
 };
 
 export {

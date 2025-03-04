@@ -52,12 +52,12 @@ const PostCard = ({ post }) => {
                 <Space>
                   <Avatar
                     src={
-                      post?.user?.avatar ||
+                      post?.author?.avatar ||
                       "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
                     }
                     size={20}
                   ></Avatar>
-                  <p>{post.user.name}</p>
+                  <p>{post.author?.name}</p>
                 </Space>
               </div>
               <div>

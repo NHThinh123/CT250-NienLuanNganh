@@ -21,7 +21,7 @@ const PostDetail = ({ postData, isLoading, isError }) => {
             <Col style={{ marginRight: "10px" }}>
               <Avatar
                 src={
-                  postData?.user?.avatar ||
+                  postData?.author?.avatar ||
                   "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
                 }
                 size={"large"}
@@ -29,7 +29,7 @@ const PostDetail = ({ postData, isLoading, isError }) => {
             </Col>
             <Col span={20}>
               <Typography.Title level={4} style={{ marginBottom: 0 }}>
-                {postData?.user?.name}
+                {postData?.author?.name}
               </Typography.Title>
               <Typography.Text>
                 {formatTime(postData?.createdAt)}

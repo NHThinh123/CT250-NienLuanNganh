@@ -7,45 +7,32 @@ const { createTagService } = require("./tag.service");
 const Tag = require("../models/tag.model");
 
 require("dotenv").config();
+
 const getListPostService = async ({
-  user_id,
-  business_id,
+  id, // Thay user_id và business_id bằng id duy nhất
   search,
   sort,
   filter,
   page = 1,
   limit = 10,
 }) => {
-  // Kiểm tra hợp lệ ObjectId
-  const isValidUserId = user_id
-    ? mongoose.Types.ObjectId.isValid(user_id)
-    : false;
-  const isValidBusinessId = business_id
-    ? mongoose.Types.ObjectId.isValid(business_id)
-    : false;
-  const userObjectId = isValidUserId
-    ? new mongoose.Types.ObjectId(user_id)
-    : null;
-  const businessObjectId = isValidBusinessId
-    ? new mongoose.Types.ObjectId(business_id)
-    : null;
+  // Kiểm tra hợp lệ ObjectId cho id
+  const isValidId = id ? mongoose.Types.ObjectId.isValid(id) : false;
+  const objectId = isValidId ? new mongoose.Types.ObjectId(id) : null;
 
   let pipeline = [];
 
   /** 1. MATCH - Áp dụng bộ lọc không liên quan đến tags trước */
   let initialMatchConditions = {};
-  if (filter?.user_id) {
-    initialMatchConditions.user_id = new mongoose.Types.ObjectId(
-      filter.user_id
-    );
-  }
-  if (filter?.business_id) {
-    initialMatchConditions.business_id = new mongoose.Types.ObjectId(
-      filter.business_id
-    );
+  if (filter?.id) {
+    initialMatchConditions.$or = [
+      { user_id: new mongoose.Types.ObjectId(filter.id) },
+      { business_id: new mongoose.Types.ObjectId(filter.id) },
+    ];
   }
   if (search) {
     initialMatchConditions.$or = [
+      ...(initialMatchConditions.$or || []),
       { title: { $regex: search, $options: "i" } },
       { content: { $regex: search, $options: "i" } },
     ];
@@ -67,7 +54,7 @@ const getListPostService = async ({
     {
       $unwind: {
         path: "$user",
-        preserveNullAndEmptyArrays: true, // Giữ lại document nếu không có user
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
@@ -81,7 +68,7 @@ const getListPostService = async ({
     {
       $unwind: {
         path: "$business",
-        preserveNullAndEmptyArrays: true, // Giữ lại document nếu không có business
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
@@ -164,20 +151,40 @@ const getListPostService = async ({
       isLike: {
         $cond: {
           if: {
-            $or: [
-              { $in: [userObjectId, "$likes.user_id"] },
-              { $in: [businessObjectId, "$likes.business_id"] },
+            $and: [
+              { $ne: [objectId, null] },
+              {
+                $or: [
+                  { $in: [objectId, "$likes.user_id"] },
+                  { $in: [objectId, "$likes.business_id"] },
+                ],
+              },
             ],
           },
           then: 1,
           else: 0,
         },
       },
+      author: {
+        $cond: {
+          if: { $ne: ["$user_id", null] },
+          then: {
+            id: "$user_id",
+            name: "$user.name",
+            avatar: "$user.avatar",
+          },
+          else: {
+            id: "$business_id",
+            name: "$business.business_name",
+            avatar: "$business.avatar",
+          },
+        },
+      },
     },
   });
 
   /** 6. SORT - Sắp xếp theo yêu cầu */
-  let sortOptions = { createdAt: -1 }; // Mặc định sắp xếp mới nhất
+  let sortOptions = { createdAt: -1 };
   if (sort === "oldest") sortOptions = { createdAt: 1 };
   if (sort === "most_likes") sortOptions = { likeCount: -1, createdAt: -1 };
   if (sort === "most_comments")
@@ -193,11 +200,6 @@ const getListPostService = async ({
     $project: {
       user_id: 1,
       business_id: 1,
-      "user.name": 1,
-      "user.email": 1,
-      "user.avatar": 1,
-      "business.business_name": 1,
-      "business.logo": 1,
       title: 1,
       content: 1,
       createdAt: 1,
@@ -207,23 +209,7 @@ const getListPostService = async ({
       likeCount: 1,
       commentCount: 1,
       isLike: 1,
-      entity: {
-        $cond: {
-          if: { $ne: ["$user_id", null] },
-          then: {
-            type: "user",
-            id: "$user_id",
-            name: "$user.name",
-            avatar: "$user.avatar",
-          },
-          else: {
-            type: "business",
-            id: "$business_id",
-            name: "$business.business_name",
-            avatar: "$business.logo",
-          },
-        },
-      },
+      author: 1,
     },
   });
 
@@ -275,22 +261,19 @@ const getListPostService = async ({
   };
 };
 
-const getPostByIdService = async (post_id, user_id) => {
+const getPostByIdService = async (post_id, id) => {
   if (!mongoose.Types.ObjectId.isValid(post_id)) {
     throw new AppError("Invalid post ID", 400);
   }
 
-  const isValidUserId = mongoose.Types.ObjectId.isValid(user_id);
-  const userObjectId = isValidUserId
-    ? new mongoose.Types.ObjectId(user_id)
-    : null;
+  const isValidId = id ? mongoose.Types.ObjectId.isValid(id) : false;
+  const objectId = isValidId ? new mongoose.Types.ObjectId(id) : null;
 
   let result = await Post.aggregate([
     {
       $match: { _id: new mongoose.Types.ObjectId(post_id) },
     },
     {
-      // Tìm kiếm thông tin user tác giả
       $lookup: {
         from: "users",
         localField: "user_id",
@@ -298,9 +281,27 @@ const getPostByIdService = async (post_id, user_id) => {
         as: "user",
       },
     },
-    { $unwind: "$user" },
     {
-      // Tìm kiếm ảnh của bài viết
+      $unwind: {
+        path: "$user",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "business_id",
+        foreignField: "_id",
+        as: "business",
+      },
+    },
+    {
+      $unwind: {
+        path: "$business",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
       $lookup: {
         from: "assets",
         localField: "_id",
@@ -309,7 +310,6 @@ const getPostByIdService = async (post_id, user_id) => {
       },
     },
     {
-      // Tìm kiếm tag của bài viết
       $lookup: {
         from: "post_tags",
         localField: "_id",
@@ -319,14 +319,13 @@ const getPostByIdService = async (post_id, user_id) => {
     },
     {
       $lookup: {
-        from: "tags", // Bảng chứa tên tags
+        from: "tags",
         localField: "postTags.tag_id",
         foreignField: "_id",
         as: "tags",
       },
     },
     {
-      // Tìm danh sách id người like bài viết
       $lookup: {
         from: "user_like_posts",
         localField: "_id",
@@ -335,7 +334,6 @@ const getPostByIdService = async (post_id, user_id) => {
       },
     },
     {
-      // Tìm danh sách comment của bài viết
       $lookup: {
         from: "comments",
         localField: "_id",
@@ -344,28 +342,44 @@ const getPostByIdService = async (post_id, user_id) => {
       },
     },
     {
-      // Tính số lượt like và kiểm tra user có like bài viết không
       $addFields: {
         likeCount: { $size: "$likes" },
         commentCount: { $size: "$comments" },
-        isLike: isValidUserId
+        isLike: isValidId
           ? {
               $cond: {
-                if: { $in: [userObjectId, "$likes.user_id"] },
+                if: {
+                  $or: [
+                    { $in: [objectId, "$likes.user_id"] },
+                    { $in: [objectId, "$likes.business_id"] },
+                  ],
+                },
                 then: 1,
                 else: 0,
               },
             }
-          : 0, // Nếu user_id không hợp lệ thì isLike = 0
+          : 0,
+        author: {
+          $cond: {
+            if: { $ne: ["$user_id", null] },
+            then: {
+              id: "$user_id",
+              name: "$user.name",
+              avatar: "$user.avatar",
+            },
+            else: {
+              id: "$business_id",
+              name: "$business.business_name",
+              avatar: "$business.avatar",
+            },
+          },
+        },
       },
     },
     {
-      // Chọn ra những trường cần thiết
       $project: {
         user_id: 1,
-        "user.name": 1,
-        "user.email": 1,
-        "user.avatar": 1,
+        business_id: 1,
         title: 1,
         content: 1,
         createdAt: 1,
@@ -375,6 +389,7 @@ const getPostByIdService = async (post_id, user_id) => {
         likeCount: 1,
         commentCount: 1,
         isLike: 1,
+        author: 1,
       },
     },
   ]);
@@ -383,9 +398,8 @@ const getPostByIdService = async (post_id, user_id) => {
     throw new AppError("Post not found", 404);
   }
 
-  return result[0]; // Trả về object thay vì array
+  return result[0];
 };
-
 const createPostService = async (
   user_id,
   business_id,

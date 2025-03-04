@@ -6,14 +6,15 @@ import PostCard from "../../../post/components/organisms/PostCard";
 import { useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../../contexts/auth.context";
+import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 const ListPostHome = () => {
   const navigate = useNavigate();
-  const { auth } = useContext(AuthContext);
+  const { entity } = useAuthEntity();
   const [params, setParams] = useState({
     search: "",
     sort: "most_likes",
     limit: 6,
-    user_id: auth?.user?.id,
+    id: entity.id,
   });
 
   const { data, isLoading } = usePost(params);

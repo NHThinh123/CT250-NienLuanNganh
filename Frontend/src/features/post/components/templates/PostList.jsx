@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Col, List, Row, Spin } from "antd";
 import { useInView } from "react-intersection-observer";
 
@@ -6,15 +6,16 @@ import usePost from "../../hooks/usePost";
 import PostItem from "../organisms/PostItem";
 import SideBar from "../organisms/SideBar";
 import PostFilter from "../organisms/PostFilter";
-import { AuthContext } from "../../../../contexts/auth.context";
+
+import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 
 const PostList = () => {
-  const { auth } = useContext(AuthContext);
+  const { entity } = useAuthEntity();
   const [params, setParams] = useState({
     search: "",
     sort: "most_likes",
     limit: 4,
-    user_id: auth?.user?.id,
+    id: entity.id,
     filter: {
       tags: [],
     },
@@ -73,7 +74,7 @@ const PostList = () => {
           )}
           <div ref={ref} style={{ height: "20px" }} />
         </Col>
-        {auth.user.id && (
+        {entity.id && (
           <Col
             xs={24}
             sm={0}

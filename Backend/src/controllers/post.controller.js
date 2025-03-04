@@ -8,7 +8,7 @@ const {
 
 const getListPost = async (req, res, next) => {
   try {
-    const { user_id, search, sort, filter, page, limit } = req.query;
+    const { id, search, sort, filter, page, limit } = req.query;
     let filterObj = {};
 
     // Kiểm tra và parse filter an toàn
@@ -21,7 +21,7 @@ const getListPost = async (req, res, next) => {
     }
 
     const data = await getListPostService({
-      user_id,
+      id,
       search,
       sort,
       filter: filterObj, // Truyền filter object

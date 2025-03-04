@@ -4,14 +4,15 @@ import {
   ShareAltOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Row, Typography } from "antd";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useLikePost from "../../hooks/useLikePost";
 import useUnlikePost from "../../hooks/useUnLikePost";
-import { AuthContext } from "../../../../contexts/auth.context";
+
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
+import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 
 const PostFooter = ({ postData, showModal, commentCount }) => {
-  const { auth } = useContext(AuthContext);
+  const { entity } = useAuthEntity();
   const { mutate: likePost } = useLikePost();
   const { mutate: unlikePost } = useUnlikePost();
 
@@ -19,7 +20,7 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
   const [likeCount, setLikeCount] = useState(postData?.likeCount || 0);
   const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
     useState(false);
-  const user_id = auth?.user?.id;
+
   const showLoginRequiredModal = () => {
     setIsLoginRequiredModalOpen(true);
   };
@@ -29,7 +30,7 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
   };
   // Hành động được bảo vệ (yêu cầu đăng nhập)
   const handleAction = (action) => {
-    if (!user_id) {
+    if (!entity?.id) {
       showLoginRequiredModal();
     } else {
       action();
@@ -39,7 +40,7 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
     if (!isLiked) {
       likePost(
         {
-          user_id: user_id,
+          id: entity.id,
           post_id: postData._id,
         },
         {
@@ -55,7 +56,7 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
     } else {
       unlikePost(
         {
-          user_id: user_id,
+          id: entity.id,
           post_id: postData._id,
         },
         {

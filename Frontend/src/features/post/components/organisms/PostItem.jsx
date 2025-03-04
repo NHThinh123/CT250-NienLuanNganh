@@ -16,7 +16,7 @@ const PostItem = ({ postData }) => {
   return (
     <BoxContainer style={{ minWidth: "500px" }}>
       <PostHeader
-        userData={postData?.user}
+        userData={postData?.author}
         createAt={postData.createdAt}
       ></PostHeader>
       <PostBody postData={postData}></PostBody>
