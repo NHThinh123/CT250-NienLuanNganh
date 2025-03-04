@@ -1,14 +1,14 @@
 import { Button, Form } from "antd";
 import { SquarePlus } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ModalAddDish from "../atoms/ModalAddDish";
-// import { BusinessContext } from "../../../../contexts/business.context";
+import { BusinessContext } from "../../../../contexts/business.context";
 
 const AddDish = ({ menuData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
 
-  // const { business } = useContext(BusinessContext);
+  const { business } = useContext(BusinessContext);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -24,11 +24,11 @@ const AddDish = ({ menuData }) => {
 
   return (
     <>
-      {/* {business.isAuthenticated && ( */}
-      <Button type="link" onClick={showModal} style={{ padding: 0 }}>
-        <SquarePlus />
-      </Button>
-      {/* )} */}
+      {business.isAuthenticated && (
+        <Button type="link" onClick={showModal} style={{ padding: 0 }}>
+          <SquarePlus />
+        </Button>
+      )}
       <ModalAddDish
         form={form}
         isModalOpen={isModalOpen}

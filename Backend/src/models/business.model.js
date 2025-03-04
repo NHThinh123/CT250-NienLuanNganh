@@ -12,24 +12,24 @@ const BusinessSchema = new mongoose.Schema(
     avatar: { type: String, default: "" },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    rating_average: { type: Number, default: 0, min: 1, max: 5 },
-    dish_lowest_cost: { type: Number, default: 0, min: 1000 },
-    dish_highest_cost: { type: Number, default: 0, min: 1000 },
+    rating_average: { type: Number, default: 0, min: 0, max: 5 },
+    dish_lowest_cost: { type: Number, default: 0 },
+    dish_highest_cost: { type: Number, default: 0 },
     status: {
       type: String,
-      enum: ['pending', 'active', 'suspended'],
-      default: 'pending'
+      enum: ["pending", "active", "suspended"],
+      default: "pending",
     },
     activationPayment: {
       type: Boolean,
-      default: false
+      default: false,
     },
     lastPaymentDate: {
-      type: Date
+      type: Date,
     },
     nextPaymentDueDate: {
-      type: Date
-    }
+      type: Date,
+    },
   },
   { timestamps: true }
 );
