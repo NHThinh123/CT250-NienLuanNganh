@@ -15,6 +15,8 @@ function App() {
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
   const { business, setBusiness } = useContext(BusinessContext);
+  console.log("Auth trong App:", auth);
+  console.log("Business trong App:", business);
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -24,14 +26,14 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-    ? business.business?.avatar
-    : null;
+      ? business.business?.avatar
+      : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-    ? business.business?.business_name
-    : "";
+      ? business.business?.business_name
+      : "";
 
   const handleLogout = () => {
     setIsLoggingOut(true);

@@ -1,4 +1,5 @@
 require("dotenv").config();
+require("./services/paymentScheduler")
 
 const express = require("express");
 const cors = require("cors");

@@ -15,14 +15,29 @@ const BusinessSchema = new mongoose.Schema(
     rating_average: { type: Number, default: 0, min: 1, max: 5 },
     dish_lowest_cost: { type: Number, default: 0, min: 1000 },
     dish_highest_cost: { type: Number, default: 0, min: 1000 },
+    status: {
+      type: String,
+      enum: ['pending', 'active', 'suspended'],
+      default: 'pending'
+    },
+    activationPayment: {
+      type: Boolean,
+      default: false
+    },
+    lastPaymentDate: {
+      type: Date
+    },
+    nextPaymentDueDate: {
+      type: Date
+    }
   },
   { timestamps: true }
 );
 
 // Thêm plugin xóa mềm
 BusinessSchema.plugin(mongooseDelete, {
-  deletedAt: true, // Tự động thêm trường `deletedAt`
-  overrideMethods: "all", // Ghi đè các phương thức mặc định (find, findOne, count...)
+  deletedAt: true,
+  overrideMethods: "all",
 });
 
 module.exports = mongoose.model("Business", BusinessSchema);
