@@ -5,7 +5,6 @@ import { loginUser } from "../services/userApi";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
 
-
 export const useLogin = () => {
   const { setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -25,7 +24,9 @@ export const useLogin = () => {
         email: data.user.email,
         role: data.user.role,
         name: data.user.name,
-        avatar: data.user.avatar || "", // Nếu không có avatar thì để chuỗi rỗng
+        avatar:
+          data.user.avatar ||
+          "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg", // Nếu không có avatar thì để chuỗi rỗng
         dateOfBirth: data.user.dateOfBirth,
       };
 

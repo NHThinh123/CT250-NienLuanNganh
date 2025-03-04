@@ -10,7 +10,6 @@ const Footer = () => {
   return (
     <Row
       style={{ backgroundColor: "#fff", padding: "32px", marginTop: "32px" }}
-      gutter={16}
     >
       <Col span={4}>
         <Typography.Title level={4}>Dịch vụ</Typography.Title>

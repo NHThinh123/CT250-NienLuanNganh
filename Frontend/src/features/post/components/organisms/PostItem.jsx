@@ -15,19 +15,26 @@ const PostItem = ({ postData }) => {
   };
   return (
     <BoxContainer style={{ minWidth: "500px" }}>
-      <PostHeader userData={postData?.user}></PostHeader>
+      <PostHeader
+        userData={postData?.user}
+        createAt={postData.createdAt}
+      ></PostHeader>
       <PostBody postData={postData}></PostBody>
-      <PostImages imagesData={postData?.images}></PostImages>
+      {postData?.images.length > 0 && (
+        <PostImages imagesData={postData?.images}></PostImages>
+      )}
       <PostFooter
         postData={postData}
         showModal={showModal}
         commentCount={postData?.commentCount}
       ></PostFooter>
-      <CommentModal
-        post_id={postData?._id}
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-      ></CommentModal>
+      {isModalOpen && (
+        <CommentModal
+          post_id={postData?._id}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        ></CommentModal>
+      )}
     </BoxContainer>
   );
 };

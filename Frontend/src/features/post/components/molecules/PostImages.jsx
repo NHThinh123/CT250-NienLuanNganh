@@ -24,7 +24,7 @@ const PostImages = ({ imagesData }) => {
             navigation
             className="mySwiper2"
           >
-            {imagesData.map((image, index) => (
+            {imagesData?.map((image, index) => (
               <SwiperSlide
                 key={index}
                 style={{ maxHeight: "500px", overflow: "cover" }}
@@ -39,17 +39,17 @@ const PostImages = ({ imagesData }) => {
               </SwiperSlide>
             ))}
           </Swiper>
-          {imagesData.length > 1 && (
+          {imagesData?.length > 1 && (
             <Swiper
               onSwiper={setThumbsSwiper}
               spaceBetween={10}
-              slidesPerView={imagesData.length > 5 ? 5 : imagesData.length}
+              slidesPerView={imagesData?.length > 5 ? 5 : imagesData?.length}
               freeMode={true}
               watchSlidesProgress={true}
               modules={[FreeMode, Navigation, Thumbs]}
               className="mySwiper"
             >
-              {imagesData.map((image, index) => (
+              {imagesData?.map((image, index) => (
                 <SwiperSlide key={index} style={{ maxHeight: "100px" }}>
                   <img src={image?.url} alt={`Slide ${index}`} />
                 </SwiperSlide>

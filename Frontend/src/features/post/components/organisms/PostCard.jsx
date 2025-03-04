@@ -50,7 +50,13 @@ const PostCard = ({ post }) => {
 
               <div style={{ marginTop: "8px" }}>
                 <Space>
-                  <Avatar src={post.user.avatar} size={20}></Avatar>
+                  <Avatar
+                    src={
+                      post?.user?.avatar ||
+                      "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
+                    }
+                    size={20}
+                  ></Avatar>
                   <p>{post.user.name}</p>
                 </Space>
               </div>

@@ -3,7 +3,7 @@ import { getCommentApi } from "../services/commentApi";
 import { useContext, useMemo } from "react";
 import { AuthContext } from "../../../contexts/auth.context";
 
-const useComment = (post_id) => {
+const useComment = (post_id, enabled) => {
   const { auth } = useContext(AuthContext);
   const userId = auth?.user?.id || null;
 
@@ -19,7 +19,7 @@ const useComment = (post_id) => {
   } = useQuery({
     queryKey,
     queryFn: () => getCommentApi(post_id, userId),
-    enabled: !!post_id, // Chỉ fetch nếu có post_id hợp lệ
+    enabled,
   });
 
   return { commentData, loading, isError };

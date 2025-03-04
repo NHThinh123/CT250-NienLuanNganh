@@ -4,6 +4,7 @@ import PostImages from "../molecules/PostImages";
 import PostFooter from "../molecules/PostFooter";
 import { useState } from "react";
 import CommentModal from "../../../comment/components/templates/CommentModal";
+import { formatTime } from "../../../../constants/formatTime";
 
 const PostDetail = ({ postData, isLoading, isError }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,12 +19,21 @@ const PostDetail = ({ postData, isLoading, isError }) => {
         <BoxContainer style={{ padding: "20px" }}>
           <Row align={"middle"}>
             <Col style={{ marginRight: "10px" }}>
-              <Avatar src={postData?.user?.avatar} size={"large"}></Avatar>
+              <Avatar
+                src={
+                  postData?.user?.avatar ||
+                  "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
+                }
+                size={"large"}
+              ></Avatar>
             </Col>
             <Col span={20}>
-              <Typography.Title level={4}>
+              <Typography.Title level={4} style={{ marginBottom: 0 }}>
                 {postData?.user?.name}
               </Typography.Title>
+              <Typography.Text>
+                {formatTime(postData?.createdAt)}
+              </Typography.Text>
             </Col>
           </Row>
           <Divider />

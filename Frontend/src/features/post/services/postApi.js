@@ -1,8 +1,9 @@
 import axios from "../../../services/axios.customize";
 
-const getPostApi = (user_id) => {
-  const URL_API = `/api/posts/${user_id}`;
-  return axios.get(URL_API);
+const getPostApi = ({ pageParam = 1, queryKey }) => {
+  const [, params] = queryKey;
+  const URL_API = `/api/posts`;
+  return axios.get(URL_API, { params: { ...params, page: pageParam } });
 };
 
 const getPostByIdApi = (id, user_id) => {

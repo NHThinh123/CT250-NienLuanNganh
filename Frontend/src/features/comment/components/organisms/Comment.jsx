@@ -1,5 +1,6 @@
 import {
   CaretDownOutlined,
+  CaretUpOutlined,
   HeartFilled,
   SendOutlined,
 } from "@ant-design/icons";
@@ -25,10 +26,12 @@ const Comment = ({ commentData, post_id, minWidth }) => {
     useState(false);
   const [isShowReply, setIsShowReply] = useState(false);
   const [isShowListReply, setIsShowListReply] = useState(false);
+
   const { replyData, loading } = useReplyComment(
     commentData?._id,
     isShowListReply
   );
+
   const handleShowReply = () => {
     setIsShowReply(!isShowReply);
   };
@@ -87,7 +90,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
     }
   }, [isShowReply]);
   return (
-    <Row style={{ minWidth: minWidth || "380px" }}>
+    <Row style={{ minWidth: minWidth || "380px", margin: 0 }}>
       <Col style={{ marginRight: "10px" }}>
         <Avatar src={commentData?.user_id?.avatar}></Avatar>
       </Col>
@@ -134,11 +137,20 @@ const Comment = ({ commentData, post_id, minWidth }) => {
               <Button
                 type="link"
                 style={{ padding: "0px", fontSize: "12px" }}
-                onClick={() => setIsShowListReply(!isShowListReply)}
+                onClick={() => {
+                  setIsShowListReply(!isShowListReply);
+                }}
               >
-                <p>
-                  <CaretDownOutlined /> Xem {commentData.replyCount} phản hồi
-                </p>
+                {!isShowListReply ? (
+                  <p>
+                    {" "}
+                    <CaretDownOutlined /> Xem {commentData.replyCount} phản hồi
+                  </p>
+                ) : (
+                  <p>
+                    <CaretUpOutlined /> Ẩn {commentData.replyCount} phản hồi
+                  </p>
+                )}
               </Button>
             </Col>
           </Row>
@@ -163,7 +175,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           )}
         </Col>
       )}
-      {isShowReply && (
+      {isShowReply && user_id && (
         <Col span={24}>
           <Row>
             <Col span={1}></Col>

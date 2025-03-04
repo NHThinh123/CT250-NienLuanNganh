@@ -8,8 +8,26 @@ const {
 
 const getListPost = async (req, res, next) => {
   try {
-    const { user_id } = req.params;
-    const data = await getListPostService(user_id);
+    const { user_id, search, sort, filter, page, limit } = req.query;
+    let filterObj = {};
+
+    // Kiểm tra và parse filter an toàn
+    if (filter) {
+      try {
+        filterObj = typeof filter === "string" ? JSON.parse(filter) : filter;
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid filter format" });
+      }
+    }
+
+    const data = await getListPostService({
+      user_id,
+      search,
+      sort,
+      filter: filterObj, // Truyền filter object
+      page,
+      limit,
+    });
     res.status(200).json(data);
   } catch (error) {
     next(error);
