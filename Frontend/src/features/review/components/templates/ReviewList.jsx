@@ -4,8 +4,15 @@ const ReviewList = ({ reviewData }) => {
   return (
     <>
       <List
-        style={{ padding: 20 }}
+        style={{ padding: "20px 20px 0px 20px", justifyContent: "center" }}
         grid={{ gutter: 16, column: 1 }}
+        pagination={{
+          onChange: (page) => {
+            console.log(page);
+          },
+          pageSize: 3,
+          align: "center",
+        }}
         dataSource={reviewData}
         renderItem={(review) => (
           <List.Item>

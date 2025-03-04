@@ -1,24 +1,20 @@
-import { Button, Form } from "antd";
-import { SquarePlus } from "lucide-react";
+import { Button } from "antd";
 import { useState } from "react";
-import ModalAddMenu from "../atoms/ModalAddMenu";
-// import { BusinessContext } from "../../../../contexts/business.context";
+import ModalCreateReview from "../organisms/ModalCreateReview";
 
-const AddMenu = ({ businessId }) => {
+const CreateReview = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
-
-  //   const { business } = useContext(BusinessContext);
+  //   const [form] = Form.useForm();
 
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = async () => {
-    form.submit();
-    // setIsModalOpen(false);
+  const handleOk = () => {
+    // form.submit();
+    setIsModalOpen(false);
   };
   const handleCancel = () => {
-    form.resetFields();
+    // form.resetFields();
     setIsModalOpen(false);
   };
 
@@ -34,6 +30,7 @@ const AddMenu = ({ businessId }) => {
           border: "none",
           fontSize: 13,
           width: "calc(100% - 8px)",
+          height: 35,
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = "#CDE5FF";
@@ -42,35 +39,27 @@ const AddMenu = ({ businessId }) => {
           e.currentTarget.style.backgroundColor = "#FFFFFF";
         }}
       >
-        <div
+        <p
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
+            margin: 2,
+            fontWeight: "bold",
+            color: "#1677FF",
           }}
         >
-          <SquarePlus />
-          <p
-            style={{
-              margin: 2,
-              fontWeight: "bold",
-            }}
-          >
-            THÊM THỰC ĐƠN
-          </p>
-        </div>
+          VIẾT ĐÁNH GIÁ VỀ QUÁN
+        </p>
       </Button>
       {/* )} */}
-      <ModalAddMenu
-        form={form}
+      <ModalCreateReview
+        // form={form}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         handleOk={handleOk}
         setIsModalOpen={setIsModalOpen}
-        businessId={businessId}
+        // businessId={businessId}
       />
     </>
   );
 };
 
-export default AddMenu;
+export default CreateReview;

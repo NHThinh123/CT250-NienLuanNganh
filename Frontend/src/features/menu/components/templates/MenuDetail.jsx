@@ -5,6 +5,7 @@ import MenuDetailList from "../organisms/MenuDetailList";
 import ReviewList from "../../../review/components/templates/ReviewList";
 import useReviewByBusinessId from "../../../review/hooks/useReviewByBusinessId";
 import AddMenu from "../molecules/AddMenu";
+import CreateReview from "../../../review/components/templates/CreateReview";
 
 const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
   const reviewData = useReviewByBusinessId(business_id);
@@ -76,7 +77,23 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               }}
             >
               <div>
-                <ReviewList reviewData={reviewData.reviewData}></ReviewList>
+                <ReviewList reviewData={reviewData.reviewData} />
+              </div>
+              <hr
+                style={{
+                  height: "3px",
+                  border: "no",
+                  opacity: "0.5",
+                  margin: "15px 15px 5px 15px",
+                }}
+              />
+              <div
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "5px",
+                }}
+              >
+                <CreateReview />
               </div>
             </div>
           </Col>
