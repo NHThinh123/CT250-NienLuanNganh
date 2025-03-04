@@ -21,7 +21,7 @@ const Footer = () => {
             <Link to={"/"}>Trang chủ</Link>
           </List.Item>
           <List.Item>
-            <Link to={"/business"}>Quán ăn</Link>
+            <Link to={"/businesses"}>Quán ăn</Link>
           </List.Item>
         </List>
       </Col>
