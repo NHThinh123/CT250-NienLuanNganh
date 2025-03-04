@@ -1,16 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createReplyApi } from "../services/commentApi";
-import { useContext } from "react";
-import { AuthContext } from "../../../contexts/auth.context";
+
+import { useAuthEntity } from "../../../hooks/useAuthEntry";
 
 const useCreateReply = (comment_id) => {
-  const { auth } = useContext(AuthContext);
-  const userId = auth?.user?.id || null;
+  const { entity } = useAuthEntity();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createReplyApi,
     onSuccess: () => {
-      queryClient.invalidateQueries("comments", comment_id, userId);
+      queryClient.invalidateQueries("comments", comment_id, entity?.id);
     },
   });
 };

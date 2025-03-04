@@ -5,7 +5,10 @@ const user_like_commentSchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+    },
+    business_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
     },
     comment_id: {
       type: mongoose.Schema.Types.ObjectId,

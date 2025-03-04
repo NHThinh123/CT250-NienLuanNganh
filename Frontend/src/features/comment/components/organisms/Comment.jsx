@@ -7,18 +7,19 @@ import {
 import { Avatar, Button, Col, Form, message, Row, Typography } from "antd";
 import useLikeComment from "../../hooks/useLikeComment";
 import useUnlikeComment from "../../hooks/useUnlikeComment";
-import { useContext, useEffect, useRef, useState } from "react";
-import { AuthContext } from "../../../../contexts/auth.context";
+import { useEffect, useRef, useState } from "react";
+
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
 import TextArea from "antd/es/input/TextArea";
 import CommentList from "../templates/CommentList";
 import useReplyComment from "../../hooks/useReplyComment";
 import useCreateReply from "../../hooks/useCreateReply";
+import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 
 const Comment = ({ commentData, post_id, minWidth }) => {
-  const { auth } = useContext(AuthContext);
+  const { entity } = useAuthEntity();
   const [form] = Form.useForm();
-  const user_id = auth?.user?.id;
+
   const { mutate: createReply } = useCreateReply(commentData?._id);
   const { mutate: likeComment } = useLikeComment(post_id);
   const { mutate: unlikeComment } = useUnlikeComment(post_id);
@@ -44,7 +45,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
   };
   // Hành động được bảo vệ (yêu cầu đăng nhập)
   const handleAction = (action) => {
-    if (!user_id) {
+    if (!entity?.id) {
       showLoginRequiredModal();
     } else {
       action();
@@ -53,12 +54,12 @@ const Comment = ({ commentData, post_id, minWidth }) => {
   const handleLike = () => {
     if (!commentData?.isLike)
       likeComment({
-        user_id: user_id,
+        id: entity.id,
         comment_id: commentData?._id,
       });
     else
       unlikeComment({
-        user_id: user_id,
+        id: entity.id,
         comment_id: commentData?._id,
       });
   };
@@ -66,7 +67,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
     // if (!values.comment_content.trim()) return;
     createReply(
       {
-        user_id: auth?.user?.id,
+        id: entity.id,
         post_id: post_id,
         parent_comment_id: commentData?._id,
         comment_content: values.comment_content,
@@ -92,7 +93,12 @@ const Comment = ({ commentData, post_id, minWidth }) => {
   return (
     <Row style={{ minWidth: minWidth || "380px", margin: 0 }}>
       <Col style={{ marginRight: "10px" }}>
-        <Avatar src={commentData?.user_id?.avatar}></Avatar>
+        <Avatar
+          src={
+            commentData?.author?.avatar ||
+            "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
+          }
+        ></Avatar>
       </Col>
       <Col style={{ maxWidth: "89%" }}>
         <div
@@ -102,7 +108,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
             borderRadius: "10px",
           }}
         >
-          <Typography.Text strong>{commentData?.user_id?.name}</Typography.Text>
+          <Typography.Text strong>{commentData?.author?.name}</Typography.Text>
           <br />
           <Typography.Text>{commentData?.comment_content}</Typography.Text>
         </div>
@@ -122,7 +128,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           <Button
             type="link"
             style={{ padding: "0px", fontSize: "12px" }}
-            onClick={handleShowReply}
+            onClick={() => handleAction(handleShowReply)}
           >
             <p style={{ fontWeight: "bold", color: "gray" }}>Phản hồi</p>
           </Button>
@@ -175,12 +181,12 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           )}
         </Col>
       )}
-      {isShowReply && user_id && (
+      {isShowReply && entity.id && (
         <Col span={24}>
           <Row>
             <Col span={1}></Col>
             <Col span={2} style={{ textAlign: "center" }}>
-              <Avatar size={"small"} src={auth.user.avatar}></Avatar>
+              <Avatar size={"small"} src={entity.avatar}></Avatar>
             </Col>
             <Col span={20}>
               <div

@@ -20,20 +20,31 @@ const useBusinessLogin = () => {
         id: data.business.id,
         email: data.business.email,
         business_name: data.business.business_name,
-        avatar: data.business.avatar || "",
+        avatar:
+          data.business.avatar ||
+          "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg",
         contact_info: data.business.contact_info,
         location: data.business.location,
         open_hours: data.business.open_hours,
         close_hours: data.business.close_hours,
       };
-      console.log("Dữ liệu business trước khi set:", { isAuthenticated: true, business: businessData });
+      console.log("Dữ liệu business trước khi set:", {
+        isAuthenticated: true,
+        business: businessData,
+      });
 
       setBusiness({ isAuthenticated: true, business: businessData });
       setAuth({ isAuthenticated: false, user: {} }); // Reset auth
-      localStorage.setItem("authBusiness", JSON.stringify({ isAuthenticated: true, business: businessData }));
+      localStorage.setItem(
+        "authBusiness",
+        JSON.stringify({ isAuthenticated: true, business: businessData })
+      );
       localStorage.removeItem("authUser"); // Xóa authUser
 
-      console.log("💾 Dữ liệu sau khi lưu localStorage:", JSON.parse(localStorage.getItem("authBusiness")));
+      console.log(
+        "💾 Dữ liệu sau khi lưu localStorage:",
+        JSON.parse(localStorage.getItem("authBusiness"))
+      );
 
       message.success("Đăng nhập thành công!");
       setTimeout(() => {

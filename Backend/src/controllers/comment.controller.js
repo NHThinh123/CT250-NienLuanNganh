@@ -9,9 +9,9 @@ const {
 
 const createComment = async (req, res, next) => {
   try {
-    const { user_id, post_id, parent_comment_id, comment_content } = req.body;
+    const { id, post_id, parent_comment_id, comment_content } = req.body;
     const data = await createCommentService(
-      user_id,
+      id,
       post_id,
       parent_comment_id,
       comment_content

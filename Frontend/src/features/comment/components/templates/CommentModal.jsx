@@ -8,19 +8,18 @@ import {
   Row,
   Typography,
 } from "antd";
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SendOutlined } from "@ant-design/icons";
 import useComment from "../../hooks/useComment";
 import useCreateComment from "../../hooks/useCreateComment";
 import CommentList from "./CommentList";
-import { AuthContext } from "../../../../contexts/auth.context";
+
+import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 
 const { TextArea } = Input;
 
 const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
-  const { auth } = useContext(AuthContext);
-
-  const user_id = auth?.user?.id;
+  const { entity } = useAuthEntity();
   const [form] = Form.useForm();
   const { commentData } = useComment(post_id, isModalOpen);
   const { mutate: createComment, isPending } = useCreateComment();
@@ -42,7 +41,7 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
     createComment(
       {
         post_id: post_id,
-        user_id: auth?.user?.id,
+        id: entity?.id,
         comment_content: inputValue,
       },
       {
@@ -77,7 +76,7 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
       onCancel={() => setIsModalOpen(false)}
       width={700}
       footer={
-        user_id ? (
+        entity?.id ? (
           <Form form={form} onFinish={handleSubmit}>
             <Row>
               <Col span={20}>

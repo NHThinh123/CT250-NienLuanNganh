@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { useContext, useMemo } from "react";
-import { AuthContext } from "../../../contexts/auth.context";
+import { useMemo } from "react";
+
 import { getReplyCommentApi } from "../services/commentApi";
+import { useAuthEntity } from "../../../hooks/useAuthEntry";
 
 const useReplyComment = (comment_id, enabled) => {
-  const { auth } = useContext(AuthContext);
-  const userId = auth?.user?.id || null;
+  const { entity } = useAuthEntity();
 
   const queryKey = useMemo(
-    () => ["replies", comment_id, userId],
-    [comment_id, userId]
+    () => ["replies", comment_id, entity?.id],
+    [comment_id, entity?.id]
   );
 
   const {
@@ -18,7 +18,7 @@ const useReplyComment = (comment_id, enabled) => {
     isError,
   } = useQuery({
     queryKey,
-    queryFn: () => getReplyCommentApi(comment_id, userId),
+    queryFn: () => getReplyCommentApi(comment_id, entity?.id),
     enabled,
   });
 

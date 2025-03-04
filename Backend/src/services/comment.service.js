@@ -1,19 +1,40 @@
 const mongoose = require("mongoose");
 const AppError = require("../utils/AppError");
 const Comment = require("../models/comment.model");
+const User = require("../models/user.model"); // Thêm model User
+const Business = require("../models/business.model"); // Thêm model Business
 require("dotenv").config();
 
 const createCommentService = async (
-  user_id,
+  id,
   post_id,
   parent_comment_id,
   comment_content
 ) => {
-  if (!user_id || !post_id || !comment_content) {
+  if (!id || !post_id || !comment_content) {
     throw new AppError("Missing required fields", 400);
   }
+
+  if (
+    !mongoose.Types.ObjectId.isValid(id) ||
+    !mongoose.Types.ObjectId.isValid(post_id)
+  ) {
+    throw new AppError("Invalid ID or post ID", 400);
+  }
+
+  const objectId = new mongoose.Types.ObjectId(id);
+
+  // Kiểm tra xem id thuộc về user hay business
+  const user = await User.findById(objectId);
+  const business = await Business.findById(objectId);
+
+  if (!user && !business) {
+    throw new AppError("ID does not belong to any user or business", 404);
+  }
+
   let result = await Comment.create({
-    user_id: user_id,
+    user_id: user ? objectId : null,
+    business_id: business ? objectId : null,
     post_id: post_id,
     parent_comment_id: parent_comment_id,
     comment_content: comment_content,
@@ -22,10 +43,14 @@ const createCommentService = async (
 };
 
 const getListCommentByPostService = async (query) => {
-  const { post_id, user_id } = query;
+  const { post_id, id } = query;
   if (!mongoose.Types.ObjectId.isValid(post_id)) {
     throw new AppError("Invalid post ID", 400);
   }
+
+  const isValidId = id ? mongoose.Types.ObjectId.isValid(id) : false;
+  const objectId = isValidId ? new mongoose.Types.ObjectId(id) : null;
+
   let comments = await Comment.aggregate([
     { $match: { post_id: new mongoose.Types.ObjectId(post_id) } },
     {
@@ -33,10 +58,19 @@ const getListCommentByPostService = async (query) => {
         from: "users",
         localField: "user_id",
         foreignField: "_id",
-        as: "user_id",
+        as: "user",
       },
     },
-    { $unwind: "$user_id" },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "business_id",
+        foreignField: "_id",
+        as: "business",
+      },
+    },
+    { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
     {
       $lookup: {
         from: "user_like_comments",
@@ -48,19 +82,35 @@ const getListCommentByPostService = async (query) => {
     {
       $addFields: {
         likeCount: { $size: "$likes" },
-        isLike: {
-          $in: [new mongoose.Types.ObjectId(user_id), "$likes.user_id"],
+        isLike: isValidId
+          ? {
+              $or: [
+                { $in: [objectId, "$likes.user_id"] },
+                { $in: [objectId, "$likes.business_id"] },
+              ],
+            }
+          : false,
+        author: {
+          $cond: {
+            if: { $ne: ["$user_id", null] },
+            then: {
+              id: "$user_id",
+              name: "$user.name",
+              avatar: "$user.avatar",
+            },
+            else: {
+              id: "$business_id",
+              name: "$business.business_name",
+              avatar: "$business.avatar",
+            },
+          },
         },
       },
     },
     { $sort: { createdAt: -1 } },
     {
       $project: {
-        user_id: {
-          _id: 1,
-          name: 1,
-          avatar: 1,
-        },
+        author: 1,
         comment_content: 1,
         createdAt: 1,
         likeCount: 1,
@@ -81,43 +131,34 @@ const getListCommentByPostService = async (query) => {
   return result;
 };
 
-const getCommentByIdService = async (comment_id) => {
+const getCommentByIdService = async (comment_id, id) => {
   if (!mongoose.Types.ObjectId.isValid(comment_id)) {
     throw new AppError("Invalid comment ID", 400);
   }
 
-  let result = await Comment.findById(comment_id).populate(
-    "user_id",
-    "name _id"
-  );
+  const isValidId = id ? mongoose.Types.ObjectId.isValid(id) : false;
+  const objectId = isValidId ? new mongoose.Types.ObjectId(id) : null;
 
-  if (!result) {
-    throw new AppError("Comment not found", 404);
-  }
-  let replies = await Comment.find({ parent_comment_id: comment_id }).populate(
-    "user_id",
-    "name _id"
-  );
-  return { ...result._doc, replies };
-};
-
-const getReplyByCommentService = async (query) => {
-  const { comment_id, user_id } = query;
-  if (!mongoose.Types.ObjectId.isValid(comment_id)) {
-    throw new AppError("Invalid comment ID", 400);
-  }
-
-  let replies = await Comment.aggregate([
-    { $match: { parent_comment_id: new mongoose.Types.ObjectId(comment_id) } },
+  let result = await Comment.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(comment_id) } },
     {
       $lookup: {
         from: "users",
         localField: "user_id",
         foreignField: "_id",
-        as: "user_id",
+        as: "user",
       },
     },
-    { $unwind: "$user_id" },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "business_id",
+        foreignField: "_id",
+        as: "business",
+      },
+    },
+    { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
     {
       $lookup: {
         from: "user_like_comments",
@@ -129,18 +170,34 @@ const getReplyByCommentService = async (query) => {
     {
       $addFields: {
         likeCount: { $size: "$likes" },
-        isLike: {
-          $in: [new mongoose.Types.ObjectId(user_id), "$likes.user_id"],
+        isLike: isValidId
+          ? {
+              $or: [
+                { $in: [objectId, "$likes.user_id"] },
+                { $in: [objectId, "$likes.business_id"] },
+              ],
+            }
+          : false,
+        author: {
+          $cond: {
+            if: { $ne: ["$user_id", null] },
+            then: {
+              id: "$user_id",
+              name: "$user.name",
+              avatar: "$user.avatar",
+            },
+            else: {
+              id: "$business_id",
+              name: "$business.business_name",
+              avatar: "$business.avatar",
+            },
+          },
         },
       },
     },
     {
       $project: {
-        user_id: {
-          _id: 1,
-          name: 1,
-          avatar: 1,
-        },
+        author: 1,
         comment_content: 1,
         createdAt: 1,
         likeCount: 1,
@@ -150,7 +207,139 @@ const getReplyByCommentService = async (query) => {
     },
   ]);
 
-  // Đếm số lượng reply con cho từng reply
+  if (!result || result.length === 0) {
+    throw new AppError("Comment not found", 404);
+  }
+
+  let replies = await Comment.aggregate([
+    { $match: { parent_comment_id: new mongoose.Types.ObjectId(comment_id) } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "business_id",
+        foreignField: "_id",
+        as: "business",
+      },
+    },
+    { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
+    {
+      $addFields: {
+        author: {
+          $cond: {
+            if: { $ne: ["$user_id", null] },
+            then: {
+              id: "$user_id",
+              name: "$user.name",
+              avatar: "$user.avatar",
+            },
+            else: {
+              id: "$business_id",
+              name: "$business.business_name",
+              avatar: "$business.avatar",
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        author: 1,
+        comment_content: 1,
+        createdAt: 1,
+        parent_comment_id: 1,
+      },
+    },
+  ]);
+
+  return { ...result[0], replies };
+};
+
+const getReplyByCommentService = async (query) => {
+  const { comment_id, id } = query;
+  if (!mongoose.Types.ObjectId.isValid(comment_id)) {
+    throw new AppError("Invalid comment ID", 400);
+  }
+
+  const isValidId = id ? mongoose.Types.ObjectId.isValid(id) : false;
+  const objectId = isValidId ? new mongoose.Types.ObjectId(id) : null;
+
+  let replies = await Comment.aggregate([
+    { $match: { parent_comment_id: new mongoose.Types.ObjectId(comment_id) } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "business_id",
+        foreignField: "_id",
+        as: "business",
+      },
+    },
+    { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "user_like_comments",
+        localField: "_id",
+        foreignField: "comment_id",
+        as: "likes",
+      },
+    },
+    {
+      $addFields: {
+        likeCount: { $size: "$likes" },
+        isLike: isValidId
+          ? {
+              $or: [
+                { $in: [objectId, "$likes.user_id"] },
+                { $in: [objectId, "$likes.business_id"] },
+              ],
+            }
+          : false,
+        author: {
+          $cond: {
+            if: { $ne: ["$user_id", null] },
+            then: {
+              id: "$user_id",
+              name: "$user.name",
+              avatar: "$user.avatar",
+            },
+            else: {
+              id: "$business_id",
+              name: "$business.business_name",
+              avatar: "$business.avatar",
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        author: 1,
+        comment_content: 1,
+        createdAt: 1,
+        likeCount: 1,
+        isLike: 1,
+        parent_comment_id: 1,
+      },
+    },
+  ]);
+
   for (let reply of replies) {
     let replyCount = await Comment.countDocuments({
       parent_comment_id: reply._id,

@@ -7,8 +7,8 @@ const {
 
 const likeComment = async (req, res, next) => {
   try {
-    const { user_id, comment_id } = req.body;
-    const data = await likeCommentService(user_id, comment_id);
+    const { id, comment_id } = req.body;
+    const data = await likeCommentService(id, comment_id);
     res.status(200).json(data);
   } catch (error) {
     next(error);
@@ -17,8 +17,8 @@ const likeComment = async (req, res, next) => {
 
 const unlikeComment = async (req, res, next) => {
   try {
-    const { user_id, comment_id } = req.body;
-    const data = await unlikeCommentService(user_id, comment_id);
+    const { id, comment_id } = req.body;
+    const data = await unlikeCommentService(id, comment_id);
     res.status(200).json(data);
   } catch (error) {
     next(error);
