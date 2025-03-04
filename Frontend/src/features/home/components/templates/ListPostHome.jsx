@@ -12,7 +12,7 @@ const ListPostHome = () => {
   const [params, setParams] = useState({
     search: "",
     sort: "most_likes",
-    limit: 5,
+    limit: 6,
     user_id: auth?.user?.id,
   });
 

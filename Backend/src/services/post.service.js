@@ -7,18 +7,27 @@ const { createTagService } = require("./tag.service");
 const Tag = require("../models/tag.model");
 
 require("dotenv").config();
-
 const getListPostService = async ({
   user_id,
+  business_id,
   search,
   sort,
   filter,
   page = 1,
   limit = 10,
 }) => {
-  const isValidUserId = mongoose.Types.ObjectId.isValid(user_id);
+  // Kiểm tra hợp lệ ObjectId
+  const isValidUserId = user_id
+    ? mongoose.Types.ObjectId.isValid(user_id)
+    : false;
+  const isValidBusinessId = business_id
+    ? mongoose.Types.ObjectId.isValid(business_id)
+    : false;
   const userObjectId = isValidUserId
     ? new mongoose.Types.ObjectId(user_id)
+    : null;
+  const businessObjectId = isValidBusinessId
+    ? new mongoose.Types.ObjectId(business_id)
     : null;
 
   let pipeline = [];
@@ -28,6 +37,11 @@ const getListPostService = async ({
   if (filter?.user_id) {
     initialMatchConditions.user_id = new mongoose.Types.ObjectId(
       filter.user_id
+    );
+  }
+  if (filter?.business_id) {
+    initialMatchConditions.business_id = new mongoose.Types.ObjectId(
+      filter.business_id
     );
   }
   if (search) {
@@ -50,7 +64,26 @@ const getListPostService = async ({
         as: "user",
       },
     },
-    { $unwind: "$user" },
+    {
+      $unwind: {
+        path: "$user",
+        preserveNullAndEmptyArrays: true, // Giữ lại document nếu không có user
+      },
+    },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "business_id",
+        foreignField: "_id",
+        as: "business",
+      },
+    },
+    {
+      $unwind: {
+        path: "$business",
+        preserveNullAndEmptyArrays: true, // Giữ lại document nếu không có business
+      },
+    },
     {
       $lookup: {
         from: "assets",
@@ -94,53 +127,77 @@ const getListPostService = async ({
   );
 
   /** 3. MATCH - Áp dụng bộ lọc tags nếu có */
-  let totalMatchConditions = { ...initialMatchConditions }; // Sao chép điều kiện ban đầu để đếm tổng
+  let totalMatchConditions = { ...initialMatchConditions };
   if (filter?.tags) {
     pipeline.push({
       $match: {
         "tags.tag_name": { $in: filter.tags },
       },
     });
-    totalMatchConditions["tags.tag_name"] = { $in: filter.tags }; // Cập nhật điều kiện đếm tổng
+    totalMatchConditions["tags.tag_name"] = { $in: filter.tags };
   }
 
-  /** 4. ADD FIELDS - Tính toán số like, comment và kiểm tra user có like bài viết không */
+  /** 4. GROUP - Loại bỏ trùng lặp và giữ lại dữ liệu cần thiết */
+  pipeline.push({
+    $group: {
+      _id: "$_id",
+      user_id: { $first: "$user_id" },
+      business_id: { $first: "$business_id" },
+      user: { $first: "$user" },
+      business: { $first: "$business" },
+      title: { $first: "$title" },
+      content: { $first: "$content" },
+      createdAt: { $first: "$createdAt" },
+      updatedAt: { $first: "$updatedAt" },
+      images: { $first: "$images" },
+      tags: { $first: "$tags" },
+      likes: { $first: "$likes" },
+      comments: { $first: "$comments" },
+    },
+  });
+
+  /** 5. ADD FIELDS - Tính toán số like, comment và trạng thái like */
   pipeline.push({
     $addFields: {
       likeCount: { $size: "$likes" },
       commentCount: { $size: "$comments" },
-      isLike: isValidUserId
-        ? {
-            $cond: {
-              if: { $in: [userObjectId, "$likes.user_id"] },
-              then: 1,
-              else: 0,
-            },
-          }
-        : 0,
+      isLike: {
+        $cond: {
+          if: {
+            $or: [
+              { $in: [userObjectId, "$likes.user_id"] },
+              { $in: [businessObjectId, "$likes.business_id"] },
+            ],
+          },
+          then: 1,
+          else: 0,
+        },
+      },
     },
   });
 
-  /** 5. SORT - Sắp xếp theo yêu cầu */
+  /** 6. SORT - Sắp xếp theo yêu cầu */
   let sortOptions = { createdAt: -1 }; // Mặc định sắp xếp mới nhất
   if (sort === "oldest") sortOptions = { createdAt: 1 };
-  if (sort === "most_likes") sortOptions = { likeCount: -1 };
-  if (sort === "most_comments") sortOptions = { commentCount: -1 };
+  if (sort === "most_likes") sortOptions = { likeCount: -1, createdAt: -1 };
+  if (sort === "most_comments")
+    sortOptions = { commentCount: -1, createdAt: -1 };
   pipeline.push({ $sort: sortOptions });
 
-  /** 6. PAGINATION - Phân trang */
-  page = parseInt(page);
-  limit = parseInt(limit);
-  const skip = (page - 1) * limit;
-  pipeline.push({ $skip: skip }, { $limit: limit });
+  /** 7. PAGINATION - Phân trang */
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+  pipeline.push({ $skip: skip }, { $limit: parseInt(limit) });
 
-  /** 7. PROJECT - Lựa chọn trường cần trả về */
+  /** 8. PROJECT - Lựa chọn trường cần trả về */
   pipeline.push({
     $project: {
       user_id: 1,
+      business_id: 1,
       "user.name": 1,
       "user.email": 1,
       "user.avatar": 1,
+      "business.business_name": 1,
+      "business.logo": 1,
       title: 1,
       content: 1,
       createdAt: 1,
@@ -150,13 +207,30 @@ const getListPostService = async ({
       likeCount: 1,
       commentCount: 1,
       isLike: 1,
+      entity: {
+        $cond: {
+          if: { $ne: ["$user_id", null] },
+          then: {
+            type: "user",
+            id: "$user_id",
+            name: "$user.name",
+            avatar: "$user.avatar",
+          },
+          else: {
+            type: "business",
+            id: "$business_id",
+            name: "$business.business_name",
+            avatar: "$business.logo",
+          },
+        },
+      },
     },
   });
 
-  /** 8. EXECUTE QUERY */
-  let result = await Post.aggregate(pipeline);
+  /** 9. EXECUTE QUERY */
+  const result = await Post.aggregate(pipeline);
 
-  /** 9. Tính tổng số bài viết */
+  /** 10. Tính tổng số bài viết */
   let countPipeline = [];
   if (Object.keys(initialMatchConditions).length > 0) {
     countPipeline.push({ $match: initialMatchConditions });
@@ -186,15 +260,15 @@ const getListPostService = async ({
       },
     });
   }
-  countPipeline.push({ $count: "totalPosts" });
-  let countResult = await Post.aggregate(countPipeline);
-  let totalPosts = countResult.length > 0 ? countResult[0].totalPosts : 0;
+  countPipeline.push({ $group: { _id: null, totalPosts: { $sum: 1 } } });
+  const countResult = await Post.aggregate(countPipeline);
+  const totalPosts = countResult.length > 0 ? countResult[0].totalPosts : 0;
 
   return {
     posts: result,
     pagination: {
-      page,
-      limit,
+      page: parseInt(page),
+      limit: parseInt(limit),
       totalPages: Math.ceil(totalPosts / limit),
       totalPosts,
     },
@@ -312,13 +386,28 @@ const getPostByIdService = async (post_id, user_id) => {
   return result[0]; // Trả về object thay vì array
 };
 
-const createPostService = async (user_id, title, content, tags, files) => {
-  if (!user_id || !title || !content) {
+const createPostService = async (
+  user_id,
+  business_id,
+  title,
+  content,
+  tags,
+  files
+) => {
+  if (!title || !content) {
     throw new AppError("Missing required fields", 400);
+  }
+
+  if (!user_id && !business_id) {
+    throw new AppError(
+      "At least one of user_id or business_id must be provided",
+      400
+    );
   }
 
   let result = await Post.create({
     user_id: user_id,
+    business_id: business_id,
     title: title,
     content: content,
   });
