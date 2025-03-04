@@ -25,6 +25,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import { BusinessWrapper } from "./contexts/business.context.jsx";
 import ProfileBusinessPage from "./pages/ProfileBusinessPage.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
+import SubscriptionPlansPage from "./pages/SubscriptionPlansPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -121,6 +122,10 @@ const router = createBrowserRouter([
   {
     path: "payment/activation/:businessId",
     element: <PaymentPage />,
+  },
+  {
+    path: "/subscription/plans/:businessId",
+    element: <SubscriptionPlansPage />,
   },
 ]);
 createRoot(document.getElementById("root")).render(
