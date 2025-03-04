@@ -1,37 +1,40 @@
 import { Form, Input, Button, Checkbox, Card, Row, Col, Spin } from "antd";
-import { useLogin } from "../../hooks/useLogin";
-import { useState } from "react";
+import useBusinessLogin from "../../hooks/usebusinessLogin";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const LoginForm = () => {
-    const { mutate: loginMutation, isLoading } = useLogin();
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const loginMutation = useBusinessLogin();
+    const [isLoading, setIsLoading] = useState(false);
 
     const onFinish = (values) => {
-        setLoading(true); // Hiển thị loading khi bắt đầu đăng nhập
-        loginMutation(values, {
-            onSettled: () => setLoading(false), // Tắt loading khi hoàn tất
+        setIsLoading(true);
+        loginMutation.mutate(values, {
+            onSettled: () => {
+                setIsLoading(false); // Tắt loading sau khi hoàn tất login
+            },
         });
     };
 
     return (
-        <Row justify="center" align="middle" style={{ minHeight: "100vh", position: "relative" }}>
-            {/* Overlay Loading */}
-            {loading && (
-                <div style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "rgba(0, 0, 0, 0.3)", // Mờ nền
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 1000
-                }}>
-                    <Spin size="large" />
+        <Row justify="center" align="middle" style={{ minHeight: "100vh" }}>
+            {isLoading && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100vw",
+                        height: "100vh",
+                        backgroundColor: "rgba(255, 255, 255, 0.8)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 9999,
+                    }}
+                >
+                    <Spin size="large" tip="Đang đăng nhập..." />
                 </div>
             )}
 
@@ -44,15 +47,15 @@ const LoginForm = () => {
                     }}
                 >
                     <h2 style={{ textAlign: "center", fontSize: "24px", fontWeight: "bold" }}>
-                        Đăng Nhập
+                        Đăng Nhập Business
                     </h2>
                     <p style={{ textAlign: "center", color: "#666" }}>
                         Điền vào thông tin email và mật khẩu
                     </p>
 
-                    <Form name="login-form" layout="vertical" onFinish={onFinish} disabled={loading}>
+                    <Form name="login-form" layout="vertical" initialValues={{ remember: true }} onFinish={onFinish}>
                         <Form.Item label="Email" name="email" rules={[{ required: true, message: "Hãy nhập email" }]}>
-                            <Input size="large" placeholder="Yumzy123@gmail.com" />
+                            <Input size="large" placeholder="Yumzy@gmail.com" />
                         </Form.Item>
 
                         <Form.Item label="Mật Khẩu" name="password" rules={[{ required: true, message: "Hãy nhập mật khẩu" }]}>
@@ -60,12 +63,14 @@ const LoginForm = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Checkbox disabled={loading}>Hãy Nhớ Tôi</Checkbox>
+                            <Row justify="space-between">
+                                <Checkbox>Hãy Nhớ Tôi</Checkbox>
+                            </Row>
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" block size="large" loading={loading}>
-                                {loading ? "Đang đăng nhập..." : "Đăng Nhập"}
+                            <Button type="primary" htmlType="submit" block size="large" loading={loginMutation.isLoading}>
+                                Đăng Nhập
                             </Button>
                         </Form.Item>
                         <Button
@@ -79,13 +84,13 @@ const LoginForm = () => {
                         </Button>
 
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Nếu bạn không có tài khoản? <a href="/signup">Đăng Kí</a>
+                            Nếu bạn không có tài khoản Business? <a href="/signupBusiness">Đăng Kí</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Nếu bạn quên mật khẩu? <a href="/resetpassword">Đặt lại mật khẩu</a>
+                            Nếu bạn quên mật khẩu? <a href="/forgot-password">Đặt lại mật khẩu</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Nếu bạn là chủ doanh nghiệp ẩm thực? <a href="/loginBusiness">Đăng nhập Business</a>
+                            Nếu bạn là người dùng bình thường? <a href="/login">Đăng nhập</a>
                         </p>
                     </Form>
                 </Card>

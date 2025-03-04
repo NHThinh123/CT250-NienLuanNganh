@@ -7,6 +7,8 @@ const {
 const AppError = require("../utils/AppError");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const stripe = require("../config/stripe")
+const Payment = require("../models/payment.model");
 const Business = require("../models/business.model");
 const cloudinary = require("cloudinary").v2;
 
@@ -33,32 +35,57 @@ const getBusinessById = async (req, res, next) => {
 //cập nhật thông tin business
 const updateBusiness = async (req, res, next) => {
   try {
-    const { id } = req.params; // Lấy ID business từ params
-    const updateData = req.body;
+    const { id } = req.params;
+    const { business_name, close_hours, open_hours, contact_info, location } = req.body;
+    let updateData = {};
 
-    // Kiểm tra business có tồn tại không
+    // Tìm doanh nghiệp trước khi cập nhật
     const business = await Business.findById(id);
     if (!business) {
-      return next(new AppError(404, "Business không tồn tại"));
+      return res.status(404).json({ error: "Doanh nghiệp không tồn tại!" });
     }
+
+    // Nếu có thông tin mới, thêm vào dữ liệu cập nhật
+    if (business_name) updateData.business_name = business_name;
+    if (open_hours) updateData.open_hours = open_hours;
+    if (close_hours) updateData.close_hours = close_hours;
+    if (contact_info) updateData.contact_info = contact_info;
+    if (location) updateData.location = location;
 
     // Nếu có file ảnh mới => upload lên Cloudinary
     if (req.file) {
-      const avatarUrl = req.file.path; // URL ảnh từ Cloudinary
-      updateData.avatar = avatarUrl; // Thêm avatar mới vào updateData
+      updateData.avatar = req.file.path;
 
-      // Nếu business có avatar cũ => Xóa ảnh cũ trên Cloudinary (nếu cần)
-      if (business.avatar) {
-        const publicId = business.avatar.split("/").pop().split(".")[0]; // Lấy public_id từ URL cũ
-        await cloudinary.uploader.destroy(publicId); // Xóa ảnh cũ trên Cloudinary
+      // Nếu business có avatar cũ => Xóa ảnh cũ trên Cloudinary
+      if (business.avatar && business.avatar.includes("cloudinary.com")) {
+        try {
+          const publicId = business.avatar.match(/\/([^\/]+)\.[a-z]+$/i)?.[1];
+          if (publicId) {
+            await cloudinary.uploader.destroy(publicId);
+          }
+        } catch (err) {
+          console.error("Lỗi khi xóa ảnh cũ trên Cloudinary:", err);
+        }
       }
+    }
+
+    // Kiểm tra nếu không có dữ liệu nào để cập nhật
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: "Không có dữ liệu nào để cập nhật!" });
     }
 
     // Cập nhật thông tin business
     const updatedBusiness = await Business.findByIdAndUpdate(id, updateData, {
       new: true,
+      runValidators: true,
     });
 
+    // Kiểm tra nếu cập nhật thất bại
+    if (!updatedBusiness) {
+      return res.status(500).json({ error: "Cập nhật thông tin thất bại!" });
+    }
+
+    // Trả về thông tin business sau khi cập nhật
     res.status(200).json({
       message: "Cập nhật thông tin thành công",
       business: {
@@ -73,12 +100,11 @@ const updateBusiness = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error("Lỗi khi cập nhật business:", error);
-    return res
-      .status(500)
-      .json({ message: "Lỗi! Không thể cập nhật thông tin business" });
+    console.error("Lỗi server khi cập nhật business:", error);
+    res.status(500).json({ error: "Lỗi server. Vui lòng thử lại!" });
   }
 };
+
 
 // Signup
 const signupBusiness = async (req, res, next) => {
@@ -93,21 +119,17 @@ const signupBusiness = async (req, res, next) => {
       password,
     } = req.body;
 
-    // Kiểm tra business đã tồn tại chưa
     const existingBusiness = await Business.findOne({ email });
     if (existingBusiness) {
       return res.status(400).json({ message: "Business already exists" });
     }
 
-    // Mã hóa mật khẩu trước khi lưu
     const hashedPassword = await bcrypt.hash(password, 10);
-    //xử lý ảnh up lên cloudinary
     let avatarUrl = null;
     if (req.file) {
       avatarUrl = req.file.path;
     }
 
-    // Tạo business mới
     const newBusiness = new Business({
       business_name,
       open_hours,
@@ -117,12 +139,13 @@ const signupBusiness = async (req, res, next) => {
       email,
       password: hashedPassword,
       avatar: avatarUrl,
+      status: "pending",
     });
 
     await newBusiness.save();
     res.status(201).json({
       status: "PENDING",
-      message: "Tài khoản đã được tạo!",
+      message: "Tài khoản đã được tạo! Vui lòng hoàn tất thanh toán để kích hoạt.",
       business: {
         id: newBusiness._id,
         business_name: newBusiness.business_name,
@@ -133,7 +156,107 @@ const signupBusiness = async (req, res, next) => {
         open_hours: newBusiness.open_hours,
         close_hours: newBusiness.close_hours,
       },
+      redirectTo: `/payment/activation/${newBusiness._id}`,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Xử lý thanh toán kích hoạt
+const processActivationPayment = async (req, res) => {
+  const { businessId } = req.params;
+  const { paymentMethodId, amount } = req.body;
+
+  try {
+    const business = await Business.findById(businessId);
+    if (!business) {
+      return res.status(404).json({ message: "Không tìm thấy tài khoản" });
+    }
+
+    // Tạo Payment Intent với automatic_payment_methods
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100,
+      currency: "vnd",
+      payment_method: paymentMethodId,
+      confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never", // Chỉ chấp nhận thanh toán không cần redirect
+      },
+    });
+
+    if (paymentIntent.status === "succeeded") {
+      business.status = "active";
+      business.activationPayment = true;
+      business.lastPaymentDate = new Date();
+      business.nextPaymentDueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      await business.save();
+
+      const payment = new Payment({
+        businessId: business._id,
+        businessName: business.business_name,
+        amount: amount,
+      });
+      await payment.save();
+
+      res.status(200).json({
+        message: "Thanh toán thành công! Tài khoản đã được kích hoạt.",
+        amount: amount,
+        paymentId: payment._id,
+      });
+    } else {
+      res.status(400).json({ message: "Thanh toán thất bại" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// Xử lý thanh toán phí duy trì
+const processMonthlyPayment = async (req, res) => {
+  const { businessId } = req.params;
+  const { paymentMethodId, amount } = req.body;
+
+  try {
+    const business = await Business.findById(businessId);
+    if (!business) {
+      return res.status(404).json({ message: "Không tìm thấy tài khoản" });
+    }
+
+    // Tạo thanh toán qua Stripe
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100,
+      currency: "vnd",
+      payment_method: paymentMethodId,
+      confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never", // Chỉ chấp nhận thanh toán không cần redirect
+      },
+
+    });
+
+    if (paymentIntent.status === "succeeded") {
+      business.lastPaymentDate = new Date();
+      business.nextPaymentDueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      business.status = "active";
+      await business.save();
+
+      const payment = new Payment({
+        businessId: business._id,
+        businessName: business.business_name,
+        amount: amount,
+      });
+      await payment.save();
+
+      res.status(200).json({
+        message: "Thanh toán phí duy trì thành công!",
+        amount: amount,
+        paymentId: payment._id,
+      });
+    } else {
+      res.status(400).json({ message: "Thanh toán thất bại" });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -199,4 +322,6 @@ module.exports = {
   signupBusiness,
   loginBusiness,
   updateRatingAverage,
+  processActivationPayment,
+  processMonthlyPayment,
 };

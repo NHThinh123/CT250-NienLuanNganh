@@ -1,6 +1,6 @@
-import AuthLayout from "../features/business/component/template/AuthLayout";
-import LoginForm from "../features/business/component/template/LoginForm";
-import SocialLogin from "../features/business/component/template/SocialLogin";
+import AuthLayout from "../features/business/components/templates/AuthLayout";
+import LoginForm from "../features/business/components/templates/LoginBusinessForm";
+import SocialLogin from "../features/business/components/templates/SocialLogin";
 
 const LoginBusinessPage = () => {
     return (

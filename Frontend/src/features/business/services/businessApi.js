@@ -16,7 +16,7 @@ const createBusinessApi = (data) => {
 };
 
 const updateBusinessApi = (id, data) => {
-  const URL_API = `/api/businesss/${id}`;
+  const URL_API = `/api/businesss/id/${id}`;
   return axios.put(URL_API, data);
 };
 

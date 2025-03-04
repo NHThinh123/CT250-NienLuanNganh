@@ -12,7 +12,7 @@ export const useSignup = () => {
         },
         onSuccess: () => {
             message.success("Vui lòng kiểm tra email để xác nhận tài khoản!");
-            navigate("/login");
+            setTimeout(() => navigate("/login"), 2000);
         },
         onError: (error) => {
             message.error("Đăng ký thất bại. Vui lòng thử lại!");

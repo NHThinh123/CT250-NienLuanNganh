@@ -123,15 +123,15 @@ const SignupForm = () => {
                             block
                             size="large"
                             onClick={() => navigate("/")}
-                            style={{ marginTop: "10px" }}
+                            style={{ marginTop: "0px" }}
                         >
                             Quay về trang chủ
                         </Button>
 
-                        <p style={{ textAlign: "center", marginTop: "20px" }}>
+                        <p style={{ textAlign: "center", marginTop: "10px" }}>
                             Nếu bạn có tài khoản? <a href="/login">Đăng Nhập</a>
                         </p>
-                        <p style={{ textAlign: "center", marginTop: "20px" }}>
+                        <p style={{ textAlign: "center", marginTop: "10px" }}>
                             Nếu bạn là chủ doanh nghiệp ẩm thực? <a href="/signupBusiness">Đăng Kí Business</a>
                         </p>
                     </Form>

@@ -1,33 +1,10 @@
 const { get } = require("../config/emailConfig");
 const Business = require("../models/business.model");
+const payment = require("../models/payment.model");
+const transporter = require("../config/emailConfig");
 const Review = require("../models/review.model");
 
-// const createBusinessService = async (req, res) => {
-//   const {
-//     business_name,
-//     open_hours,
-//     close_hours,
-//     location,
-//     contact_info,
-//     email,
-//     password,
-//   } = req.body;
-//   const business = new Business({
-//     business_name,
-//     open_hours,
-//     close_hours,
-//     location,
-//     contact_info,
-//     email,
-//     password,
-//   });
-//   try {
-//     const savedBusiness = await business.save();
-//     res.json(savedBusiness);
-//   } catch (error) {
-//     res.status(400).json({ message: error });
-//   }
-// };
+
 const getBusinessService = async (req, res) => {
   try {
     const business = await Business.find();
@@ -93,6 +70,23 @@ const updateRatingAverageService = async (businessId) => {
     throw new Error(error.message);
   }
 };
+//Gửi email nhắc nhở thanh toán
+const sendPaymentReminder = async (email, business_name, dueDate, businessId) => {
+  const paymentLink = `http://localhost:8080/api/businesss/payment/monthly/${businessId}`;
+  const mailOptions = {
+    from: process.env.AUTH_EMAIL,
+    to: email,
+    subject: "Nhắc nhở thanh toán phí duy trì tài khoản Yumzy",
+    text: `Kính gửi ${business_name},\n\nPhí duy trì tài khoản của bạn sẽ đến hạn vào ngày ${dueDate.toLocaleDateString("vi-VN")}. Vui lòng thanh toán trước hạn: ${paymentLink}\n\nTrân trọng,\nĐội ngũ hỗ trợ`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Đã gửi email nhắc nhở đến ${email}`);
+  } catch (error) {
+    console.error(`Lỗi gửi email đến ${email}:`, error);
+  }
+};
 
 module.exports = {
   // createBusinessService,
@@ -100,4 +94,5 @@ module.exports = {
   getBusinessByIdService,
   updateBusinessService,
   updateRatingAverageService,
+  sendPaymentReminder
 };

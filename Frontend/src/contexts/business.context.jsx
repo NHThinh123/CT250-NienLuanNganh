@@ -23,6 +23,7 @@ export const BusinessWrapper = ({ children }) => {
     const [business, setBusiness] = useState(() => {
         try {
             const storedBusiness = localStorage.getItem("authBusiness");
+            console.log("Dữ liệu từ localStorage trong BusinessWrapper:", localStorage.getItem("authBusiness"));
             const parsedBusiness = storedBusiness ? JSON.parse(storedBusiness) : null;
             return parsedBusiness && parsedBusiness.isAuthenticated
                 ? parsedBusiness
@@ -33,13 +34,11 @@ export const BusinessWrapper = ({ children }) => {
         }
     });
 
-
     const [loading, setLoading] = useState(false);
 
-    // Cập nhật localStorage khi business thay đổi
     useEffect(() => {
         if (business.isAuthenticated) {
-            localStorage.setItem("authBusiness", JSON.stringify(business.business));
+            localStorage.setItem("authBusiness", JSON.stringify(business));
         } else {
             localStorage.removeItem("authBusiness");
         }
@@ -50,4 +49,5 @@ export const BusinessWrapper = ({ children }) => {
             {children}
         </BusinessContext.Provider>
     );
+
 };
