@@ -178,7 +178,7 @@ const processActivationPayment = async (req, res) => {
     // Tạo Payment Intent với automatic_payment_methods
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100,
-      currency: "vnd",
+      currency: "usd",
       payment_method: paymentMethodId,
       confirm: true,
       automatic_payment_methods: {
