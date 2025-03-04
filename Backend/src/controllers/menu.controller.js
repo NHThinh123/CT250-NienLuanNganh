@@ -30,7 +30,6 @@ const getMenuById = async (req, res, next) => {
 const createMenu = async (req, res, next) => {
   try {
     const { menu_name, business_id } = req.body;
-    console.log(req.body);
     const data = await createMenuService(menu_name, business_id);
     res.status(201).json(data);
   } catch (error) {
