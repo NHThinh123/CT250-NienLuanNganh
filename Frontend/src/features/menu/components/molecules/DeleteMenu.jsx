@@ -1,11 +1,13 @@
 import { Button, message, Modal, Typography } from "antd";
 import { SquareX, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import useDeleteMenu from "../../hooks/useDeleteMenu";
+import { BusinessContext } from "../../../../contexts/business.context";
 
 const DeleteMenu = ({ menuName, menuId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutate: deleteMenu, isLoading } = useDeleteMenu();
+  const { business } = useContext(BusinessContext);
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -59,21 +61,23 @@ const DeleteMenu = ({ menuName, menuId }) => {
           </p>
         </div>
       </Modal>
-      <Button
-        onClick={showModal}
-        type="link"
-        danger
-        style={{
-          margin: 0,
-          padding: 0,
-          border: "none",
-          display: "flex-box",
-          placeItems: "center",
-          height: "100%",
-        }}
-      >
-        <SquareX />
-      </Button>
+      {business.isAuthenticated && (
+        <Button
+          onClick={showModal}
+          type="link"
+          danger
+          style={{
+            margin: 0,
+            padding: 0,
+            border: "none",
+            display: "flex-box",
+            placeItems: "center",
+            height: "100%",
+          }}
+        >
+          <SquareX />
+        </Button>
+      )}
     </>
   );
 };

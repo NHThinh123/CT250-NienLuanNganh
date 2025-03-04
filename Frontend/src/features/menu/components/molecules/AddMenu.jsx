@@ -1,14 +1,14 @@
 import { Button, Form } from "antd";
 import { SquarePlus } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ModalAddMenu from "../atoms/ModalAddMenu";
-// import { BusinessContext } from "../../../../contexts/business.context";
+import { BusinessContext } from "../../../../contexts/business.context";
 
 const AddMenu = ({ businessId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
 
-  //   const { business } = useContext(BusinessContext);
+  const { business } = useContext(BusinessContext);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -24,43 +24,43 @@ const AddMenu = ({ businessId }) => {
 
   return (
     <>
-      {/* {business.isAuthenticated && ( */}
-      <Button
-        type="link"
-        onClick={showModal}
-        style={{
-          margin: 4,
-          cursor: "pointer",
-          border: "none",
-          fontSize: 13,
-          width: "calc(100% - 8px)",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = "#CDE5FF";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = "#FFFFFF";
-        }}
-      >
-        <div
+      {business.isAuthenticated && (
+        <Button
+          type="link"
+          onClick={showModal}
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
+            margin: 4,
+            cursor: "pointer",
+            border: "none",
+            fontSize: 13,
+            width: "calc(100% - 8px)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#CDE5FF";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#FFFFFF";
           }}
         >
-          <SquarePlus />
-          <p
+          <div
             style={{
-              margin: 2,
-              fontWeight: "bold",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            THÊM THỰC ĐƠN
-          </p>
-        </div>
-      </Button>
-      {/* )} */}
+            <SquarePlus />
+            <p
+              style={{
+                margin: 2,
+                fontWeight: "bold",
+              }}
+            >
+              THÊM THỰC ĐƠN
+            </p>
+          </div>
+        </Button>
+      )}
       <ModalAddMenu
         form={form}
         isModalOpen={isModalOpen}
