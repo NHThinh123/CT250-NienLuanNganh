@@ -58,7 +58,7 @@ const SignupForm = () => {
                     }}
                 >
                     <h2 style={{ textAlign: "center", fontSize: "24px", fontWeight: "bold" }}>
-                        Đăng Kí
+                        Đăng Ký
                     </h2>
                     <p style={{ textAlign: "center", color: "#666" }}>
                         Điền vào thông tin
@@ -114,8 +114,10 @@ const SignupForm = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" block size="large" loading={loading}>
-                                {loading ? "Đang đăng kí..." : "Đăng Kí"}
+                            <Button type="primary" htmlType="submit" block size="large" loading={loading}
+                                style={{ height: "35px" }}
+                            >
+                                {loading ? "Đang đăng ký..." : "Đăng Ký"}
                             </Button>
                         </Form.Item>
                         <Button
@@ -123,16 +125,16 @@ const SignupForm = () => {
                             block
                             size="large"
                             onClick={() => navigate("/")}
-                            style={{ marginTop: "0px" }}
+                            style={{ marginTop: "0px", height: "35px" }}
                         >
                             Quay về trang chủ
                         </Button>
 
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Nếu bạn có tài khoản? <a href="/login">Đăng Nhập</a>
+                            Bạn có tài khoản? <a href="/login" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đăng Nhập</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Nếu bạn là chủ doanh nghiệp ẩm thực? <a href="/signupBusiness">Đăng Kí Business</a>
+                            Bạn là chủ doanh nghiệp ẩm thực? <a href="/signupBusiness" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đăng Ký Business</a>
                         </p>
                     </Form>
                 </Card>

@@ -1,62 +1,91 @@
-import { Button } from "antd";
-import { useState } from "react";
+import { Button, Form } from "antd";
+import { useContext, useState } from "react";
 import ModalCreateReview from "../organisms/ModalCreateReview";
+import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
+import { AuthContext } from "../../../../contexts/auth.context";
+import { BusinessContext } from "../../../../contexts/business.context";
 
-const CreateReview = () => {
+const CreateReview = ({ businessId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  //   const [form] = Form.useForm();
+  const { auth } = useContext(AuthContext);
+  const { business } = useContext(BusinessContext);
+  const user_id = auth?.user?.id;
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
+    useState(false);
+  const [form] = Form.useForm();
 
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
-    // form.submit();
-    setIsModalOpen(false);
+  const handleOk = async () => {
+    form.submit();
+    // setIsModalOpen(false);
   };
   const handleCancel = () => {
-    // form.resetFields();
+    form.resetFields();
     setIsModalOpen(false);
+  };
+
+  const showLoginRequiredModal = () => {
+    setIsLoginRequiredModalOpen(true);
+  };
+
+  const handleCancelLoginRequiredModal = () => {
+    setIsLoginRequiredModalOpen(false);
+  };
+
+  // Hành động được bảo vệ (yêu cầu đăng nhập)
+  const handleAction = (action) => {
+    if (!user_id) {
+      showLoginRequiredModal();
+    } else {
+      action();
+    }
   };
 
   return (
     <>
-      {/* {business.isAuthenticated && ( */}
-      <Button
-        type="link"
-        onClick={showModal}
-        style={{
-          margin: 4,
-          cursor: "pointer",
-          border: "none",
-          fontSize: 13,
-          width: "calc(100% - 8px)",
-          height: 35,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = "#CDE5FF";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = "#FFFFFF";
-        }}
-      >
-        <p
+      {!business.isAuthenticated && (
+        <Button
+          type="link"
+          onClick={() => handleAction(showModal)}
           style={{
-            margin: 2,
-            fontWeight: "bold",
-            color: "#1677FF",
+            margin: 4,
+            cursor: "pointer",
+            border: "none",
+            fontSize: 13,
+            width: "calc(100% - 8px)",
+            height: 35,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#CDE5FF";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#FFFFFF";
           }}
         >
-          VIẾT ĐÁNH GIÁ VỀ QUÁN
-        </p>
-      </Button>
-      {/* )} */}
+          <p
+            style={{
+              margin: 2,
+              fontWeight: "bold",
+              color: "#1677FF",
+            }}
+          >
+            VIẾT ĐÁNH GIÁ VỀ QUÁN
+          </p>
+        </Button>
+      )}
       <ModalCreateReview
-        // form={form}
+        form={form}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         handleOk={handleOk}
         setIsModalOpen={setIsModalOpen}
-        // businessId={businessId}
+        businessId={businessId}
+      />
+      <LoginRequiredModal
+        isModalOpen={isLoginRequiredModalOpen}
+        handleCancel={handleCancelLoginRequiredModal}
       />
     </>
   );

@@ -1,49 +1,56 @@
-import { Col, Form, Input, Modal, Rate, Row, Typography } from "antd";
-// import { useState } from "react";
-// import SpinLoading from "../../../../components/atoms/SpinLoading";
-// import useCreateReview from "../../../review/hooks/useCreateReview";
-import { useState } from "react";
+import { Col, Form, Input, message, Modal, Rate, Row, Typography } from "antd";
+import SpinLoading from "../../../../components/atoms/SpinLoading";
+import useCreateReview from "../../../review/hooks/useCreateReview";
+import { AuthContext } from "../../../../contexts/auth.context";
+import { useContext, useState } from "react";
 
 const ModalCreateReview = ({
   isModalOpen,
   handleCancel,
   handleOk,
-  //   form,
-  // setIsModalOpen,
+  form,
+  setIsModalOpen,
+  businessId,
 }) => {
   const desc = ["Rất tệ", "Tệ", "Bình thường", "Tốt", "Rất tốt"];
-  const [value, setValue] = useState(0);
-  //   const { mutate: createReview, isPending } = useCreateReview();
+  const [value, setValue] = useState(5);
+  const { auth } = useContext(AuthContext);
+  // console.log("auth", auth?.user);
+  const { mutate: createReview, isPending } = useCreateReview();
 
-  //   const onFinish = async (values) => {
-  //     try {
-  //       //   await form.validateFields();
-  //       // console.log("Form values sau validate:", values);
+  const onFinish = async (values) => {
+    try {
+      await form.validateFields();
+      console.log("Form values sau validate:", values);
 
-  //       const formData = new FormData();
-  //       formData.append("dish_name", values.dish_name || "");
-  //       formData.append("dish_description", values.dish_description || "");
-  //       formData.append("dish_price", values.dish_price || 0);
+      const formData = {
+        user_id: auth?.user.id,
+        business_id: businessId,
+        review_rating: values.review_rating,
+        review_contents: values.review_contents,
+      };
 
-  //       // console.log("📜 FormData trước khi gửi:");
-  //       // for (let pair of formData.entries()) {
-  //       //   console.log(`${pair[0]}:`, pair[1]);
-  //       // }
+      console.log("📜 FormData trước khi gửi:");
+      Object.entries(formData).forEach(([key, value]) => {
+        console.log(`${key}:`, value);
+      });
 
-  //       createReview(formData, {
-  //         onSuccess: () => {
-  //           message.success("Đánh giá thành công!");
-  //           //   form.resetFields();
-  //           setIsModalOpen(false);
-  //         },
-  //         onError: () => {
-  //           message.error("Lỗi khi đánh giá!");
-  //         },
-  //       });
-  //     } catch (error) {
-  //       console.error("Lỗi khi validate form:", error);
-  //     }
-  //   };
+      createReview(formData, {
+        onSuccess: () => {
+          message.success("Đánh giá thành công!");
+          form.resetFields(); // Reset toàn bộ form
+          setValue(5); // Đặt lại số sao về 5
+          form.setFieldsValue({ review_rating: 5 }); // Cập nhật giá trị trong Form
+          setIsModalOpen(false);
+        },
+        onError: () => {
+          message.error("Lỗi khi đánh giá!");
+        },
+      });
+    } catch (error) {
+      console.error("Lỗi khi validate form:", error);
+    }
+  };
 
   return (
     <Modal
@@ -56,15 +63,19 @@ const ModalCreateReview = ({
       onOk={handleOk}
       onCancel={() => {
         handleCancel();
+        form.resetFields(); // Xóa dữ liệu form
+        setValue(5); // Đặt lại số sao về 5
+        form.setFieldsValue({ review_rating: 5 }); // Cập nhật giá trị trong Form
+        setIsModalOpen(false);
       }}
-      //   okText={isPending ? "Đang gửi..." : "Gửi"}
-      okText="Gửi"
+      okText={isPending ? "Đang gửi..." : "Gửi"}
+      // okText="Gửi"
       cancelText="Hủy"
       maskClosable={false}
       centered
       style={{ minWidth: "50%" }}
     >
-      {/* {isPending && <SpinLoading />} */}
+      {isPending && <SpinLoading />}
       <Row
         style={{
           marginTop: "16px",
@@ -75,36 +86,60 @@ const ModalCreateReview = ({
         }}
       >
         <Col span={24}>
-          <Form
-          // form={form}
-          // onFinish={onFinish}
-          >
+          <Form form={form} onFinish={onFinish}>
+            <div style={{ display: "flex", marginBottom: 10 }}>
+              <img
+                style={{ width: "50px", height: "50px", borderRadius: "50%" }}
+                src={auth?.user.avatar}
+                alt="Ảnh"
+              ></img>
+              <p
+                style={{
+                  margin: "0px 0px 0px 10px",
+                  fontWeight: "bold",
+                  placeContent: "center",
+                }}
+              >
+                {auth?.user.name}
+              </p>
+            </div>
             <Form.Item
               name="review_rating"
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng đánh giá mức độ!",
+                  message: "Vui lòng đánh giá chất lượng quán!",
                 },
               ]}
+              initialValue={5}
             >
               <div style={{ display: "flex" }}>
-                <Rate
-                  tooltips={desc}
-                  onChange={setValue}
-                  value={value}
-                  style={{ fontSize: 25 }}
-                />
-                {value ? (
-                  <div
-                    style={{
-                      margin: "3px 0px 0px 15px",
-                      fontWeight: "bold",
+                <p style={{ fontSize: 15, marginRight: 10 }}>
+                  Chất lượng quán:
+                </p>
+                <div style={{ display: "flex" }}>
+                  <Rate
+                    tooltips={desc}
+                    onChange={(newValue) => {
+                      if (newValue === 0) return;
+                      setValue(newValue);
+                      form.setFieldsValue({ review_rating: newValue }); // Đồng bộ với form
                     }}
-                  >
-                    {desc[value - 1]}
-                  </div>
-                ) : null}
+                    value={value}
+                    style={{ fontSize: 25 }}
+                  />
+                  {value ? (
+                    <div
+                      style={{
+                        margin: "3px 0px 0px 15px",
+                        fontWeight: "bold",
+                        color: "orange",
+                      }}
+                    >
+                      {desc[value - 1]}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </Form.Item>
             <Form.Item
@@ -118,21 +153,10 @@ const ModalCreateReview = ({
             >
               <Input.TextArea
                 size="large"
-                placeholder="Nhập nội dung đánh giá"
+                placeholder="Hãy chia sẻ chi tiết cảm nhận của bạn về quán này bạn nhé!"
                 autoSize={{ minRows: 4, maxRows: 10 }}
               />
             </Form.Item>
-            {/* <Form.Item
-              name="menu_name"
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: "Vui lòng nhập tên thực đơn!",
-              //   },
-              // ]}
-            >
-              <Input size="large" disabled initialValue={menuData.menu_name} />
-            </Form.Item> */}
           </Form>
         </Col>
       </Row>

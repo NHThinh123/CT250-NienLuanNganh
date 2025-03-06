@@ -28,7 +28,7 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
           <Col span={9}>
             <div style={styles.businessAva}>
               <img
-                style={{ width: "500px", height: "250px" }}
+                style={{ width: "500px", height: "250px", borderRadius: 5 }}
                 src={businessData.avatar}
                 alt="Ảnh"
               ></img>
@@ -83,7 +83,9 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  <p>{businessData.rating_average}/5</p>
+                  <p style={{ marginTop: 3 }}>
+                    {businessData.rating_average}/5
+                  </p>
                 </div>
               </div>
               <div style={styles.businessLocation}>
@@ -91,6 +93,7 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
                   <MapPinHouse
                     size={20}
                     style={{ marginRight: "5px", marginBottom: "-3px" }}
+                    strokeWidth="1.5"
                   />
                   {businessData.location}
                 </p>
@@ -100,6 +103,7 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
                   <BookUser
                     size={20}
                     style={{ marginRight: "5px", marginBottom: "-3px" }}
+                    strokeWidth="1.5"
                   />
                   {businessData.contact_info}
                 </p>
@@ -109,6 +113,7 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
                   <Clock
                     size={20}
                     style={{ marginRight: "5px", marginBottom: "-3px" }}
+                    strokeWidth="1.5"
                   />
                   {businessData.open_hours} - {businessData.close_hours}
                 </p>
@@ -118,6 +123,7 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
                   <CircleDollarSign
                     size={20}
                     style={{ marginRight: "5px", marginBottom: "-3px" }}
+                    strokeWidth="1.5"
                   />
                   {formatPrice(businessData.dish_lowest_cost)}đ -{" "}
                   {formatPrice(businessData.dish_highest_cost)}đ

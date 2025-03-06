@@ -69,7 +69,9 @@ const LoginForm = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" block size="large" loading={loginMutation.isLoading}>
+                            <Button type="primary" htmlType="submit" block size="large" loading={loginMutation.isLoading}
+                                style={{ height: "35px" }}
+                            >
                                 Đăng Nhập
                             </Button>
                         </Form.Item>
@@ -78,19 +80,19 @@ const LoginForm = () => {
                             block
                             size="large"
                             onClick={() => navigate("/")}
-                            style={{ marginTop: "0px" }}
+                            style={{ marginTop: "0px", height: "35px" }}
                         >
                             Quay về trang chủ
                         </Button>
 
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Nếu bạn không có tài khoản Business? <a href="/signupBusiness">Đăng Kí</a>
+                            Bạn không có tài khoản Business? <a href="/signupBusiness" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đăng Ký Business</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Nếu bạn quên mật khẩu? <a href="/forgot-password">Đặt lại mật khẩu</a>
+                            Bạn quên mật khẩu? <a href="/forgot-password" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đặt lại mật khẩu</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Nếu bạn là người dùng bình thường? <a href="/login">Đăng nhập</a>
+                            Bạn là người dùng bình thường? <a href="/login" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đăng nhập</a>
                         </p>
                     </Form>
                 </Card>

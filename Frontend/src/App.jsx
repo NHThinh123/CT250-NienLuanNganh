@@ -111,10 +111,10 @@ function App() {
           }}
         >
           {/* Logo */}
-          <div style={{ flexShrink: 0 }}>
+          <div style={{ flexShrink: 0, marginTop: "10px" }}>
             <img
               src={logo}
-              style={{ height: "60px", width: "auto" }} // Điều chỉnh kích thước logo
+              style={{ height: "60px", width: "auto", marginBottom: "10px" }} // Điều chỉnh kích thước logo
               alt="logo"
             />
           </div>

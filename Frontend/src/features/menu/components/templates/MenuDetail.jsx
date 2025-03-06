@@ -25,24 +25,24 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
     <>
       <div style={styles.menuPage}>
         <Row>
-          <Col span={3}></Col>
-          <Col span={4}>
+          <Col span={2}></Col>
+          <Col span={5}>
             <div style={{ padding: "13px 26px" }}>
               <p style={styles.titleMenu}>THỰC ĐƠN</p>
             </div>
           </Col>
-          <Col span={8}></Col>
+          <Col span={9}></Col>
           <Col span={8}>
-            <div style={{ padding: "13px 26px" }}>
+            <div style={{ padding: "13px 26px", marginLeft: 20 }}>
               <p style={styles.titleMenu}>ĐÁNH GIÁ</p>
             </div>
           </Col>
         </Row>
         <Row>
-          <Col span={3}></Col>
+          <Col span={2}></Col>
           <MenuProvider>
             <Col span={4}>
-              <div style={{ marginRight: "20px", position: "sticky", top: 0 }}>
+              <div style={{ marginRight: "20px", position: "sticky", top: 64 }}>
                 <MenuList menuData={menuData}></MenuList>
                 <div
                   style={{
@@ -56,7 +56,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               </div>
             </Col>
             <Col
-              span={8}
+              span={10}
               style={{
                 backgroundColor: "#ffffff",
                 padding: "6px 15px",
@@ -74,6 +74,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               style={{
                 backgroundColor: "#ffffff",
                 marginLeft: "20px",
+                borderRadius: 5,
               }}
             >
               <div>
@@ -93,12 +94,12 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
                   borderRadius: "5px",
                 }}
               >
-                <CreateReview />
+                <CreateReview businessId={business_id} />
               </div>
             </div>
           </Col>
 
-          <Col span={3}></Col>
+          <Col span={2}></Col>
         </Row>
       </div>
     </>
@@ -113,6 +114,7 @@ const styles = {
     fontSize: "14px",
     fontWeight: "bold",
     color: "#CF2127",
+    margin: 0,
   },
   onecol: {
     backgroundColor: "#ffffff",

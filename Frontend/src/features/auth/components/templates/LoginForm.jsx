@@ -103,6 +103,7 @@ const LoginForm = () => {
                 block
                 size="large"
                 loading={loading}
+                style={{ height: "35px" }}
               >
                 {loading ? "Đang đăng nhập..." : "Đăng Nhập"}
               </Button>
@@ -112,21 +113,37 @@ const LoginForm = () => {
               block
               size="large"
               onClick={() => navigate("/")}
-              style={{ marginTop: "0px" }}
+              style={{ marginTop: "0px", height: "35px" }}
             >
               Quay về trang chủ
             </Button>
 
             <p style={{ textAlign: "center", marginTop: "10px" }}>
-              Nếu bạn không có tài khoản? <a href="/signup">Đăng Kí</a>
+              Bạn không có tài khoản?{" "}
+              <a
+                href="/signup"
+                style={{ color: "#1a73e8", fontWeight: "bold" }}
+              >
+                Đăng Ký
+              </a>
             </p>
             <p style={{ textAlign: "center", marginTop: "10px" }}>
-              Nếu bạn quên mật khẩu?{" "}
-              <a href="/resetpassword">Đặt lại mật khẩu</a>
+              Bạn quên mật khẩu?{" "}
+              <a
+                href="/resetpassword"
+                style={{ color: "#1a73e8", fontWeight: "bold" }}
+              >
+                Đặt lại mật khẩu
+              </a>
             </p>
             <p style={{ textAlign: "center", marginTop: "10px" }}>
-              Nếu bạn là chủ doanh nghiệp ẩm thực?{" "}
-              <a href="/loginBusiness">Đăng nhập Business</a>
+              Bạn là chủ doanh nghiệp ẩm thực?{" "}
+              <a
+                href="/loginBusiness"
+                style={{ color: "#1a73e8", fontWeight: "bold" }}
+              >
+                Đăng nhập Business
+              </a>
             </p>
           </Form>
         </Card>

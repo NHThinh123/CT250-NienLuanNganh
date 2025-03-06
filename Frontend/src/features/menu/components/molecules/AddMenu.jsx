@@ -49,11 +49,12 @@ const AddMenu = ({ businessId }) => {
               gap: "8px",
             }}
           >
-            <SquarePlus />
+            <SquarePlus strokeWidth={1} style={{ color: "#1677FF" }} />
             <p
               style={{
                 margin: 2,
                 fontWeight: "bold",
+                color: "#1677FF",
               }}
             >
               THÊM THỰC ĐƠN

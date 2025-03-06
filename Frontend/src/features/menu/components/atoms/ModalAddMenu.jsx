@@ -1,7 +1,6 @@
 import { Col, Form, Input, message, Modal, Row, Typography } from "antd";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import useCreateMenu from "../../hooks/useCreateMenu";
-// import { BusinessContext } from "../../../../contexts/business.context";
 
 const ModalAddMenu = ({
   isModalOpen,
@@ -11,7 +10,6 @@ const ModalAddMenu = ({
   setIsModalOpen,
   businessId,
 }) => {
-  // const { business } = useContext(BusinessContext);
   const { mutate: createMenu, isPending } = useCreateMenu();
 
   const onFinish = async (values) => {
@@ -38,10 +36,6 @@ const ModalAddMenu = ({
       console.error("Lỗi khi validate form:", error);
     }
   };
-
-  // if (!business.isAuthenticated) {
-  //   return null; // Ẩn modal nếu không phải tài khoản business
-  // }
 
   return (
     <Modal
@@ -80,7 +74,16 @@ const ModalAddMenu = ({
                 },
               ]}
             >
-              <Input size="large" placeholder="Nhập tên thực đơn" />
+              <Input
+                size="large"
+                placeholder="Nhập tên thực đơn"
+                maxLength={50} // Giới hạn ký tự
+                onChange={(e) => {
+                  if (e.target.value.length > 50) {
+                    message.warning("Tên thực đơn không nên quá 50 ký tự!");
+                  }
+                }}
+              />
             </Form.Item>
           </Form>
         </Col>

@@ -22,7 +22,7 @@ router.put("/id/:id", upload.single("avatar"), updateBusiness);
 router.post("/signupBusiness", upload.single("avatar"), signupBusiness);
 router.post("/payment/activation/:businessId", processActivationPayment);
 router.post("/payment/monthly/:businessId", processMonthlyPayment);
-router.post("/loginBusiness", checkAccountStatus, loginBusiness);
+router.post("/loginBusiness", loginBusiness);
 router.put("/updateRatingAverage/:id", updateRatingAverage);
 router.put("/updateDishCost/:id", updateDishCostBusiness);
 

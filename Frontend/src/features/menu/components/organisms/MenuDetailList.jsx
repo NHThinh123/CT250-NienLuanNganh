@@ -8,42 +8,58 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
   const { menuRefs } = useContext(MenuContext);
 
   return (
-    <List
-      grid={{ gutter: 16, column: 1 }}
-      dataSource={menuData}
-      renderItem={(menu) => (
-        <List.Item>
-          <div
-            ref={(el) => {
-              if (menuRefs.current) {
-                menuRefs.current[menu._id] = el;
-              }
-            }}
-            style={styles.twocol}
-          >
-            <div>
-              <Row>
-                <Col span={22}>
-                  <div
-                    style={{
-                      color: "#6D6f71",
-                      fontSize: "14px",
-                      paddingBottom: "20px",
-                    }}
-                  >
-                    {capitalizeMenuName(menu.menu_name)}
-                  </div>
-                </Col>
-                <Col span={2}>
-                  <AddDish menuData={menu} />
-                </Col>
-              </Row>
-            </div>
-            <DisplayDishesByMenu menuId={menu._id} />
-          </div>
-        </List.Item>
+    <>
+      {menuData.length > 0 ? (
+        <List
+          grid={{ gutter: 16, column: 1 }}
+          dataSource={menuData}
+          renderItem={(menu) => (
+            <List.Item>
+              <div
+                ref={(el) => {
+                  if (menuRefs.current) {
+                    menuRefs.current[menu._id] = el;
+                  }
+                }}
+                style={styles.twocol}
+              >
+                <div>
+                  <Row>
+                    <Col span={22}>
+                      <div
+                        style={{
+                          color: "#6D6f71",
+                          fontSize: "14px",
+                          paddingBottom: "20px",
+                        }}
+                      >
+                        {capitalizeMenuName(menu.menu_name)}
+                      </div>
+                    </Col>
+                    <Col span={2}>
+                      <AddDish menuData={menu} />
+                    </Col>
+                  </Row>
+                </div>
+                <DisplayDishesByMenu menuId={menu._id} />
+              </div>
+            </List.Item>
+          )}
+        />
+      ) : (
+        <div
+          style={{
+            placeContent: "center",
+            padding: "20px",
+            fontSize: "16px",
+            color: "#888",
+            display: "flex",
+          }}
+        >
+          Chưa có thực đơn! Vui lòng thêm thực đơn!
+        </div>
       )}
-    />
+    </>
   );
 };
 
