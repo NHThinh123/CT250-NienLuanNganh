@@ -2,6 +2,8 @@ import { List, Row, Col } from "antd";
 import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 import DeleteDish from "../../../dish/components/templates/DeleteDish";
 import { useState } from "react";
+import { SquarePlus } from "lucide-react";
+// import AddDish from "./AddDish";
 
 const DisplayDishesByMenu = ({ menuId }) => {
   const { dishData } = useDishByMenuId(menuId);
@@ -98,13 +100,15 @@ const DisplayDishesByMenu = ({ menuId }) => {
       ) : (
         <div
           style={{
-            textAlign: "center",
+            placeContent: "center",
             padding: "20px",
             fontSize: "16px",
             color: "#888",
+            display: "flex",
           }}
         >
-          Chưa có món!
+          Chưa có món! Vui lòng nhấn vào nút
+          <SquarePlus strokeWidth={1} /> để thêm!
         </div>
       )}
     </>

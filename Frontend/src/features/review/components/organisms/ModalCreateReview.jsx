@@ -95,7 +95,7 @@ const ModalCreateReview = ({
               ></img>
               <p
                 style={{
-                  marginLeft: 10,
+                  margin: "0px 0px 0px 10px",
                   fontWeight: "bold",
                   placeContent: "center",
                 }}

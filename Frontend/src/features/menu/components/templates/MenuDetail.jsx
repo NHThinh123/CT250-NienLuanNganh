@@ -25,8 +25,8 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
     <>
       <div style={styles.menuPage}>
         <Row>
-          <Col span={3}></Col>
-          <Col span={4}>
+          <Col span={2}></Col>
+          <Col span={5}>
             <div style={{ padding: "13px 26px" }}>
               <p style={styles.titleMenu}>THỰC ĐƠN</p>
             </div>
@@ -39,7 +39,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
           </Col>
         </Row>
         <Row>
-          <Col span={3}></Col>
+          <Col span={2}></Col>
           <MenuProvider>
             <Col span={4}>
               <div style={{ marginRight: "20px", position: "sticky", top: 64 }}>
@@ -56,7 +56,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               </div>
             </Col>
             <Col
-              span={9}
+              span={10}
               style={{
                 backgroundColor: "#ffffff",
                 padding: "6px 15px",
@@ -69,7 +69,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               ></MenuDetailList>
             </Col>
           </MenuProvider>
-          <Col span={5}>
+          <Col span={6}>
             <div
               style={{
                 backgroundColor: "#ffffff",
@@ -99,7 +99,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
             </div>
           </Col>
 
-          <Col span={3}></Col>
+          <Col span={2}></Col>
         </Row>
       </div>
     </>
@@ -114,6 +114,7 @@ const styles = {
     fontSize: "14px",
     fontWeight: "bold",
     color: "#CF2127",
+    margin: 0,
   },
   onecol: {
     backgroundColor: "#ffffff",

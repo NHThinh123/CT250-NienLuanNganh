@@ -9,8 +9,7 @@ export const BusinessContext = createContext({
     email: "",
     contact_info: "",
     location: "",
-    avatar:
-      "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg",
+    avatar: "",
     open_hours: "",
     close_hours: "",
   },
@@ -29,34 +28,12 @@ export const BusinessWrapper = ({ children }) => {
         localStorage.getItem("authBusiness")
       );
       const parsedBusiness = storedBusiness ? JSON.parse(storedBusiness) : null;
-      if (parsedBusiness && parsedBusiness.isAuthenticated) {
-        return {
-          ...parsedBusiness,
-          business: {
-            ...parsedBusiness.business,
-            avatar:
-              parsedBusiness.business.avatar ||
-              "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg",
-          },
-        };
-      }
-      return {
-        isAuthenticated: false,
-        business: {
-          avatar:
-            "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg",
-        },
-      };
+      return parsedBusiness && parsedBusiness.isAuthenticated
+        ? parsedBusiness
+        : { isAuthenticated: false, business: {} };
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu từ localStorage:", error);
       localStorage.removeItem("authBusiness");
-      return {
-        isAuthenticated: false,
-        business: {
-          avatar:
-            "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg",
-        },
-      };
+      return { isAuthenticated: false, business: {} };
     }
   });
 

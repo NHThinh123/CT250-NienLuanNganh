@@ -8,13 +8,11 @@ const {
 const AppError = require("../utils/AppError");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const stripe = require("../config/stripe")
+const stripe = require("../config/stripe");
 const Payment = require("../models/payment.model");
 const Business = require("../models/business.model");
 const cloudinary = require("cloudinary").v2;
-const ResetTokenBusiness = require("../models/businessResetPassword.model")
-
-
+const ResetTokenBusiness = require("../models/businessResetPassword.model");
 
 const getBusiness = async (req, res, next) => {
   try {
@@ -40,7 +38,8 @@ const getBusinessById = async (req, res, next) => {
 const updateBusiness = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { business_name, close_hours, open_hours, contact_info, location } = req.body;
+    const { business_name, close_hours, open_hours, contact_info, location } =
+      req.body;
     let updateData = {};
 
     // Tìm doanh nghiệp trước khi cập nhật
@@ -75,7 +74,9 @@ const updateBusiness = async (req, res, next) => {
 
     // Kiểm tra nếu không có dữ liệu nào để cập nhật
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ error: "Không có dữ liệu nào để cập nhật!" });
+      return res
+        .status(400)
+        .json({ error: "Không có dữ liệu nào để cập nhật!" });
     }
 
     // Cập nhật thông tin business
@@ -109,7 +110,6 @@ const updateBusiness = async (req, res, next) => {
   }
 };
 
-
 // Signup
 const signupBusiness = async (req, res, next) => {
   try {
@@ -129,7 +129,8 @@ const signupBusiness = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    let avatarUrl = null;
+    let avatarUrl =
+      "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg";
     if (req.file) {
       avatarUrl = req.file.path;
     }
@@ -149,7 +150,8 @@ const signupBusiness = async (req, res, next) => {
     await newBusiness.save();
     res.status(201).json({
       status: "PENDING",
-      message: "Tài khoản đã được tạo! Vui lòng hoàn tất thanh toán để kích hoạt.",
+      message:
+        "Tài khoản đã được tạo! Vui lòng hoàn tất thanh toán để kích hoạt.",
       business: {
         id: newBusiness._id,
         business_name: newBusiness.business_name,
@@ -173,27 +175,20 @@ const processActivationPayment = async (req, res) => {
   const { paymentMethodId, amount, planType } = req.body;
 
   try {
-
-
     // Kiểm tra amount
     if (!amount || isNaN(amount) || amount <= 0) {
-
       return res.status(400).json({ message: "Số tiền không hợp lệ." });
     }
 
     // Kiểm tra planType
     if (!planType || !["monthly", "yearly"].includes(planType)) {
-
       return res.status(400).json({ message: "Loại gói không hợp lệ." });
     }
 
     const business = await Business.findById(businessId);
     if (!business) {
-
       return res.status(404).json({ message: "Không tìm thấy tài khoản" });
     }
-
-
 
     // Tạo PaymentIntent với Stripe
     const paymentIntent = await stripe.paymentIntents.create({
@@ -206,8 +201,6 @@ const processActivationPayment = async (req, res) => {
         allow_redirects: "never",
       },
     });
-
-
 
     if (paymentIntent.status === "succeeded") {
       // Cập nhật Business
@@ -230,14 +223,12 @@ const processActivationPayment = async (req, res) => {
 
       await business.save();
 
-
       const payment = new Payment({
         businessId: business._id,
         businessName: business.business_name,
         amount: amount,
       });
       await payment.save();
-
 
       res.status(200).json({
         message: "Thanh toán thành công! Tài khoản đã được kích hoạt.",
@@ -252,7 +243,11 @@ const processActivationPayment = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error in processActivationPayment:", error.message, error.stack);
+    console.error(
+      "Error in processActivationPayment:",
+      error.message,
+      error.stack
+    );
     res.status(500).json({ message: error.message || "Lỗi server nội bộ." });
   }
 };
@@ -277,12 +272,13 @@ const processMonthlyPayment = async (req, res) => {
         enabled: true,
         allow_redirects: "never", // Chỉ chấp nhận thanh toán không cần redirect
       },
-
     });
 
     if (paymentIntent.status === "succeeded") {
       business.lastPaymentDate = new Date();
-      business.nextPaymentDueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      business.nextPaymentDueDate = new Date(
+        Date.now() + 30 * 24 * 60 * 60 * 1000
+      );
       business.status = "active";
       await business.save();
 
@@ -386,11 +382,17 @@ const requestPasswordReset = async (req, res) => {
   const resetToken = crypto.randomBytes(32).toString("hex");
   const expiresAt = Date.now() + 15 * 60 * 1000; // Hết hạn sau 15 phút
 
-  await ResetTokenBusiness.create({ businessId: business._id, token: resetToken, expiresAt });
+  await ResetTokenBusiness.create({
+    businessId: business._id,
+    token: resetToken,
+    expiresAt,
+  });
 
   await sendResetPasswordEmail(business.email, resetToken);
 
-  res.status(200).json({ message: "Link đặt lại mật khẩu đã được gửi qua email!" });
+  res
+    .status(200)
+    .json({ message: "Link đặt lại mật khẩu đã được gửi qua email!" });
 };
 //Đặt lại mật khẩu
 const resetPassword = async (req, res) => {
@@ -404,8 +406,14 @@ const resetPassword = async (req, res) => {
 
     const resetToken = await ResetToken.findOne({ token });
 
-    if (!resetToken || !resetToken.userId || resetToken.expiresAt < Date.now()) {
-      return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
+    if (
+      !resetToken ||
+      !resetToken.userId ||
+      resetToken.expiresAt < Date.now()
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
     }
 
     // Mã hóa mật khẩu mới
@@ -419,13 +427,17 @@ const resetPassword = async (req, res) => {
     );
 
     if (!updatedUser) {
-      return res.status(400).json({ message: "Không tìm thấy người dùng, đặt lại mật khẩu thất bại!" });
+      return res.status(400).json({
+        message: "Không tìm thấy người dùng, đặt lại mật khẩu thất bại!",
+      });
     }
 
     // Xóa token đặt lại mật khẩu sau khi sử dụng
     await ResetToken.findOneAndDelete({ token });
 
-    res.status(200).json({ message: "Mật khẩu đã được đặt lại thành công! Vui lòng đăng nhập lại." });
+    res.status(200).json({
+      message: "Mật khẩu đã được đặt lại thành công! Vui lòng đăng nhập lại.",
+    });
   } catch (error) {
     console.error("Lỗi đặt lại mật khẩu:", error);
     res.status(500).json({ message: "Lỗi server khi đặt lại mật khẩu" });
@@ -440,7 +452,9 @@ const getEmail = async (req, res) => {
     const resetRequest = await ResetToken.findOne({ token });
 
     if (!resetRequest) {
-      return res.status(404).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+      return res
+        .status(404)
+        .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
     }
 
     // Dùng userId để tìm user trong bảng Users
