@@ -47,12 +47,11 @@ const getPostById = async (req, res, next) => {
 
 const createPost = async (req, res, next) => {
   try {
-    const { user_id, business_id, title, content, tags } = req.body;
+    const { id, title, content, tags } = req.body;
     const parsedTags = tags ? JSON.parse(tags) : [];
     //console.log(user_id, title, content, parsedTags, req.files);
     const data = await createPostService(
-      user_id,
-      business_id,
+      id,
       title,
       content,
       parsedTags,

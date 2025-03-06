@@ -47,7 +47,7 @@ const UploadImage = ({ fileList, setFileList }) => {
             key={index}
             src={src}
             alt="preview"
-            style={{ maxWidth: "600px", maxHeight: "270px", marginTop: "8px" }}
+            style={{ maxWidth: "600px", maxHeight: "300px", marginTop: "8px" }}
           />
         ))}
       </div>

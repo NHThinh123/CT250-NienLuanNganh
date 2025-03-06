@@ -115,13 +115,20 @@ const Comment = ({ commentData, post_id, minWidth }) => {
         <div style={{ display: "flex", gap: "4px" }}>
           <Button
             type="link"
-            style={{ padding: "0px", fontSize: "12px" }}
+            style={{ padding: "0px", fontSize: "12px", lineHeight: "1" }}
             onClick={() => handleAction(handleLike)}
           >
             <HeartFilled
-              style={{ color: !commentData?.isLike ? "gray" : "#ff4d4f" }}
+              style={{
+                color: !commentData?.isLike ? "gray" : "#ff4d4f",
+              }}
             />
-            <p style={{ color: !commentData?.isLike ? "gray" : "#ff4d4f" }}>
+            <p
+              style={{
+                color: !commentData?.isLike ? "gray" : "#ff4d4f",
+                margin: 0,
+              }}
+            >
               {commentData?.likeCount} Yêu thích
             </p>
           </Button>
@@ -130,7 +137,9 @@ const Comment = ({ commentData, post_id, minWidth }) => {
             style={{ padding: "0px", fontSize: "12px" }}
             onClick={() => handleAction(handleShowReply)}
           >
-            <p style={{ fontWeight: "bold", color: "gray" }}>Phản hồi</p>
+            <p style={{ fontWeight: "bold", color: "gray", margin: 0 }}>
+              Phản hồi
+            </p>
           </Button>
         </div>
       </Col>

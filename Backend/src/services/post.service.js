@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Post = require("../models/post.model");
+const User = require("../models/user.model");
+const Business = require("../models/business.model");
 const AppError = require("../utils/AppError");
 const Asset = require("../models/asset.model");
 const Post_Tag = require("../models/post_tag.model");
@@ -400,28 +402,28 @@ const getPostByIdService = async (post_id, id) => {
 
   return result[0];
 };
-const createPostService = async (
-  user_id,
-  business_id,
-  title,
-  content,
-  tags,
-  files
-) => {
+const createPostService = async (id, title, content, tags, files) => {
   if (!title || !content) {
     throw new AppError("Missing required fields", 400);
   }
 
-  if (!user_id && !business_id) {
-    throw new AppError(
-      "At least one of user_id or business_id must be provided",
-      400
-    );
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError("A valid ID must be provided", 400);
+  }
+
+  const objectId = new mongoose.Types.ObjectId(id);
+
+  // Kiểm tra xem id thuộc về user hay business
+  const user = await User.findById(objectId);
+  const business = await Business.findById(objectId);
+
+  if (!user && !business) {
+    throw new AppError("ID does not belong to any user or business", 404);
   }
 
   let result = await Post.create({
-    user_id: user_id,
-    business_id: business_id,
+    user_id: user ? objectId : null,
+    business_id: business ? objectId : null,
     title: title,
     content: content,
   });

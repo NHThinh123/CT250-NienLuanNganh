@@ -6,6 +6,7 @@ import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import { Row } from "antd";
 import { useState } from "react";
+
 const PostImages = ({ imagesData }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
@@ -16,6 +17,7 @@ const PostImages = ({ imagesData }) => {
           <Swiper
             style={{
               "--swiper-navigation-size": "30px",
+              "--swiper-navigation-color": "#52c41a",
               marginBottom: "10px",
             }}
             spaceBetween={10}

@@ -16,8 +16,8 @@ function App() {
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
   const { business, setBusiness } = useContext(BusinessContext);
-  console.log("Auth trong App:", auth);
-  console.log("Business trong App:", business);
+  // console.log("Auth trong App:", auth);
+  // console.log("Business trong App:", business);
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -27,14 +27,14 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-      ? business.business?.avatar
-      : null;
+    ? business.business?.avatar
+    : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-      ? business.business?.business_name
-      : "";
+    ? business.business?.business_name
+    : "";
 
   const handleLogout = () => {
     setIsLoggingOut(true);
@@ -111,7 +111,7 @@ function App() {
           }}
         >
           {/* Logo */}
-          <div style={{ flexShrink: 0, marginTop: "16px" }}>
+          <div style={{ flexShrink: 0 }}>
             <img
               src={logo}
               style={{ height: "60px", width: "auto" }} // Điều chỉnh kích thước logo
@@ -120,7 +120,7 @@ function App() {
           </div>
 
           {/* NavBar */}
-          <div style={{ flexGrow: 1, padding: 20 }}>
+          <div style={{ flexGrow: 1, padding: "0 20px" }}>
             <NavBar />
           </div>
 

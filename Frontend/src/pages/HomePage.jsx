@@ -14,7 +14,10 @@ const HomePage = () => {
         <ListBusinessHome />
       </Col>
       <Col span={22}>
-        <Typography.Title level={2} style={{ fontWeight: "bold" }}>
+        <Typography.Title
+          level={2}
+          style={{ fontWeight: "bold", marginTop: 32 }}
+        >
           Bài Viết Nổi Bật
         </Typography.Title>
         <ListPostHome />

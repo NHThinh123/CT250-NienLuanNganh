@@ -11,8 +11,8 @@ const DishDetailPage = () => {
       {/* <ButtonCustomize margin={"8px 0px"} to={"/posts/create"}>
         Thêm bài đăng
       </ButtonCustomize> */}
-      
-      <DishDetail dishData={dishData} isLoading={isLoading} isError={isError}/>;
+      <DishDetail dishData={dishData} isLoading={isLoading} isError={isError} />
+      ;
     </>
   );
 };

@@ -11,7 +11,10 @@ const ListBusinessHome = () => {
   return (
     <Row>
       <Col span={24}>
-        <Typography.Title level={2} style={{ fontWeight: "bold" }}>
+        <Typography.Title
+          level={2}
+          style={{ fontWeight: "bold", marginTop: 32 }}
+        >
           Quán Ăn
         </Typography.Title>
 

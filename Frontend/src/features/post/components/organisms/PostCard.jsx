@@ -1,7 +1,7 @@
 import { Avatar, Col, Row, Space, Tag, Typography } from "antd";
 import logo from "../../../../assets/logo/logo.png";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import { HeartOutlined, MessageOutlined } from "@ant-design/icons";
+import { HeartFilled, MessageOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 const PostCard = ({ post }) => {
@@ -32,12 +32,13 @@ const PostCard = ({ post }) => {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between",
+
+                height: "100%",
               }}
             >
               <div>
-                <h1>{post.title}</h1>
-                <Col span={24}>
+                <h1 style={{ marginBottom: 4 }}>{post.title}</h1>
+                <Col span={24} style={{ marginBottom: "8px" }}>
                   {post?.tags?.length > 0 &&
                     post.tags.map((tag) => (
                       <Tag key={tag.tag_name} color="blue">
@@ -45,11 +46,28 @@ const PostCard = ({ post }) => {
                       </Tag>
                     ))}
                 </Col>
-                <p>{post.content}</p>
+                <div
+                  style={{
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: 4, // Giới hạn tối đa 4 dòng
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    lineHeight: "1.5em",
+                    maxHeight: "6em",
+                  }}
+                >
+                  <p style={{ margin: 0 }}>{post.content}</p>
+                </div>
+                {post.content.length > 400 && (
+                  <Typography.Text style={{ color: "#1890ff" }}>
+                    Xem thêm
+                  </Typography.Text>
+                )}
               </div>
 
-              <div style={{ marginTop: "8px" }}>
-                <Space>
+              <div>
+                <Space align="center" style={{ marginTop: "8px" }}>
                   <Avatar
                     src={
                       post?.author?.avatar ||
@@ -57,14 +75,23 @@ const PostCard = ({ post }) => {
                     }
                     size={20}
                   ></Avatar>
-                  <p>{post.author?.name}</p>
+                  <p style={{ marginBottom: "0" }}>{post.author?.name}</p>
                 </Space>
               </div>
               <div>
-                <Row style={{ marginTop: "16px" }} gutter={8}>
+                <Row style={{ margin: "8px 0px" }} gutter={8}>
                   <Col span={4}>
-                    <HeartOutlined style={{ marginRight: "4px" }} />
-                    <Typography.Text>
+                    <HeartFilled
+                      style={{
+                        color: post.isLike ? "#ff4d4f" : "gray",
+                        marginRight: "4px",
+                      }}
+                    />
+                    <Typography.Text
+                      style={{
+                        color: post.isLike ? "#ff4d4f" : "black",
+                      }}
+                    >
                       {post.likeCount} Yêu thích
                     </Typography.Text>
                   </Col>

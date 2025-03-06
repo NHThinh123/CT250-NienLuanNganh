@@ -14,7 +14,7 @@ const PostList = () => {
   const [params, setParams] = useState({
     search: "",
     sort: "most_likes",
-    limit: 4,
+    limit: 2,
     id: entity.id,
     filter: {
       tags: [],

@@ -3,7 +3,7 @@ import axios from "../../../services/axios.customize";
 // API để đăng nhập
 const loginUser = (data) => {
   const URL_API = "/api/user/login";
-  console.log("api", data);
+  // console.log("api", data);
   return axios.post(URL_API, data);
 };
 //api đăng kí
@@ -15,7 +15,10 @@ const signupUser = (data) => {
 const updateUser = (id, data) => {
   const URL_API = `/api/user/update/${id}`;
   return axios.put(URL_API, data, {
-    headers: { "Content-Type": data instanceof FormData ? "multipart/form-data" : "application/json" },
+    headers: {
+      "Content-Type":
+        data instanceof FormData ? "multipart/form-data" : "application/json",
+    },
   });
 };
 //api lấy id người dùng
@@ -29,4 +32,10 @@ const requestResetPassword = (email) => {
   const URL_API = `/api/user/reset-password-request`;
   return axios.post(URL_API, email);
 };
-export { loginUser, updateUser, getUserProfile, signupUser, requestResetPassword };
+export {
+  loginUser,
+  updateUser,
+  getUserProfile,
+  signupUser,
+  requestResetPassword,
+};

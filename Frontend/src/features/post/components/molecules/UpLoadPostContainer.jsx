@@ -1,14 +1,14 @@
 import { Button, Col, Form, Row, Typography } from "antd";
 import { ChefHat, Utensils } from "lucide-react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import ModalUploadPost from "./ModalUploadPost";
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
-import { AuthContext } from "../../../../contexts/auth.context";
+
+import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 
 const UpLoadPostContainer = () => {
-  const { auth } = useContext(AuthContext);
-  const user_id = auth?.user?.id;
+  const { entity } = useAuthEntity();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
     useState(false);
@@ -34,7 +34,7 @@ const UpLoadPostContainer = () => {
   };
   // Hành động được bảo vệ (yêu cầu đăng nhập)
   const handleAction = (action) => {
-    if (!user_id) {
+    if (!entity.id) {
       showLoginRequiredModal();
     } else {
       action();

@@ -12,12 +12,12 @@ import {
 } from "antd";
 import { Images, MapPinned, Tags } from "lucide-react";
 import UploadImage from "../atoms/UploadImage";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import UploadTag from "../atoms/UploadTag";
 import useCreatePost from "../../hooks/useCreatePost";
 
 import SpinLoading from "../../../../components/atoms/SpinLoading";
-import { AuthContext } from "../../../../contexts/auth.context";
+import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 
 const ModalUploadPost = ({
   isModalOpen,
@@ -26,7 +26,7 @@ const ModalUploadPost = ({
   form,
   setIsModalOpen,
 }) => {
-  const { auth } = useContext(AuthContext);
+  const { entity } = useAuthEntity();
   const { mutate: createPost, isPending } = useCreatePost();
   const [tags, setTags] = useState([]);
   const [fileList, setFileList] = useState([]);
@@ -47,7 +47,7 @@ const ModalUploadPost = ({
 
   const onFinish = (values) => {
     const formData = new FormData();
-    formData.append("user_id", auth?.user?.id);
+    formData.append("id", entity.id);
     formData.append("title", values.title);
     formData.append("content", values.content);
     formData.append("tags", JSON.stringify(tags));
@@ -100,11 +100,11 @@ const ModalUploadPost = ({
       {isPending && <SpinLoading />}
       <Row>
         <Col span={2}>
-          <Avatar src={auth?.user?.avatar}></Avatar>
+          <Avatar src={entity?.avatar}></Avatar>
         </Col>
         <Col span={20}>
           <Typography.Text style={{ fontWeight: "bold" }}>
-            {auth?.user?.name}
+            {entity.name}
           </Typography.Text>
         </Col>
       </Row>

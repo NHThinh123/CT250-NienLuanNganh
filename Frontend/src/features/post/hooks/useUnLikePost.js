@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { unlikePostApi } from "../services/postApi";
 
@@ -6,7 +7,7 @@ const useUnlikePost = () => {
   return useMutation({
     mutationFn: ({ id, post_id }) => unlikePostApi(id, post_id),
     onSuccess: () => {
-      queryClient.invalidateQueries("posts"); // Làm mới danh sách bài viết
+      // queryClient.invalidateQueries("posts"); // Làm mới danh sách bài viết
     },
   });
 };
