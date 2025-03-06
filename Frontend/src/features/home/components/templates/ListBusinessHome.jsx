@@ -12,7 +12,7 @@ const ListBusinessHome = () => {
     <Row>
       <Col span={24}>
         <Typography.Title level={2} style={{ fontWeight: "bold" }}>
-          Quán ăn
+          Quán Ăn
         </Typography.Title>
 
         <Business businessData={businessData}></Business>

@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -8,7 +7,6 @@ import App from "./App.jsx";
 import HomePage from "./pages/HomePage.jsx";
 //import UserPage from "./pages/UserPage.jsx";
 import PostPage from "./pages/PostPage.jsx";
-
 import PostCreatePage from "./pages/PostCreatePage.jsx";
 import PostDetailPage from "./pages/PostDetailPage.jsx";
 import PostEditPage from "./pages/PostEditPage.jsx";
@@ -25,6 +23,9 @@ import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import { BusinessWrapper } from "./contexts/business.context.jsx";
 import ProfileBusinessPage from "./pages/ProfileBusinessPage.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
+
+// Thêm import ConfigProvider từ antd
+import { ConfigProvider } from "antd";
 
 const queryClient = new QueryClient();
 
@@ -43,12 +44,8 @@ const router = createBrowserRouter([
       },
       {
         path: "/business-profile",
-        element: <ProfileBusinessPage />
+        element: <ProfileBusinessPage />,
       },
-      // {
-      //   path: "/users",
-      //   element: <UserPage />,
-      // },
       {
         path: "/posts",
         children: [
@@ -73,10 +70,6 @@ const router = createBrowserRouter([
       {
         path: "/dishes",
         children: [
-          // {
-          //   index: true,
-          //   element: <DishPage />,
-          // },
           {
             path: ":id",
             element: <DishDetailPage />,
@@ -123,13 +116,26 @@ const router = createBrowserRouter([
     element: <PaymentPage />,
   },
 ]);
+
 createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
-    <AuthWrapper>
-      <BusinessWrapper>
-        <RouterProvider router={router} />
-      </BusinessWrapper>
-    </AuthWrapper>
+    {/* Thêm ConfigProvider bao quanh ứng dụng */}
+    <ConfigProvider
+      theme={{
+        token: {
+          // Đổi màu primary (ví dụ: xanh lá cây)
+          colorPrimary: "#52c41a",
+          // Thêm font family (ví dụ: Roboto)
+          fontFamily: "Bitter, serif",
+        },
+      }}
+    >
+      <AuthWrapper>
+        <BusinessWrapper>
+          <RouterProvider router={router} />
+        </BusinessWrapper>
+      </AuthWrapper>
+    </ConfigProvider>
     <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>
 );
