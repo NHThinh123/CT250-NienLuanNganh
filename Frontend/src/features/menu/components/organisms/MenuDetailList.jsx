@@ -21,6 +21,7 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
                     menuRefs.current[menu._id] = el;
                   }
                 }}
+                data-menu-id={menu._id}
                 style={styles.twocol}
               >
                 <div>
@@ -41,7 +42,10 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
                     </Col>
                   </Row>
                 </div>
-                <DisplayDishesByMenu menuId={menu._id} />
+                <DisplayDishesByMenu
+                  menuId={menu._id}
+                  businessId={menuData[0]?.business_id}
+                />
               </div>
             </List.Item>
           )}

@@ -1,6 +1,8 @@
 import { Col, Form, Input, message, Modal, Row, Typography } from "antd";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import useCreateMenu from "../../hooks/useCreateMenu";
+import { useContext } from "react";
+import { MenuContext } from "../molecules/MenuContext";
 
 const ModalAddMenu = ({
   isModalOpen,
@@ -11,6 +13,7 @@ const ModalAddMenu = ({
   businessId,
 }) => {
   const { mutate: createMenu, isPending } = useCreateMenu();
+  const { handleMenuClick } = useContext(MenuContext);
 
   const onFinish = async (values) => {
     try {
@@ -23,10 +26,13 @@ const ModalAddMenu = ({
       };
 
       createMenu(formData, {
-        onSuccess: () => {
+        onSuccess: (newMenu) => {
           message.success("Thực đơn đã được tạo thành công!");
           form.resetFields();
           setIsModalOpen(false);
+          setTimeout(() => {
+            handleMenuClick(newMenu._id);
+          }, 300);
         },
         onError: () => {
           message.error("Lỗi khi tạo thực đơn!");

@@ -12,6 +12,12 @@ export const MenuProvider = ({ children }) => {
     menuElements.forEach((element) => {
       menuRefs.current[element.getAttribute("data-menu-id")] = element;
     });
+    Object.keys(menuRefs.current).forEach((key) => {
+      const element = document.querySelector(`[data-menu-id="${key}"]`);
+      if (element) {
+        menuRefs.current[key] = element;
+      }
+    });
   }, [children]); // Cập nhật khi children thay đổi
 
   // Hàm xử lý cuộn đến menu
@@ -19,7 +25,7 @@ export const MenuProvider = ({ children }) => {
     const element = menuRefs.current?.[menuId]; // Kiểm tra tồn tại
     if (element) {
       const offsetTop =
-        element.getBoundingClientRect().top + window.scrollY - 50;
+        element.getBoundingClientRect().top + window.scrollY - 75;
       window.scrollTo({ top: offsetTop, behavior: "smooth" });
     }
   };

@@ -24,11 +24,12 @@ const AddDish = ({ menuData }) => {
 
   return (
     <>
-      {business.isAuthenticated && (
-        <Button type="link" onClick={showModal} style={{ padding: 0 }}>
-          <SquarePlus strokeWidth={1} />
-        </Button>
-      )}
+      {business.isAuthenticated &&
+        business.business.id == menuData.business_id && (
+          <Button type="link" onClick={showModal} style={{ padding: 0 }}>
+            <SquarePlus strokeWidth={1} />
+          </Button>
+        )}
       <ModalAddDish
         form={form}
         isModalOpen={isModalOpen}

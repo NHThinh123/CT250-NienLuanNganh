@@ -42,7 +42,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
           <Col span={2}></Col>
           <MenuProvider>
             <Col span={4}>
-              <div style={{ marginRight: "20px", position: "sticky", top: 64 }}>
+              <div style={{ marginRight: "20px", position: "sticky", top: 70 }}>
                 <MenuList menuData={menuData}></MenuList>
                 <div
                   style={{
@@ -75,6 +75,8 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
                 backgroundColor: "#ffffff",
                 marginLeft: "20px",
                 borderRadius: 5,
+                position: "sticky",
+                top: 70,
               }}
             >
               <div>
@@ -98,7 +100,6 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               </div>
             </div>
           </Col>
-
           <Col span={2}></Col>
         </Row>
       </div>
