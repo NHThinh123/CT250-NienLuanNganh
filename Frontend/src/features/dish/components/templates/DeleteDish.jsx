@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import useDeleteDish from "../../hooks/useDeleteDish";
 import { BusinessContext } from "../../../../contexts/business.context";
 
-const DeleteDish = ({ dishName, dishId }) => {
+const DeleteDish = ({ dishName, dishId, businessId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutate: deleteDish, isLoading } = useDeleteDish();
   const { business } = useContext(BusinessContext);
@@ -74,7 +74,7 @@ const DeleteDish = ({ dishName, dishId }) => {
           </p>
         </div>
       </Modal>
-      {business.isAuthenticated && (
+      {business.isAuthenticated && business.business.id == businessId && (
         <Button
           onClick={showModal}
           type="link"

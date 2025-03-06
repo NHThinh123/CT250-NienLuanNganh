@@ -1,20 +1,24 @@
-import { Menu } from "antd";
-import { useContext } from "react";
+import { Button, Menu } from "antd";
+import { useContext, useState } from "react";
 import { MenuContext } from "../molecules/MenuContext";
 import DeleteMenu from "../molecules/DeleteMenu";
 
 const MenuList = ({ menuData }) => {
   const menuContext = useContext(MenuContext);
+  const [showAll, setShowAll] = useState(false);
 
   if (!menuContext) {
     console.error("MenuList must be used within a MenuProvider");
     return null;
   }
+  const MAX_VISIBLE_ITEMS = 4; // Giới hạn số lượng menu hiển thị ban đầu
+
+  const visibleMenu = showAll ? menuData : menuData.slice(0, MAX_VISIBLE_ITEMS);
 
   const { handleMenuClick } = menuContext;
 
   //Duyệt qua mảng menuData để tạo ra mảng items
-  const items = menuData.map((menu) => ({
+  const items = visibleMenu.map((menu) => ({
     key: menu._id,
     label: (
       <div
@@ -35,7 +39,11 @@ const MenuList = ({ menuData }) => {
         >
           {menu.menu_name.toUpperCase()}
         </span>
-        <DeleteMenu menuName={menu.menu_name} menuId={menu._id} />
+        <DeleteMenu
+          menuName={menu.menu_name}
+          menuId={menu._id}
+          businessId={menu.business_id}
+        />
       </div>
     ),
   }));
@@ -53,6 +61,15 @@ const MenuList = ({ menuData }) => {
         items={items}
         onClick={(e) => handleMenuClick?.(e.key)}
       />
+      {menuData.length > MAX_VISIBLE_ITEMS && !showAll && (
+        <Button
+          type="link"
+          onClick={() => setShowAll(true)}
+          style={{ marginTop: "8px", fontSize: "14px", color: "#1890ff" }}
+        >
+          Xem thêm thực đơn...
+        </Button>
+      )}
     </>
   );
 };

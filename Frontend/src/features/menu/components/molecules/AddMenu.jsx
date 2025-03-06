@@ -24,7 +24,7 @@ const AddMenu = ({ businessId }) => {
 
   return (
     <>
-      {business.isAuthenticated && (
+      {business.isAuthenticated && business.business.id == businessId && (
         <Button
           type="link"
           onClick={showModal}
