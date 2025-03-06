@@ -1,5 +1,5 @@
 import { Button, message, Modal, Typography } from "antd";
-import { SquareX, Trash2 } from "lucide-react";
+import { X } from "lucide-react";
 import { useContext, useState } from "react";
 import useDeleteDish from "../../hooks/useDeleteDish";
 import { BusinessContext } from "../../../../contexts/business.context";
@@ -8,6 +8,7 @@ const DeleteDish = ({ dishName, dishId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutate: deleteDish, isLoading } = useDeleteDish();
   const { business } = useContext(BusinessContext);
+  const [hover, setHover] = useState(false); //set hover cho delete button
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -29,7 +30,10 @@ const DeleteDish = ({ dishName, dishId }) => {
     <>
       <Modal
         title={
-          <Typography.Title level={4} style={{ textAlign: "center" }}>
+          <Typography.Title
+            level={4}
+            style={{ textAlign: "center", color: "red" }}
+          >
             Xác nhận xóa
           </Typography.Title>
         }
@@ -40,6 +44,17 @@ const DeleteDish = ({ dishName, dishId }) => {
         cancelText="Hủy"
         maskClosable={false}
         centered
+        okButtonProps={{
+          style: { backgroundColor: "red", borderColor: "red" },
+          onMouseEnter: (e) => {
+            e.target.style.backgroundColor = "#cc0000"; // Màu đậm hơn khi hover
+            e.target.style.borderColor = "#cc0000";
+          },
+          onMouseLeave: (e) => {
+            e.target.style.backgroundColor = "red";
+            e.target.style.borderColor = "red";
+          },
+        }}
       >
         <div
           style={{
@@ -48,11 +63,9 @@ const DeleteDish = ({ dishName, dishId }) => {
             justifyContent: "center",
           }}
         >
-          <Trash2 color="red" />
           <p
             style={{
               fontSize: 16,
-              fontWeight: "bold",
               marginLeft: 4,
             }}
           >
@@ -70,12 +83,14 @@ const DeleteDish = ({ dishName, dishId }) => {
             margin: 0,
             padding: 0,
             border: "none",
-            display: "flex-box",
+            display: "grid",
             placeItems: "center",
             height: "100%",
           }}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
         >
-          <SquareX />
+          <X strokeWidth={hover ? 2.75 : 0.75} color={hover ? "red" : "red"} />
         </Button>
       )}
     </>

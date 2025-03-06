@@ -28,7 +28,7 @@ const BusinessDetail = ({ businessData, isLoading, isError }) => {
           <Col span={9}>
             <div style={styles.businessAva}>
               <img
-                style={{ width: "500px", height: "250px" }}
+                style={{ width: "500px", height: "250px", borderRadius: 5 }}
                 src={businessData.avatar}
                 alt="Ảnh"
               ></img>

@@ -10,10 +10,9 @@ import {
   Typography,
   Upload,
 } from "antd";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import useCreateDish from "../../../dish/hooks/useCreateDish";
-// import { BusinessContext } from "../../../../contexts/business.context";
 
 const MAX_IMAGES = 5; //Giới hạn 5 ảnh tải lên
 
@@ -26,18 +25,39 @@ const ModalAddDish = ({
   menuData,
 }) => {
   const [imageList, setImageList] = useState([]);
-  // const { business } = useContext(BusinessContext);
+  const formRef = useRef(null);
+  const [isImageError, setIsImageError] = useState(false);
   const { mutate: createDish, isPending } = useCreateDish();
+
+  const resetFormScroll = () => {
+    if (formRef.current) {
+      formRef.current.scrollTop = 0;
+    }
+  };
+
+  const handleModalClose = () => {
+    handleCancel();
+    setImageList([]);
+    setIsImageError(false);
+    resetFormScroll(); // Reset thanh cuộn khi đóng modal
+  };
 
   const handleImageChange = ({ fileList }) => {
     setImageList(fileList);
     form.setFieldsValue({ dish_image: fileList });
+    setIsImageError(fileList.length === 0);
   };
 
   const onFinish = async (values) => {
     try {
       await form.validateFields();
       // console.log("Form values sau validate:", values);
+
+      if (imageList.length === 0) {
+        message.error("Vui lòng tải lên ít nhất 1 ảnh món!");
+        setIsImageError(true);
+        return;
+      }
 
       const formData = new FormData();
       formData.append("dish_name", values.dish_name || "");
@@ -62,6 +82,9 @@ const ModalAddDish = ({
         onSuccess: () => {
           message.success("Món đã được tạo thành công!");
           form.resetFields();
+          setImageList([]);
+          setIsImageError(false);
+          resetFormScroll();
           setIsModalOpen(false);
         },
         onError: () => {
@@ -73,10 +96,6 @@ const ModalAddDish = ({
     }
   };
 
-  // if (!business.isAuthenticated) {
-  //   return null; // Ẩn modal nếu không phải tài khoản business
-  // }
-
   return (
     <Modal
       title={
@@ -87,8 +106,7 @@ const ModalAddDish = ({
       open={isModalOpen}
       onOk={handleOk}
       onCancel={() => {
-        handleCancel();
-        setImageList([]);
+        handleModalClose();
       }}
       okText={isPending ? "Đang tạo..." : "Tạo"}
       cancelText="Hủy"
@@ -98,6 +116,7 @@ const ModalAddDish = ({
     >
       {isPending && <SpinLoading />}
       <Row
+        ref={formRef}
         style={{
           marginTop: "16px",
           maxHeight: "320px",
@@ -180,30 +199,33 @@ const ModalAddDish = ({
                   onChange={handleImageChange}
                   beforeUpload={() => false} // Không upload lên server ngay
                   multiple
+                  className={isImageError ? "upload-error" : ""}
                 >
                   {imageList.length < MAX_IMAGES && ( // Ẩn nút khi đạt giới hạn ảnh
                     <div>
                       <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>Thêm ảnh</div>
+                      <p style={{ marginTop: 8, borderRadius: 5 }}>Thêm ảnh</p>
                     </div>
                   )}
                 </Upload>
+                {isImageError && (
+                  <span style={{ color: "red", fontSize: "14px" }}>
+                    Vui lòng tải lên ít nhất 1 ảnh!
+                  </span>
+                )}
               </Form.Item>
             </div>
-            {/* <Form.Item
-              name="menu_name"
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: "Vui lòng nhập tên thực đơn!",
-              //   },
-              // ]}
-            >
-              <Input size="large" disabled initialValue={menuData.menu_name} />
-            </Form.Item> */}
           </Form>
         </Col>
       </Row>
+      <style>
+        {`
+          .upload-error .ant-upload {
+            border: 1.5px solid red !important;
+            border-radius: 5px
+          }
+        `}
+      </style>
     </Modal>
   );
 };
