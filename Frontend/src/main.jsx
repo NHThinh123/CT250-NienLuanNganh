@@ -23,6 +23,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import { BusinessWrapper } from "./contexts/business.context.jsx";
 import ProfileBusinessPage from "./pages/ProfileBusinessPage.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
+import SubscriptionPlansPage from "./pages/SubscriptionPlansPage.jsx";
 
 // Thêm import ConfigProvider từ antd
 import { ConfigProvider } from "antd";
@@ -114,6 +115,10 @@ const router = createBrowserRouter([
   {
     path: "payment/activation/:businessId",
     element: <PaymentPage />,
+  },
+  {
+    path: "/subscription/plans/:businessId",
+    element: <SubscriptionPlansPage />,
   },
 ]);
 

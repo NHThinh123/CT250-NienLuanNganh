@@ -5,7 +5,7 @@ import image from "../../../../assets/signupbusiness/image.png";
 
 const RegisterIllustration = () => {
     return (
-        <Col xs={0} md={12} style={{ textAlign: "center", padding: "50px" }}>
+        <Col xs={0} md={9} style={{ textAlign: "center", padding: "50px" }}>
             <img
                 src={image}
                 alt="Illustration"

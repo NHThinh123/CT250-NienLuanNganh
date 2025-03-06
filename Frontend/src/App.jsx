@@ -8,6 +8,7 @@ import NavBar from "./components/templates/NavBar";
 import logo from "../src/assets/logo/logo.png";
 import Footer from "./components/templates/Footer";
 import ScrollToTop from "./components/atoms/ScrollToTop";
+import "antd/dist/reset.css";
 
 const { Header, Content } = Layout;
 
