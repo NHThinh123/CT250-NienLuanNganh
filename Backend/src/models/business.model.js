@@ -15,6 +15,7 @@ const BusinessSchema = new mongoose.Schema(
     rating_average: { type: Number, default: 0, min: 0, max: 5 },
     dish_lowest_cost: { type: Number, default: 0 },
     dish_highest_cost: { type: Number, default: 0 },
+    verified: { type: Boolean, default: false },
     status: {
       type: String,
       enum: ["pending", "active", "suspended"],

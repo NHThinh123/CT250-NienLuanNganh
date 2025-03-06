@@ -10,13 +10,38 @@ const {
   updateDishCostBusiness,
   processActivationPayment,
   processMonthlyPayment,
+  requestBusinessPasswordReset,
+  resetBusinessPassword,
+  getBusinessEmail,
 } = require("../controllers/business.controller");
 const router = express.Router();
 const upload = require("../middleware/uploadAvatar");
-const { checkAccountStatus } = require("../middleware/checkBusiness");
+const path = require("path");
+const { verifyBusinessEmail } = require("../controllers/user.verifiEmail");
 
 // router.post("/", createBusiness);
 router.get("/", getBusiness);
+//Xác thực tài khoản
+router.get("/verify/:businessId/:uniqueString", verifyBusinessEmail);
+router.get('/verified', (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, '../views/verification.html'));
+  } catch (error) {
+    console.error('Error sending verification page:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+//Gửi yêu cầu đặt lại mật khẩu
+router.post("/reset-password-request", requestBusinessPasswordReset);
+
+router.get("/reset-password/:token", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/reset-business-password.html"));
+});
+//Đặt lại mật khẩu
+router.post("/reset-password/:token", resetBusinessPassword);
+//Lấy email
+router.get("/get-email/:token", getBusinessEmail);
+
 router.get("/id/:id", getBusinessById);
 router.put("/id/:id", upload.single("avatar"), updateBusiness);
 router.post("/signupBusiness", upload.single("avatar"), signupBusiness);

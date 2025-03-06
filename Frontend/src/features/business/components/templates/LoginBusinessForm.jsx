@@ -89,7 +89,7 @@ const LoginForm = () => {
                             Bạn không có tài khoản Business? <a href="/signupBusiness" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đăng Ký Business</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Bạn quên mật khẩu? <a href="/forgot-password" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đặt lại mật khẩu</a>
+                            Bạn quên mật khẩu? <a href="/resetbusinesspassword" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đặt lại mật khẩu</a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
                             Bạn là người dùng bình thường? <a href="/login" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đăng nhập</a>

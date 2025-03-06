@@ -27,6 +27,7 @@ import SubscriptionPlansPage from "./pages/SubscriptionPlansPage.jsx";
 
 // Thêm import ConfigProvider từ antd
 import { ConfigProvider } from "antd";
+import ResetBusinessPasswordPage from "./pages/ResetBusinessPasswordPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -111,6 +112,10 @@ const router = createBrowserRouter([
   {
     path: "resetpassword",
     element: <ResetPasswordPage />,
+  },
+  {
+    path: "resetbusinesspassword",
+    element: <ResetBusinessPasswordPage />,
   },
   {
     path: "payment/activation/:businessId",
