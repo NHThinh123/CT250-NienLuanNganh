@@ -11,7 +11,7 @@ const BillingInfo = () => {
                 <span style={{ color: "#52c41a" }}>Tần suất thanh toán</span>
             </Divider>
             <Paragraph style={{ color: "#888", marginBottom: "20px" }}>
-                Để tránh lạm dụng, chúng tôi yêu cầu thông tin thanh toán trước. Bạn sẽ được dùng thử miễn phí 30 ngày, sau đó tự động chuyển sang gói trả phí. Bạn có thể hủy bất kỳ lúc nào từ cài đặt trước khi thời gian dùng thử kết thúc.
+                Để tránh lạm dụng, chúng tôi yêu cầu thông tin thanh toán trước. Quý khách hàng có thể cân nhắc để sử dụng gói cước phù hợp. Chúng tôi sẽ có thông báo khi gói cước sắp hết hạn để tránh làm ảnh hưởng đến trải nghiệm của quý khách hàng. Cảm ơn quý khách hàng đã tin tưởng và ủng hộ của chúng tôi. Yumzy xin chân thành cảm ơn.
             </Paragraph>
         </div>
     );

@@ -13,7 +13,6 @@ const SubscriptionPlansPage = () => {
     const location = useLocation();
     const [selectedPlan, setSelectedPlan] = useState("monthly");
 
-    // Lấy email và businessName từ state
     const { email, businessName } = location.state || {};
 
     const handlePlanChange = (plan) => {
@@ -21,10 +20,11 @@ const SubscriptionPlansPage = () => {
     };
 
     const handleUpgrade = () => {
-        const amount = selectedPlan === "monthly" ? 50.00 : 500.00;
-        // Truyền email, businessName và amount qua state
+        const amount = selectedPlan === "monthly" ? 50 : 500;
+        const planType = selectedPlan; // "monthly" hoặc "yearly"
+        console.log("Navigating with data:", { businessId, amount, planType, email, businessName });
         navigate(`/payment/activation/${businessId}`, {
-            state: { amount, email, businessName },
+            state: { amount, planType, email, businessName },
         });
     };
 
