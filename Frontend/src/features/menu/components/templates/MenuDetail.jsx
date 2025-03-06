@@ -42,7 +42,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
           <Col span={3}></Col>
           <MenuProvider>
             <Col span={4}>
-              <div style={{ marginRight: "20px", position: "sticky", top: 0 }}>
+              <div style={{ marginRight: "20px", position: "sticky", top: 64 }}>
                 <MenuList menuData={menuData}></MenuList>
                 <div
                   style={{
