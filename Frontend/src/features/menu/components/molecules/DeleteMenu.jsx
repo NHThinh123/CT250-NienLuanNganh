@@ -1,5 +1,5 @@
 import { Button, message, Modal, Typography } from "antd";
-import { SquareX, Trash2 } from "lucide-react";
+import { X } from "lucide-react";
 import { useContext, useState } from "react";
 import useDeleteMenu from "../../hooks/useDeleteMenu";
 import { BusinessContext } from "../../../../contexts/business.context";
@@ -8,6 +8,7 @@ const DeleteMenu = ({ menuName, menuId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutate: deleteMenu, isLoading } = useDeleteMenu();
   const { business } = useContext(BusinessContext);
+  const [hover, setHover] = useState(false); //set hover cho delete button
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -29,7 +30,10 @@ const DeleteMenu = ({ menuName, menuId }) => {
     <>
       <Modal
         title={
-          <Typography.Title level={4} style={{ textAlign: "center" }}>
+          <Typography.Title
+            level={4}
+            style={{ textAlign: "center", color: "red" }}
+          >
             Xác nhận xóa
           </Typography.Title>
         }
@@ -40,6 +44,17 @@ const DeleteMenu = ({ menuName, menuId }) => {
         cancelText="Hủy"
         maskClosable={false}
         centered
+        okButtonProps={{
+          style: { backgroundColor: "red", borderColor: "red" },
+          onMouseEnter: (e) => {
+            e.target.style.backgroundColor = "#cc0000"; // Màu đậm hơn khi hover
+            e.target.style.borderColor = "#cc0000";
+          },
+          onMouseLeave: (e) => {
+            e.target.style.backgroundColor = "red";
+            e.target.style.borderColor = "red";
+          },
+        }}
       >
         <div
           style={{
@@ -48,11 +63,9 @@ const DeleteMenu = ({ menuName, menuId }) => {
             justifyContent: "center",
           }}
         >
-          <Trash2 color="red" />
           <p
             style={{
               fontSize: 16,
-              fontWeight: "bold",
               marginLeft: 4,
             }}
           >
@@ -70,12 +83,13 @@ const DeleteMenu = ({ menuName, menuId }) => {
             margin: 0,
             padding: 0,
             border: "none",
-            display: "flex-box",
             placeItems: "center",
             height: "100%",
           }}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
         >
-          <SquareX />
+          <X strokeWidth={hover ? 2.75 : 0.75} color={hover ? "red" : "red"} />
         </Button>
       )}
     </>

@@ -31,9 +31,9 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               <p style={styles.titleMenu}>THỰC ĐƠN</p>
             </div>
           </Col>
-          <Col span={8}></Col>
+          <Col span={9}></Col>
           <Col span={8}>
-            <div style={{ padding: "13px 26px" }}>
+            <div style={{ padding: "13px 26px", marginLeft: 20 }}>
               <p style={styles.titleMenu}>ĐÁNH GIÁ</p>
             </div>
           </Col>
@@ -56,7 +56,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               </div>
             </Col>
             <Col
-              span={8}
+              span={9}
               style={{
                 backgroundColor: "#ffffff",
                 padding: "6px 15px",
@@ -69,11 +69,12 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               ></MenuDetailList>
             </Col>
           </MenuProvider>
-          <Col span={6}>
+          <Col span={5}>
             <div
               style={{
                 backgroundColor: "#ffffff",
                 marginLeft: "20px",
+                borderRadius: 5,
               }}
             >
               <div>
@@ -93,7 +94,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
                   borderRadius: "5px",
                 }}
               >
-                <CreateReview />
+                <CreateReview businessId={business_id} />
               </div>
             </div>
           </Col>

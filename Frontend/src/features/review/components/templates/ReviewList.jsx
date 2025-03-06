@@ -1,17 +1,22 @@
-import { Avatar, List, Rate } from "antd";
+import { Avatar, List, Rate, Typography } from "antd";
+import { formatTime } from "../../../../constants/formatTime";
 
 const ReviewList = ({ reviewData }) => {
   return (
     <>
       <List
-        style={{ padding: "20px 20px 0px 20px", justifyContent: "center" }}
+        style={{ padding: "20px 10px 0px 10px", justifyContent: "center" }}
         grid={{ gutter: 16, column: 1 }}
         pagination={{
+          size: "small",
           onChange: (page) => {
             console.log(page);
           },
           pageSize: 3,
           align: "center",
+          style: { marginTop: "-16px" },
+          showSizeChanger: false,
+          showLessItems: reviewData.length > 12,
         }}
         dataSource={reviewData}
         renderItem={(review) => (
@@ -21,14 +26,18 @@ const ReviewList = ({ reviewData }) => {
               <div style={{ marginLeft: 8 }}>
                 <p style={{ fontWeight: "bold" }}>{review.user_id.name}</p>
                 <Rate
-                  allowHalf
-                  defaultValue={review.review_rating}
+                  value={review.review_rating}
                   disabled
                   style={{ fontSize: 15 }}
                 />
               </div>
             </div>
-            <p>{review.review_contents}</p>
+            <Typography.Text
+              style={{ marginLeft: 40, color: "#6D6F71", fontSize: 14 }}
+            >
+              {formatTime(review.createdAt)}
+            </Typography.Text>
+            <p style={{ marginLeft: 40 }}>{review.review_contents}</p>
           </List.Item>
         )}
       />

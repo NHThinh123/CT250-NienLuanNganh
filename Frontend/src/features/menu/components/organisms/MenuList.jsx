@@ -24,7 +24,17 @@ const MenuList = ({ menuData }) => {
           alignItems: "center",
         }}
       >
-        <span>{menu.menu_name.toUpperCase()}</span>
+        <span
+          style={{
+            maxWidth: "200px", // Giới hạn chiều rộng
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            display: "inline-block",
+          }}
+        >
+          {menu.menu_name.toUpperCase()}
+        </span>
         <DeleteMenu menuName={menu.menu_name} menuId={menu._id} />
       </div>
     ),

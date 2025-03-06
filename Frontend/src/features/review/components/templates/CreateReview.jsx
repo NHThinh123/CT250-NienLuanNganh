@@ -1,20 +1,20 @@
-import { Button } from "antd";
+import { Button, Form } from "antd";
 import { useState } from "react";
 import ModalCreateReview from "../organisms/ModalCreateReview";
 
-const CreateReview = () => {
+const CreateReview = ({ businessId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  //   const [form] = Form.useForm();
+  const [form] = Form.useForm();
 
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
-    // form.submit();
-    setIsModalOpen(false);
+  const handleOk = async () => {
+    form.submit();
+    // setIsModalOpen(false);
   };
   const handleCancel = () => {
-    // form.resetFields();
+    form.resetFields();
     setIsModalOpen(false);
   };
 
@@ -51,12 +51,12 @@ const CreateReview = () => {
       </Button>
       {/* )} */}
       <ModalCreateReview
-        // form={form}
+        form={form}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         handleOk={handleOk}
         setIsModalOpen={setIsModalOpen}
-        // businessId={businessId}
+        businessId={businessId}
       />
     </>
   );

@@ -26,7 +26,7 @@ const AddDish = ({ menuData }) => {
     <>
       {business.isAuthenticated && (
         <Button type="link" onClick={showModal} style={{ padding: 0 }}>
-          <SquarePlus />
+          <SquarePlus strokeWidth={1} />
         </Button>
       )}
       <ModalAddDish
