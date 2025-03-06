@@ -1,8 +1,4 @@
-import {
-  HeartFilled,
-  MessageOutlined,
-  ShareAltOutlined,
-} from "@ant-design/icons";
+import { HeartFilled, MessageOutlined } from "@ant-design/icons";
 import { Button, Col, Row, Typography } from "antd";
 import { useEffect, useState } from "react";
 import useLikePost from "../../hooks/useLikePost";
@@ -10,6 +6,7 @@ import useUnlikePost from "../../hooks/useUnLikePost";
 
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
+import ButtonShare from "../../../../components/atoms/ButtonShare";
 
 const PostFooter = ({ postData, showModal, commentCount }) => {
   const { entity } = useAuthEntity();
@@ -93,10 +90,7 @@ const PostFooter = ({ postData, showModal, commentCount }) => {
           </Button>
         </Col>
         <Col span={8}>
-          <Button type="text">
-            <ShareAltOutlined />
-            <Typography.Text>Chia sẻ</Typography.Text>
-          </Button>
+          <ButtonShare post_id={postData._id} />
         </Col>
       </Row>
       <LoginRequiredModal

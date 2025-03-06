@@ -43,6 +43,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
   const handleCancel = () => {
     setIsLoginRequiredModalOpen(false);
   };
+
   // Hành động được bảo vệ (yêu cầu đăng nhập)
   const handleAction = (action) => {
     if (!entity?.id) {
@@ -51,6 +52,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
       action();
     }
   };
+
   const handleLike = () => {
     if (!commentData?.isLike)
       likeComment({
@@ -63,8 +65,9 @@ const Comment = ({ commentData, post_id, minWidth }) => {
         comment_id: commentData?._id,
       });
   };
+
   const handleReply = (values) => {
-    // if (!values.comment_content.trim()) return;
+    if (!values.comment_content?.trim()) return; // Ngăn gửi nếu rỗng
     createReply(
       {
         id: entity.id,
@@ -84,12 +87,14 @@ const Comment = ({ commentData, post_id, minWidth }) => {
       }
     );
   };
+
   const replyInputRef = useRef(null);
   useEffect(() => {
     if (isShowReply && replyInputRef.current) {
       replyInputRef.current.focus();
     }
   }, [isShowReply]);
+
   return (
     <Row style={{ minWidth: minWidth || "380px", margin: 0 }}>
       <Col style={{ marginRight: "10px" }}>
@@ -213,7 +218,11 @@ const Comment = ({ commentData, post_id, minWidth }) => {
                           ref={replyInputRef}
                           autoSize={{ minRows: 1, maxRows: 5 }}
                           variant="borderless"
-                          placeholder={`Phản hồi cho ${commentData?.user_id?.name}`}
+                          placeholder={`Phản hồi cho ${commentData?.author?.name}`}
+                          onPressEnter={(e) => {
+                            e.preventDefault();
+                            form.submit();
+                          }}
                         />
                       </Form.Item>
                     </Col>
