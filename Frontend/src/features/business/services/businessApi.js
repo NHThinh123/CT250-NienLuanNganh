@@ -30,9 +30,9 @@ const signUpBusinessApi = (data) => {
   return axios.post(URL_API, data);
 };
 
-const loginBusinessApi = (data) => {
-  const URL_API = "/api/businesss/loginBusiness";
-  return axios.post(URL_API, data);
+const loginBusinessApi = (credentials) => {
+  const URL_API = `/api/businesss/loginBusiness`;
+  return axios.post(URL_API, credentials);
 };
 
 export {

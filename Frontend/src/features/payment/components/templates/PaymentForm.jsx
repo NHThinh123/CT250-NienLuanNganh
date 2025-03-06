@@ -21,7 +21,7 @@ import {
 
 const { Text } = Typography;
 
-const PaymentForm = ({ businessId, amount, email, businessName }) => {
+const PaymentForm = ({ businessId, amount, email, businessName, planType }) => {
     const stripe = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
@@ -61,7 +61,8 @@ const PaymentForm = ({ businessId, amount, email, businessName }) => {
         processPayment(
             {
                 paymentMethodId: paymentMethod.id,
-                amount: amount,
+                amount: Number(amount),
+                planType
             },
             {
                 onSuccess: () => {
@@ -120,7 +121,7 @@ const PaymentForm = ({ businessId, amount, email, businessName }) => {
                 md={12}
                 style={{
                     padding: "50px",
-                    background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+                    //background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -129,7 +130,7 @@ const PaymentForm = ({ businessId, amount, email, businessName }) => {
             >
                 <div
                     style={{
-                        maxWidth: "450px",
+                        maxWidth: "600px",
                         width: "100%",
                         padding: "30px",
                         backgroundColor: "#ffffff",
@@ -140,7 +141,7 @@ const PaymentForm = ({ businessId, amount, email, businessName }) => {
                     }}
                 >
                     {/* Tiêu đề */}
-                    <div style={{ textAlign: "center", marginBottom: "25px" }}>
+                    <div style={{ textAlign: "center", marginBottom: "15px", marginTop: "-5px" }}>
                         <CreditCardOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
                         <h2 style={{ margin: "10px 0 5px", fontWeight: "bold", color: "#1a3353" }}>
                             Thanh toán phí
@@ -194,7 +195,7 @@ const PaymentForm = ({ businessId, amount, email, businessName }) => {
                                 }}
                             >
                                 <ShopOutlined style={{ marginRight: "8px" }} />
-                                Tên doanh nghiệp
+                                Tên doanh nghiệp ẩm thực
                             </label>
                             <div
                                 style={{
@@ -347,7 +348,7 @@ const PaymentForm = ({ businessId, amount, email, businessName }) => {
                             block
                             size="large"
                             style={{
-                                height: "50px",
+                                height: "35px",
                                 fontSize: "16px",
                                 borderRadius: "8px",
                                 backgroundColor: "#1890ff",
@@ -364,7 +365,7 @@ const PaymentForm = ({ businessId, amount, email, businessName }) => {
                                 "Đang xử lý..."
                             ) : (
                                 <>
-                                    <LockOutlined style={{ marginRight: "8px" }} />
+
                                     Thanh Toán
                                 </>
                             )}
