@@ -9,7 +9,7 @@ const AuthLayout = ({ children }) => {
                 alt="Logo"
                 style={{
                     position: "absolute",
-                    top: "20px",
+                    top: "10px",
                     left: "30px",
                     width: "120px",
                 }}

@@ -208,6 +208,19 @@ const SignupBusinessForm = () => {
                         >
                             Tạo tài khoản
                         </Button>
+                        <Button
+                            type="default"
+                            block
+                            size="large"
+                            onClick={() => navigate("/")}
+                            style={{
+                                marginTop: "10px",
+                                height: "35px",
+
+                            }}
+                        >
+                            Quay về trang chủ
+                        </Button>
                     </Form.Item>
 
                     <div style={{ textAlign: "center", marginTop: "20px" }}>
