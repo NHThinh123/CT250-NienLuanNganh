@@ -69,7 +69,6 @@ const SignupBusinessForm = () => {
             md={15}
             style={{
                 padding: "50px",
-                //background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -86,7 +85,7 @@ const SignupBusinessForm = () => {
                     border: "none",
                 }}
             >
-                <Title level={3} style={{ textAlign: "center", marginBottom: "30px", color: "#1a73e8" }}>
+                <Title level={3} style={{ textAlign: "center", marginBottom: "30px" }}>
                     Đăng ký doanh nghiệp ẩm thực
                 </Title>
                 <Form
@@ -202,8 +201,8 @@ const SignupBusinessForm = () => {
                             style={{
                                 borderRadius: "8px",
                                 height: "35px",
-                                backgroundColor: "#1a73e8",
-                                borderColor: "#1a73e8",
+                                backgroundColor: "#52c41a",
+                                borderColor: "#52c41a",
                             }}
                         >
                             Tạo tài khoản

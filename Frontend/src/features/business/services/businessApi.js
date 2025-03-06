@@ -34,6 +34,10 @@ const loginBusinessApi = (credentials) => {
   const URL_API = `/api/businesss/loginBusiness`;
   return axios.post(URL_API, credentials);
 };
+const requestBusinessResetPassword = (email) => {
+  const URL_API = `/api/businesss/reset-password-request`;
+  return axios.post(URL_API, email);
+};
 
 export {
   getBusinessApi,
@@ -43,4 +47,5 @@ export {
   deleteBusinessApi,
   signUpBusinessApi,
   loginBusinessApi,
+  requestBusinessResetPassword
 };

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const businessVerificationSchema = new Schema({
-    userId: String,
+    businessId: String,
     uniqueString: String,
     createAt: Date,
     expriseAt: Date

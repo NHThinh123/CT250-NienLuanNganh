@@ -182,7 +182,7 @@ const signup = async (req, res) => {
       password: hashedPassword,
       dateOfBirth,
       role,
-      avatar: avatarUrl // Lưu link ảnh vào DB
+      avatar: avatarUrl
     });
 
     await newUser.save();
@@ -213,8 +213,6 @@ const signup = async (req, res) => {
 //singin
 const signin = async (req, res) => {
   const { email, password } = req.body;
-  // email = email.trim();
-  // password = password.trim();
 
   if (!email || !password) {
     return res.status(400).json({

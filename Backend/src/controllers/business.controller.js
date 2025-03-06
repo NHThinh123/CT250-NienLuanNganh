@@ -13,6 +13,8 @@ const Payment = require("../models/payment.model");
 const Business = require("../models/business.model");
 const cloudinary = require("cloudinary").v2;
 const ResetTokenBusiness = require("../models/businessResetPassword.model")
+const { sendBusinessVerificationEmail, sendBusinessResetPasswordEmail } = require("../services/email.service");
+const crypto = require("crypto");
 
 
 
@@ -125,7 +127,7 @@ const signupBusiness = async (req, res, next) => {
 
     const existingBusiness = await Business.findOne({ email });
     if (existingBusiness) {
-      return res.status(400).json({ message: "Business already exists" });
+      return res.status(400).json({ message: "Email đã tồn tại!" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -147,6 +149,7 @@ const signupBusiness = async (req, res, next) => {
     });
 
     await newBusiness.save();
+    await sendBusinessVerificationEmail(newBusiness)
     res.status(201).json({
       status: "PENDING",
       message: "Tài khoản đã được tạo! Vui lòng hoàn tất thanh toán để kích hoạt.",
@@ -315,6 +318,12 @@ const loginBusiness = async (req, res, next) => {
     if (!business) {
       return res.status(404).json({ message: "Tài khoản không tồn tại" });
     }
+    if (!business.verified) {
+      return res.status(403).json({
+        status: "FAILED",
+        message: "Email chưa được xác minh. Vui lòng kiểm tra hộp thư của bạn."
+      });
+    }
 
     // Kiểm tra mật khẩu
     const isMatch = await bcrypt.compare(password, business.password);
@@ -371,7 +380,7 @@ const updateDishCostBusiness = async (req, res, next) => {
   }
 };
 //Gửi yêu cầu đặt lại mật khẩu
-const requestPasswordReset = async (req, res) => {
+const requestBusinessPasswordReset = async (req, res) => {
   console.log("Request body received:", req.body);
   const { email } = req.body;
   if (!email) {
@@ -388,12 +397,12 @@ const requestPasswordReset = async (req, res) => {
 
   await ResetTokenBusiness.create({ businessId: business._id, token: resetToken, expiresAt });
 
-  await sendResetPasswordEmail(business.email, resetToken);
+  await sendBusinessResetPasswordEmail(business.email, resetToken);
 
   res.status(200).json({ message: "Link đặt lại mật khẩu đã được gửi qua email!" });
 };
 //Đặt lại mật khẩu
-const resetPassword = async (req, res) => {
+const resetBusinessPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { newPassword } = req.body;
@@ -402,9 +411,9 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Mật khẩu không được để trống!" });
     }
 
-    const resetToken = await ResetToken.findOne({ token });
+    const resetToken = await ResetTokenBusiness.findOne({ token });
 
-    if (!resetToken || !resetToken.userId || resetToken.expiresAt < Date.now()) {
+    if (!resetToken || !resetToken.businessId || resetToken.expiresAt < Date.now()) {
       return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
     }
 
@@ -412,18 +421,18 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Cập nhật mật khẩu của user
-    const updatedUser = await User.findByIdAndUpdate(
-      resetToken.userId,
+    const updatedBusiness = await Business.findByIdAndUpdate(
+      resetToken.businessId,
       { password: hashedPassword },
       { new: true } // Trả về user đã được cập nhật
     );
 
-    if (!updatedUser) {
+    if (!updatedBusiness) {
       return res.status(400).json({ message: "Không tìm thấy người dùng, đặt lại mật khẩu thất bại!" });
     }
 
     // Xóa token đặt lại mật khẩu sau khi sử dụng
-    await ResetToken.findOneAndDelete({ token });
+    await ResetTokenBusiness.findOneAndDelete({ token });
 
     res.status(200).json({ message: "Mật khẩu đã được đặt lại thành công! Vui lòng đăng nhập lại." });
   } catch (error) {
@@ -432,26 +441,26 @@ const resetPassword = async (req, res) => {
   }
 };
 //Lấy email
-const getEmail = async (req, res) => {
+const getBusinessEmail = async (req, res) => {
   const { token } = req.params;
 
   try {
     // Tìm token trong bảng ResetToken
-    const resetRequest = await ResetToken.findOne({ token });
+    const resetRequest = await ResetTokenBusiness.findOne({ token });
 
     if (!resetRequest) {
       return res.status(404).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
     }
 
-    // Dùng userId để tìm user trong bảng Users
-    const user = await User.findById(resetRequest.userId);
+    // Dùng businessId để tìm user trong bảng businesses
+    const business = await Business.findById(resetRequest.businessId);
 
-    if (!user) {
+    if (!business) {
       return res.status(404).json({ message: "Không tìm thấy người dùng" });
     }
 
     // Trả về email của người dùng
-    res.json({ email: user.email });
+    res.json({ email: business.email });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server, vui lòng thử lại" });
   }
@@ -467,7 +476,8 @@ module.exports = {
   updateDishCostBusiness,
   processActivationPayment,
   processMonthlyPayment,
-  requestPasswordReset,
-  resetPassword,
-  getEmail,
+  requestBusinessPasswordReset,
+  resetBusinessPassword,
+  getBusinessEmail
+
 };

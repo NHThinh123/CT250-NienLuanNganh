@@ -1,21 +1,21 @@
-const Business = require("../models/business.model");
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-const checkAccountStatus = async (req, res, next) => {
-    const { email } = req.body;
-    const business = await Business.findOne({ email });
+const authMiddleware = (req, res, next) => {
+    const token = req.header("Authorization");
 
-    if (!business) {
-        return res.status(404).json({ message: "Tài khoản không tồn tại" });
-    }
-    if (business.status === "pending") {
-        return res.status(403).json({ message: "Tài khoản chưa được kích hoạt. Vui lòng thanh toán phí." });
-    }
-    if (business.status === "suspended") {
-        return res.status(403).json({ message: "Tài khoản bị tạm khóa do chưa thanh toán phí duy trì." });
+    if (!token) {
+        return res.status(401).json({ message: "Access Denied!" });
     }
 
-    req.business = business;
-    next();
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.business = verified;
+        next();
+    } catch (err) {
+        res.status(400).json({ message: "Invalid Token" });
+    }
 };
 
-module.exports = { checkAccountStatus };
+
+module.exports = authMiddleware;
