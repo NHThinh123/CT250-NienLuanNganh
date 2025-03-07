@@ -2,6 +2,7 @@ import { Avatar, List, Rate, Typography } from "antd";
 import { formatTime } from "../../../../constants/formatTime";
 
 const ReviewList = ({ reviewData }) => {
+  console.log("reviewData in ReviewList: ", reviewData);
   return (
     <>
       {reviewData.length > 0 ? (
@@ -23,10 +24,18 @@ const ReviewList = ({ reviewData }) => {
           renderItem={(review) => (
             <List.Item>
               <div style={{ display: "flex" }}>
-                <Avatar src={review.user_id.avatar}></Avatar>
+                <Avatar
+                  src={
+                    !review.user_id && review.business_id_review
+                      ? review.business_id_review.avatar
+                      : review.user_id.avatar
+                  }
+                ></Avatar>
                 <div style={{ marginLeft: 8 }}>
                   <p style={{ fontWeight: "bold", margin: 0 }}>
-                    {review.user_id.name}
+                    {!review.user_id && review.business_id_review
+                      ? review.business_id_review.business_name
+                      : review.user_id.name}
                   </p>
                   <Rate
                     value={review.review_rating}
