@@ -3,7 +3,7 @@ import { Menu } from "antd";
 import { Store } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-// Định nghĩa items và ánh xạ path-to-key
+// Định nghĩa items và ánh xạ base path-to-key
 const items = [
   { label: <Link to="/">Trang chủ</Link>, key: "home", icon: <HomeOutlined /> },
   {
@@ -18,6 +18,7 @@ const items = [
   },
 ];
 
+// Ánh xạ base path-to-key
 const pathToKey = {
   "/": "home",
   "/posts": "post",
@@ -28,7 +29,20 @@ const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const selectedKey = pathToKey[location.pathname] || "home"; // Lấy key từ path, mặc định là "home"
+  // Tìm key tương ứng với path hiện tại (hỗ trợ sub-route)
+  const getSelectedKey = () => {
+    const currentPath = location.pathname;
+
+    // Kiểm tra xem path hiện tại bắt đầu bằng base path nào
+    for (const [basePath, key] of Object.entries(pathToKey)) {
+      if (currentPath === basePath || currentPath.startsWith(basePath + "/")) {
+        return key;
+      }
+    }
+    return "home"; // Mặc định về "home" nếu không khớp
+  };
+
+  const selectedKey = getSelectedKey();
 
   const handleClick = ({ key }) => {
     const path = Object.keys(pathToKey).find((p) => pathToKey[p] === key);

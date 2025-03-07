@@ -28,6 +28,8 @@ import SubscriptionPlansPage from "./pages/SubscriptionPlansPage.jsx";
 // Thêm import ConfigProvider từ antd
 import { ConfigProvider } from "antd";
 import ResetBusinessPasswordPage from "./pages/ResetBusinessPasswordPage.jsx";
+import MyPostList from "./features/post/components/templates/MyPostList.jsx";
+import ProtectedRoute from "./components/molecules/ProtectedRoute.jsx";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +56,14 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <PostPage />,
+          },
+          {
+            path: "my-posts",
+            element: (
+              <ProtectedRoute redirectPath="/login">
+                <MyPostList />
+              </ProtectedRoute>
+            ),
           },
           {
             path: ":id",

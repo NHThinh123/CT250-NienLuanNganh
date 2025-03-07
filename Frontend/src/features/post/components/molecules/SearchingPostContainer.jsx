@@ -11,6 +11,7 @@ const SearchingPostContainer = () => {
       <div>
         <Button
           type="text"
+          href="/posts/my-posts"
           style={{
             width: "100%",
             marginTop: "8px",
