@@ -7,8 +7,12 @@ import { BookUser, CircleDollarSign, Clock, MapPinHouse } from "lucide-react";
 import { useState } from "react";
 import ProfileBusinessPage from "../../../../pages/ProfileBusinessPage";
 
-
-const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) => {
+const BusinessDetail = ({
+  businessData,
+  isLoading,
+  isError,
+  canEdit = false,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái modal
 
   const formatPrice = (price) => {
@@ -76,10 +80,16 @@ const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) =
                 initialRating={businessData.rating_average}
                 readonly
                 emptySymbol={
-                  <FontAwesomeIcon icon={regularStar} style={{ fontSize: 20, color: "#ccc" }} />
+                  <FontAwesomeIcon
+                    icon={regularStar}
+                    style={{ fontSize: 20, color: "#ccc" }}
+                  />
                 }
                 fullSymbol={
-                  <FontAwesomeIcon icon={solidStar} style={{ fontSize: 20, color: "#FFD700" }} />
+                  <FontAwesomeIcon
+                    icon={solidStar}
+                    style={{ fontSize: 20, color: "#FFD700" }}
+                  />
                 }
                 fractions={10}
                 quiet={true}
@@ -116,7 +126,6 @@ const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) =
         <Col span={3}></Col>
       </Row>
 
-
       <Modal
         title="Chỉnh sửa thông tin doanh nghiệp"
         open={isModalOpen}
@@ -124,7 +133,10 @@ const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) =
         footer={null} // Tắt footer mặc định nếu không cần nút OK/Cancel mặc định
         width={800} // Tùy chỉnh kích thước modal
       >
-        <ProfileBusinessPage businessId={businessData.id} onClose={handleModalClose} />
+        <ProfileBusinessPage
+          businessId={businessData.id}
+          onClose={handleModalClose}
+        />
       </Modal>
     </div>
   );
@@ -172,9 +184,8 @@ const styles = {
   },
   ratingText: {
     fontSize: "15px",
-    marginLeft: "6px",
+    margin: "0px 0px 0px 6px",
     fontWeight: "bold",
-    marginTop: "3px",
   },
   businessTime: {
     fontSize: "15px",
