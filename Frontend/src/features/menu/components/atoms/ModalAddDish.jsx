@@ -27,6 +27,8 @@ const ModalAddDish = ({
   const [imageList, setImageList] = useState([]);
   const formRef = useRef(null);
   const [isImageError, setIsImageError] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const { mutate: createDish, isPending } = useCreateDish();
 
   const resetFormScroll = () => {
@@ -43,9 +45,20 @@ const ModalAddDish = ({
   };
 
   const handleImageChange = ({ fileList }) => {
-    setImageList(fileList);
-    form.setFieldsValue({ dish_image: fileList });
-    setIsImageError(fileList.length === 0);
+    // Tạo preview cho từng ảnh nếu chưa có
+    const newFileList = fileList.map((file) => {
+      if (!file.url && !file.preview) {
+        file.preview = URL.createObjectURL(file.originFileObj);
+      }
+      return file;
+    });
+    setImageList(newFileList);
+    setIsImageError(false);
+  };
+
+  const handlePreview = async (file) => {
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
   };
 
   const onFinish = async (values) => {
@@ -197,6 +210,7 @@ const ModalAddDish = ({
                   listType="picture-card"
                   fileList={imageList}
                   onChange={handleImageChange}
+                  onPreview={handlePreview}
                   beforeUpload={() => false} // Không upload lên server ngay
                   multiple
                   className={isImageError ? "upload-error" : ""}
@@ -208,6 +222,17 @@ const ModalAddDish = ({
                     </div>
                   )}
                 </Upload>
+                <Modal
+                  open={previewOpen}
+                  footer={null}
+                  onCancel={() => setPreviewOpen(false)}
+                >
+                  <img
+                    alt="preview"
+                    style={{ width: "100%" }}
+                    src={previewImage}
+                  />
+                </Modal>
                 {isImageError && (
                   <span style={{ color: "red", fontSize: "14px" }}>
                     Vui lòng tải lên ít nhất 1 ảnh!
