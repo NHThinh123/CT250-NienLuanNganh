@@ -4,70 +4,88 @@ import { useNavigate } from "react-router-dom";
 
 const Business = ({ businessData }) => {
   const navigate = useNavigate();
-  const maxTitleLength = 20; // Giới hạn ký tự tiêu đề trước khi cắt
-  const maxDescriptionLength = 30; // Giới hạn ký tự mô tả trước khi cắt
+
   return (
-    <>
-      <Row gutter={[16, 16]}>
-        {businessData.map((business) => (
-          <Col
-            key={business._id}
-            xs={24}
-            sm={12}
-            md={8}
-            lg={6}
-            xl={6}
-            style={{ padding: "10px" }}
+    <Row
+      gutter={[24, 24]}
+      justify={businessData.length / 4 == 0 ? "space-between" : "start"}
+    >
+      {businessData.map((business) => (
+        <Col
+          key={business._id}
+          xs={24} // 1 card trên dòng khi màn hình nhỏ
+          sm={12} // 2 card trên dòng khi màn hình nhỏ hơn
+          md={8} // 3 card trên dòng khi màn hình trung bình
+          lg={6} // 4 card trên dòng khi màn hình lớn
+          xl={6} // Giữ nguyên 4 card trên dòng ở màn hình rất lớn
+          style={{ display: "flex", justifyContent: "center" }}
+        >
+          <Card
+            hoverable
+            cover={
+              <img
+                style={{
+                  width: "100%",
+                  height: "180px",
+                  objectFit: "cover", // Giữ tỷ lệ ảnh mà không bị méo
+                  borderTopLeftRadius: "8px",
+                  borderTopRightRadius: "8px",
+                }}
+                alt="business avatar"
+                src={business.avatar}
+              />
+            }
+            onClick={() => navigate(`/businesses/${business._id}`)}
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              minHeight: "250px",
+            }}
           >
-            <Card
-              hoverable
-              cover={
-                <img
-                  style={{ width: "100%", height: "150px" }}
-                  alt="business avatar"
-                  src={business.avatar}
-                />
-              }
-              onClick={() => navigate(`/businesses/${business._id}`)}
-            >
-              <div style={{ display: "inline-block" }}>
-                <Card.Meta
-                  title={
-                    business.business_name.length > maxTitleLength
-                      ? business.business_name.slice(0, maxTitleLength) + "..."
-                      : business.business_name
-                  }
-                  style={{ marginBottom: 8 }}
-                />
-              </div>
-              <div>
-                <div style={{ display: "inline-block" }}>
-                  <p
+            <div>
+              <Card.Meta
+                title={
+                  <span
                     style={{
-                      marginBottom: 8,
+                      maxWidth: "100%",
+                      display: "block",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {business.location.length > maxDescriptionLength
-                      ? business.location.slice(0, maxDescriptionLength) + "..."
-                      : business.location}
-                  </p>
-                </div>
+                    {business.business_name}
+                  </span>
+                }
+              />
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "#666",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {business.location}
               </div>
-              <p>
-                <Clock
-                  size={17}
-                  style={{ marginRight: "8px", marginBottom: "-3px" }}
-                />
-                {business.open_hours} - {business.close_hours}
-              </p>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </>
+            </div>
+            <p
+              style={{
+                marginTop: "8px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Clock size={17} style={{ marginRight: "8px" }} />
+              {business.open_hours} - {business.close_hours}
+            </p>
+          </Card>
+        </Col>
+      ))}
+    </Row>
   );
 };
 
