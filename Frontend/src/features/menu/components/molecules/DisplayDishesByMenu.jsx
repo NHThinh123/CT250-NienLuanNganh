@@ -3,6 +3,7 @@ import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 import DeleteDish from "../../../dish/components/templates/DeleteDish";
 import { useState } from "react";
 import { SquarePlus } from "lucide-react";
+// import UpdateDish from "./UpdateDish";
 
 const DisplayDishesByMenu = ({ menuId, businessId }) => {
   const { dishData } = useDishByMenuId(menuId);
@@ -33,7 +34,7 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
             grid={{ gutter: 16, column: 1 }}
             dataSource={visibleDishes}
             renderItem={(dish) => (
-              <List.Item>
+              <List.Item styles={{ paddingRight: 0 }}>
                 <Row style={{ padding: 0 }}>
                   <Col span={4}>
                     <img
@@ -97,14 +98,39 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
                     </div>
                   </Col>
                   <Col span={1}>
-                    <DeleteDish
-                      dishName={dish.dish_name}
-                      dishId={dish._id}
-                      businessId={businessId}
-                    />
+                    <div
+                      style={{
+                        display: "grid",
+                        placeItems: "center",
+                        height: "100%",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 7, // Khoảng cách giữa các nút
+                          alignItems: "center",
+                        }}
+                      >
+                        {/* <UpdateDish dishId={dish._id} businessId={businessId} /> */}
+                        <DeleteDish
+                          dishName={dish.dish_name}
+                          dishId={dish._id}
+                          businessId={businessId}
+                        />
+                      </div>
+                    </div>
                   </Col>
                 </Row>
-                <hr style={{ height: "2px", border: "no", opacity: "0.2" }} />
+                <hr
+                  style={{
+                    height: "2px",
+                    border: "no",
+                    opacity: "0.2",
+                    marginTop: 6,
+                  }}
+                />
               </List.Item>
             )}
           />

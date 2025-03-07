@@ -12,24 +12,16 @@ import {
 } from "antd";
 import { useRef, useState } from "react";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
-import useCreateDish from "../../../dish/hooks/useCreateDish";
+import useUpdateDish from "../../../dish/hooks/useUpdateDish";
 
-const MAX_IMAGES = 5; //Giới hạn 5 ảnh tải lên
+const MAX_IMAGES = 5;
 
-const ModalAddDish = ({
-  isModalOpen,
-  handleCancel,
-  handleOk,
-  form,
-  setIsModalOpen,
-  menuData,
-}) => {
-  const [imageList, setImageList] = useState([]);
+const ModalUpdateDish = ({ isModalOpen, handleCancel, dishData }) => {
+  const [form] = Form.useForm();
   const formRef = useRef(null);
+  const [imageList, setImageList] = useState(dishData.dish_url || []);
   const [isImageError, setIsImageError] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const { mutate: createDish, isPending } = useCreateDish();
+  const { mutate: updateDish, isPending } = useUpdateDish();
 
   const resetFormScroll = () => {
     if (formRef.current) {
@@ -37,34 +29,15 @@ const ModalAddDish = ({
     }
   };
 
-  const handleModalClose = () => {
-    handleCancel();
-    setImageList([]);
-    setIsImageError(false);
-    resetFormScroll(); // Reset thanh cuộn khi đóng modal
-  };
-
   const handleImageChange = ({ fileList }) => {
-    // Tạo preview cho từng ảnh nếu chưa có
-    const newFileList = fileList.map((file) => {
-      if (!file.url && !file.preview) {
-        file.preview = URL.createObjectURL(file.originFileObj);
-      }
-      return file;
-    });
-    setImageList(newFileList);
-    setIsImageError(false);
-  };
-
-  const handlePreview = async (file) => {
-    setPreviewImage(file.url || file.preview);
-    setPreviewOpen(true);
+    setImageList(fileList);
+    form.setFieldsValue({ dish_image: fileList });
+    setIsImageError(fileList.length === 0);
   };
 
   const onFinish = async (values) => {
     try {
       await form.validateFields();
-      // console.log("Form values sau validate:", values);
 
       if (imageList.length === 0) {
         message.error("Vui lòng tải lên ít nhất 1 ảnh món!");
@@ -76,34 +49,27 @@ const ModalAddDish = ({
       formData.append("dish_name", values.dish_name || "");
       formData.append("dish_description", values.dish_description || "");
       formData.append("dish_price", values.dish_price || 0);
-      formData.append("menu_id", menuData._id || "");
 
-      if (imageList.length > 0) {
-        imageList.forEach((file) => {
-          formData.append(`dish_url`, file.originFileObj);
-        });
-      } else {
-        console.warn("⚠ Không có ảnh nào được chọn!");
-      }
-
-      // console.log("📜 FormData trước khi gửi:");
-      // for (let pair of formData.entries()) {
-      //   console.log(`${pair[0]}:`, pair[1]);
-      // }
-
-      createDish(formData, {
-        onSuccess: () => {
-          message.success("Món đã được tạo thành công!");
-          form.resetFields();
-          setImageList([]);
-          setIsImageError(false);
-          resetFormScroll();
-          setIsModalOpen(false);
-        },
-        onError: () => {
-          message.error("Lỗi khi tạo món!");
-        },
+      imageList.forEach((file) => {
+        formData.append("dish_url", file.originFileObj || file.url);
       });
+
+      updateDish(
+        { _id: dishData._id, formData },
+        {
+          onSuccess: () => {
+            message.success("Món đã được cập nhật thành công!");
+            form.resetFields();
+            setImageList([]);
+            setIsImageError(false);
+            resetFormScroll();
+            handleCancel();
+          },
+          onError: () => {
+            message.error("Lỗi khi cập nhật món!");
+          },
+        }
+      );
     } catch (error) {
       console.error("Lỗi khi validate form:", error);
     }
@@ -113,15 +79,13 @@ const ModalAddDish = ({
     <Modal
       title={
         <Typography.Title level={4} style={{ textAlign: "center" }}>
-          Tạo món
+          Cập nhật món
         </Typography.Title>
       }
       open={isModalOpen}
-      onOk={handleOk}
-      onCancel={() => {
-        handleModalClose();
-      }}
-      okText={isPending ? "Đang tạo..." : "Tạo"}
+      onOk={() => form.submit()}
+      onCancel={handleCancel}
+      okText={isPending ? "Đang cập nhật..." : "Cập nhật"}
       cancelText="Hủy"
       maskClosable={false}
       centered
@@ -142,26 +106,21 @@ const ModalAddDish = ({
           <Form
             form={form}
             onFinish={onFinish}
-            initialValues={{ dish_price: 1000 }}
+            initialValues={{
+              dish_name: dishData.dish_name,
+              dish_description: dishData.dish_description,
+              dish_price: dishData.dish_price,
+            }}
           >
             <Form.Item
               name="dish_name"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập tên món!",
-                },
-              ]}
+              rules={[{ required: true, message: "Vui lòng nhập tên món!" }]}
             >
               <Input size="large" placeholder="Nhập tên món" />
             </Form.Item>
             <Form.Item
               name="dish_description"
-              rules={[
-                {
-                  message: "Vui lòng nhập mô tả món!",
-                },
-              ]}
+              rules={[{ required: true, message: "Vui lòng nhập mô tả món!" }]}
             >
               <Input.TextArea
                 size="large"
@@ -172,14 +131,11 @@ const ModalAddDish = ({
             <Form.Item
               name="dish_price"
               rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập giá món!",
-                },
+                { required: true, message: "Vui lòng nhập giá món!" },
                 {
                   type: "number",
                   min: 1000,
-                  message: "Giá món phải lớn hơn hoặc bằng 1000 VND!",
+                  message: "Giá món phải lớn hơn 1000 VND!",
                 },
               ]}
             >
@@ -198,40 +154,23 @@ const ModalAddDish = ({
             </Form.Item>
 
             <div style={{ display: "flex" }}>
-              <p style={{ fontSize: 15, padding: 10 }}>Thêm ảnh món ăn:</p>
-              <Form.Item
-                name="dish_image"
-                // label="Thêm ảnh món"
-                valuePropName="fileList"
-                getValueFromEvent={(e) => e?.fileList}
-              >
+              <p style={{ fontSize: 15, padding: 10 }}>Cập nhật ảnh món ăn:</p>
+              <Form.Item name="dish_image" valuePropName="fileList">
                 <Upload
                   listType="picture-card"
                   fileList={imageList}
                   onChange={handleImageChange}
-                  onPreview={handlePreview}
-                  beforeUpload={() => false} // Không upload lên server ngay
+                  beforeUpload={() => false}
                   multiple
                   className={isImageError ? "upload-error" : ""}
                 >
-                  {imageList.length < MAX_IMAGES && ( // Ẩn nút khi đạt giới hạn ảnh
+                  {imageList.length < MAX_IMAGES && (
                     <div>
                       <PlusOutlined />
                       <p style={{ marginTop: 8, borderRadius: 5 }}>Thêm ảnh</p>
                     </div>
                   )}
                 </Upload>
-                <Modal
-                  open={previewOpen}
-                  footer={null}
-                  onCancel={() => setPreviewOpen(false)}
-                >
-                  <img
-                    alt="preview"
-                    style={{ width: "100%" }}
-                    src={previewImage}
-                  />
-                </Modal>
                 {isImageError && (
                   <span style={{ color: "red", fontSize: "14px" }}>
                     Vui lòng tải lên ít nhất 1 ảnh!
@@ -254,4 +193,4 @@ const ModalAddDish = ({
   );
 };
 
-export default ModalAddDish;
+export default ModalUpdateDish;

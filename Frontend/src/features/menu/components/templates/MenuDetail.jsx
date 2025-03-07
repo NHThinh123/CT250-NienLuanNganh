@@ -59,7 +59,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               span={10}
               style={{
                 backgroundColor: "#ffffff",
-                padding: "6px 15px",
+                padding: "6px 5px 6px 15px",
                 borderRadius: "5px",
               }}
             >

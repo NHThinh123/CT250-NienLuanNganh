@@ -30,7 +30,7 @@ const MenuList = ({ menuData }) => {
       >
         <span
           style={{
-            maxWidth: "200px", // Giới hạn chiều rộng
+            maxWidth: "160px", // Giới hạn chiều rộng
             overflow: "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
@@ -58,7 +58,10 @@ const MenuList = ({ menuData }) => {
         }}
         defaultSelectedKeys={[items[0]?.key]}
         mode="inline"
-        items={items}
+        items={items.map((item) => ({
+          ...item,
+          style: { paddingLeft: 15, paddingRight: 2 }, // Thêm padding cho từng item
+        }))}
         onClick={(e) => handleMenuClick?.(e.key)}
       />
       {menuData.length > MAX_VISIBLE_ITEMS && !showAll && (
