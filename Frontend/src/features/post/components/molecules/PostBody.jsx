@@ -15,7 +15,7 @@ const PostBody = ({ postData }) => {
           {postData?.tags?.length > 0 &&
             postData.tags.map((tag) => (
               <Tag key={tag.tag_name} color="blue">
-                #{tag.tag_name}
+                {tag.tag_name}
               </Tag>
             ))}
         </Col>

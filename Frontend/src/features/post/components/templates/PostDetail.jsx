@@ -1,4 +1,4 @@
-import { Avatar, Col, Divider, Row, Typography } from "antd";
+import { Avatar, Col, Divider, Row, Tag, Typography } from "antd";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import PostImages from "../molecules/PostImages";
 import PostFooter from "../molecules/PostFooter";
@@ -48,6 +48,16 @@ const PostDetail = ({ postData, isLoading, isError }) => {
           </Row>
           <Divider />
           <Typography.Title level={2}>{postData?.title}</Typography.Title>
+          <Row>
+            <Col span={24} style={{ marginBottom: "8px" }}>
+              {postData?.tags?.length > 0 &&
+                postData.tags.map((tag) => (
+                  <Tag key={tag.tag_name} color="blue">
+                    {tag.tag_name}
+                  </Tag>
+                ))}
+            </Col>
+          </Row>
           <p style={{ fontSize: 18, marginBottom: "16px" }}>
             {postData?.content}
           </p>

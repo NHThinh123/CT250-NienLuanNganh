@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { Upload, Avatar, message, Spin } from "antd";
+import { Upload, message, Spin } from "antd";
 import { UploadOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useUpdateProfileBusiness } from "../../hooks/useProfileBusiness";
 import { BusinessContext } from "../../../../contexts/business.context";
