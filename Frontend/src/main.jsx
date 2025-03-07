@@ -26,7 +26,7 @@ import PaymentPage from "./pages/PaymentPage.jsx";
 import SubscriptionPlansPage from "./pages/SubscriptionPlansPage.jsx";
 
 // Thêm import ConfigProvider từ antd
-import { ConfigProvider } from "antd";
+import { ConfigProvider, App as AntdApp } from "antd";
 import ResetBusinessPasswordPage from "./pages/ResetBusinessPasswordPage.jsx";
 
 const queryClient = new QueryClient();
@@ -45,7 +45,7 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: "/business-profile",
+        path: "/business-profile/:id",
         element: <ProfileBusinessPage />,
       },
       {
@@ -133,19 +133,20 @@ createRoot(document.getElementById("root")).render(
     <ConfigProvider
       theme={{
         token: {
-          // Đổi màu primary (ví dụ: xanh lá cây)
-          colorPrimary: "#52c41a",
-          // Thêm font family (ví dụ: Roboto)
-          fontFamily: "Bitter, serif",
+          colorPrimary: "#52c41a", // Màu chính xanh lá cây
+          fontFamily: "Bitter, serif", // Font chữ
         },
       }}
     >
-      <AuthWrapper>
-        <BusinessWrapper>
-          <RouterProvider router={router} />
-        </BusinessWrapper>
-      </AuthWrapper>
+      <AntdApp>
+        <AuthWrapper>
+          <BusinessWrapper>
+            <RouterProvider router={router} />
+          </BusinessWrapper>
+        </AuthWrapper>
+      </AntdApp>
     </ConfigProvider>
     <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>
 );
+

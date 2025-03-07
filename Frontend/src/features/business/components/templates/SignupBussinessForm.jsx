@@ -45,7 +45,7 @@ const SignupBusinessForm = () => {
 
     // Ràng buộc cho mật khẩu
     const passwordValidator = (_, value) => {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#@$!%*?&])[A-Za-z\d#@$!%*?&]{8,}$/;
         if (!value || passwordRegex.test(value)) {
             return Promise.resolve();
         }

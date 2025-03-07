@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { Layout, Button, Space, Avatar, Dropdown, Spin } from "antd";
+import { Layout, Button, Space, Avatar, Dropdown, Spin, message } from "antd"; // Thêm message
 import { UserOutlined } from "@ant-design/icons";
 import { useContext, useState } from "react";
 import { AuthContext } from "./contexts/auth.context";
@@ -16,9 +16,6 @@ function App() {
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
   const { business, setBusiness } = useContext(BusinessContext);
-  // console.log("Auth trong App:", auth);
-  // console.log("Business trong App:", business);
-
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isUserLoggedIn = auth?.isAuthenticated;
@@ -27,14 +24,14 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-    ? business.business?.avatar
-    : null;
+      ? business.business?.avatar
+      : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-    ? business.business?.business_name
-    : "";
+      ? business.business?.business_name
+      : "";
 
   const handleLogout = () => {
     setIsLoggingOut(true);
@@ -56,8 +53,19 @@ function App() {
     {
       key: "profile",
       label: isUserLoggedIn ? "Hồ sơ cá nhân" : "Hồ sơ doanh nghiệp",
-      onClick: () =>
-        navigate(isUserLoggedIn ? "/profile" : "/business-profile"),
+      onClick: () => {
+        if (isUserLoggedIn) {
+          navigate("/profile");
+        } else if (isBusinessLoggedIn) {
+          const businessId = business?.business?.id || JSON.parse(localStorage.getItem("authBusiness"))?.business?.id;
+          if (businessId) {
+            navigate(`/businesses/${businessId}`);
+          } else {
+            message.error("Không tìm thấy thông tin doanh nghiệp. Vui lòng đăng nhập lại!");
+            console.error("Không tìm thấy ID doanh nghiệp");
+          }
+        }
+      },
     },
     {
       key: "logout",
@@ -98,8 +106,8 @@ function App() {
           backgroundColor: "#fff",
           padding: "0 20px",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-          height: "64px", // Chiều cao cố định
-          lineHeight: "64px", // Căn giữa theo chiều dọc
+          height: "64px",
+          lineHeight: "64px",
         }}
       >
         <div
@@ -107,14 +115,14 @@ function App() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            height: "100%", // Đảm bảo chiếm toàn bộ chiều cao của header
+            height: "100%",
           }}
         >
           {/* Logo */}
           <div style={{ flexShrink: 0, marginTop: "10px" }}>
             <img
               src={logo}
-              style={{ height: "60px", width: "auto", marginBottom: "10px" }} // Điều chỉnh kích thước logo
+              style={{ height: "60px", width: "auto", marginBottom: "10px" }}
               alt="logo"
             />
           </div>
@@ -156,8 +164,6 @@ function App() {
 
       {/* Nội dung chính */}
       <Content style={{ paddingTop: "64px" }}>
-        {" "}
-        {/* Padding dựa trên chiều cao header */}
         <ScrollToTop />
         <Outlet />
       </Content>

@@ -197,7 +197,7 @@ const processActivationPayment = async (req, res) => {
 
     // Tạo PaymentIntent với Stripe
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Đảm bảo amount là số nguyên (cent)
+      amount: Math.round(amount * 100),
       currency: "usd",
       payment_method: paymentMethodId,
       confirm: true,
@@ -208,23 +208,30 @@ const processActivationPayment = async (req, res) => {
     });
 
     if (paymentIntent.status === "succeeded") {
+      const isActivation = business.status === "suspended" || !business.activationPayment;
+
       // Cập nhật Business
       business.status = "active";
-      business.activationPayment = true;
       business.lastPaymentDate = new Date();
 
       // Cập nhật nextPaymentDueDate dựa trên planType
       if (planType === "yearly") {
-        // Thêm 1 năm
         business.nextPaymentDueDate = new Date(
           business.lastPaymentDate.getTime() + 365 * 24 * 60 * 60 * 1000
         );
       } else {
-        // Thêm 1 tháng (mặc định)
         business.nextPaymentDueDate = new Date(
           business.lastPaymentDate.getTime() + 30 * 24 * 60 * 60 * 1000
         );
       }
+
+      // Chỉ đặt activationPayment = true nếu là kích hoạt
+      if (isActivation) {
+        business.activationPayment = true;
+      }
+
+      // Đặt lại reminderSent để chuẩn bị cho chu kỳ mới
+      business.reminderSent = false;
 
       await business.save();
 
@@ -232,11 +239,14 @@ const processActivationPayment = async (req, res) => {
         businessId: business._id,
         businessName: business.business_name,
         amount: amount,
+        type: isActivation ? "activation" : "renewal", // Phân biệt loại thanh toán
       });
       await payment.save();
 
       res.status(200).json({
-        message: "Thanh toán thành công! Tài khoản đã được kích hoạt.",
+        message: isActivation
+          ? "Thanh toán thành công! Tài khoản đã được kích hoạt."
+          : "Thanh toán thành công! Gói đã được gia hạn.",
         amount: amount,
         paymentId: payment._id,
       });

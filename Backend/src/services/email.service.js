@@ -65,7 +65,9 @@ const sendResetPasswordEmail = async (email, resetToken) => {
         html: `<h1>Yumzy</h1>
             <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản: <strong>${user.name || "bạn"}</strong>. Nhấn vào link bên dưới để tiếp tục:</p>
              <a href="${resetLink}">Đặt lại mật khẩu</a>
-             <p>Liên kết này sẽ hết hạn sau 15 phút.</p>`,
+             <p>Liên kết này sẽ hết hạn sau 15 phút.</p>
+             <p><strong>Đội ngũ Yumzy</strong></p>
+             <p>🌍 <a href="https://yumzy.com">yumzy.com</a> | 📧 support@yumzy.com</p>`,
     };
 
     await transporter.sendMail(mailOptions);
@@ -131,10 +133,34 @@ const sendBusinessResetPasswordEmail = async (email, resetToken) => {
         html: `<h1>Yumzy</h1>
             <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản Business: <strong>${business.business_name || "bạn"}</strong>  . Nhấn vào link bên dưới để tiếp tục:</p>
              <a href="${resetLink}">Đặt lại mật khẩu</a>
-             <p>Liên kết này sẽ hết hạn sau 15 phút.</p>`,
+             <p>Liên kết này sẽ hết hạn sau 15 phút.</p>
+             <p><strong>Đội ngũ Yumzy</strong></p>
+             <p>🌍 <a href="https://yumzy.com">yumzy.com</a> | 📧 support@yumzy.com</p>`,
     };
 
     await transporter.sendMail(mailOptions);
 };
+//Gửi email nhắc nhở thanh toán
+const sendPaymentReminder = async (email, business_name, dueDate, businessId) => {
+    const paymentLink = `http://localhost:8080/api/businesss/payment/monthly/${businessId}`;
+    const mailOptions = {
+        from: process.env.AUTH_EMAIL,
+        to: email,
+        subject: "Nhắc nhở thanh toán phí duy trì tài khoản Yumzy",
+        html: `<h2>YUMZY</h2>
+        <p>Kính gửi <strong>${business_name}</strong></p>
+        <p>Chúng tôi xin thông báo đến quý khách hàng rằng phí duy trì tài khoản của bạn sẽ đến hạn vào ngày ${dueDate.toLocaleDateString("vi-VN")}.</p>
+        <p> Vui lòng thanh toán trước hạn để không bị tạm khóa tài khoản gây ảnh hưởng đến quyền lợi và trải nghiệm của quý khách hàng.</p>
+        <p><strong>Đội ngũ Yumzy</strong></p>
+        <p>🌍 <a href="https://yumzy.com">yumzy.com</a> | 📧 support@yumzy.com</p>`
+    };
 
-module.exports = { sendVerificationEmail, sendResetPasswordEmail, sendBusinessVerificationEmail, sendBusinessResetPasswordEmail };
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Đã gửi email nhắc nhở đến ${email}`);
+    } catch (error) {
+        console.error(`Lỗi gửi email đến ${email}:`, error);
+    }
+};
+
+module.exports = { sendVerificationEmail, sendResetPasswordEmail, sendBusinessVerificationEmail, sendBusinessResetPasswordEmail, sendPaymentReminder };
