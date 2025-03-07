@@ -1,7 +1,11 @@
 import { Avatar, Col, Row, Space, Tag, Typography } from "antd";
 import logo from "../../../../assets/logo/logo.png";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import { HeartFilled, MessageOutlined } from "@ant-design/icons";
+import {
+  CheckCircleFilled,
+  HeartFilled,
+  MessageOutlined,
+} from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 const PostCard = ({ post }) => {
@@ -75,7 +79,18 @@ const PostCard = ({ post }) => {
                     }
                     size={20}
                   ></Avatar>
-                  <p style={{ marginBottom: "0" }}>{post.author?.name}</p>
+                  <p style={{ marginBottom: "0" }}>
+                    {post.author?.name}
+
+                    {post?.business_id && (
+                      <Link
+                        style={{ fontSize: 14, marginLeft: 8 }}
+                        to={`/businesses/${post.author?.id}`}
+                      >
+                        <CheckCircleFilled /> - Quán ăn
+                      </Link>
+                    )}
+                  </p>
                 </Space>
               </div>
               <div>

@@ -5,6 +5,8 @@ import PostFooter from "../molecules/PostFooter";
 import { useState } from "react";
 import CommentModal from "../../../comment/components/templates/CommentModal";
 import { formatTime } from "../../../../constants/formatTime";
+import { Link } from "react-router-dom";
+import { CheckCircleFilled } from "@ant-design/icons";
 
 const PostDetail = ({ postData, isLoading, isError }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,6 +32,14 @@ const PostDetail = ({ postData, isLoading, isError }) => {
             <Col span={20}>
               <Typography.Title level={4} style={{ marginBottom: 0 }}>
                 {postData?.author?.name}
+                {postData?.business_id && (
+                  <Link
+                    style={{ fontSize: 14, marginLeft: 8 }}
+                    to={`/businesses/${postData?.author?.id}`}
+                  >
+                    <CheckCircleFilled /> - Quán ăn
+                  </Link>
+                )}
               </Typography.Title>
               <Typography.Text>
                 {formatTime(postData?.createdAt)}

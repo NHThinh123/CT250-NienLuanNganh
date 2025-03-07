@@ -62,7 +62,7 @@ const PostFilter = ({ handleSearch, handleSortChange, handleTagFilter }) => {
           >
             <Option value="newest">Mới nhất</Option>
             <Option value="oldest">Cũ nhất</Option>
-            <Option value="most_likes">Phù hợp nhất</Option>
+            <Option value="most_likes">Nhiều lượt thích</Option>
             <Option value="most_comments">Nhiều bình luận</Option>
           </Select>
         </Col>

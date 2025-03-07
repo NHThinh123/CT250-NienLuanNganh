@@ -1,8 +1,9 @@
-import { EllipsisOutlined } from "@ant-design/icons";
+import { CheckCircleFilled, EllipsisOutlined } from "@ant-design/icons";
 import { Avatar, Button, Col, Row, Typography } from "antd";
 import { formatTime } from "../../../../constants/formatTime";
+import { Link } from "react-router-dom";
 
-const PostHeader = ({ userData, createAt }) => {
+const PostHeader = ({ userData, createAt, isBusiness }) => {
   return (
     <Row align={"middle"}>
       <Col span={2} style={{ textAlign: "center" }}>
@@ -17,6 +18,14 @@ const PostHeader = ({ userData, createAt }) => {
       <Col span={20}>
         <Typography.Title level={5} style={{ marginBottom: 0 }}>
           {userData?.name}
+          {isBusiness && (
+            <Link
+              style={{ fontSize: 14, marginLeft: 8 }}
+              to={`/businesses/${userData?.id}`}
+            >
+              <CheckCircleFilled /> - Quán ăn
+            </Link>
+          )}
         </Typography.Title>
         <Typography.Text>{formatTime(createAt)}</Typography.Text>
       </Col>

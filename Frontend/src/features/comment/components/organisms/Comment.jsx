@@ -1,6 +1,7 @@
 import {
   CaretDownOutlined,
   CaretUpOutlined,
+  CheckCircleFilled,
   HeartFilled,
   SendOutlined,
 } from "@ant-design/icons";
@@ -15,6 +16,7 @@ import CommentList from "../templates/CommentList";
 import useReplyComment from "../../hooks/useReplyComment";
 import useCreateReply from "../../hooks/useCreateReply";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
+import { Link } from "react-router-dom";
 
 const Comment = ({ commentData, post_id, minWidth }) => {
   const { entity } = useAuthEntity();
@@ -113,7 +115,17 @@ const Comment = ({ commentData, post_id, minWidth }) => {
             borderRadius: "10px",
           }}
         >
-          <Typography.Text strong>{commentData?.author?.name}</Typography.Text>
+          <Typography.Text strong>
+            {commentData?.author?.name}{" "}
+            {commentData?.author?.isBusiness && (
+              <Link
+                style={{ fontSize: 14, marginLeft: 8 }}
+                to={`/businesses/${commentData?.author?.id}`}
+              >
+                <CheckCircleFilled /> - Quán ăn
+              </Link>
+            )}
+          </Typography.Text>
           <br />
           <Typography.Text>{commentData?.comment_content}</Typography.Text>
         </div>
