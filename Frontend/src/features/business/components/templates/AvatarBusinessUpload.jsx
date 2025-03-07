@@ -92,7 +92,10 @@ const AvatarBusinessUpload = ({ avatar }) => {
     return (
         <div style={{ textAlign: "center", marginBottom: 16 }}>
             <div style={{ position: "relative", display: "inline-block" }}>
-                <Avatar src={imageUrl} size={100} />
+                <div style={{ width: 120, height: 80, overflow: "hidden", borderRadius: 5 }}>
+                    <img src={imageUrl} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+
                 {isUploading && (
                     <div
                         style={{
