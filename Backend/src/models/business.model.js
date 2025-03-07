@@ -16,6 +16,7 @@ const BusinessSchema = new mongoose.Schema(
     dish_lowest_cost: { type: Number, default: 0 },
     dish_highest_cost: { type: Number, default: 0 },
     verified: { type: Boolean, default: false },
+    reminderSent: { type: Boolean, default: false },
     status: {
       type: String,
       enum: ["pending", "active", "suspended"],

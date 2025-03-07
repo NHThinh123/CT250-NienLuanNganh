@@ -29,6 +29,7 @@ const useBusinessLogin = () => {
         open_hours: data.business.open_hours,
         close_hours: data.business.close_hours,
         status: data.business.status,
+        verified: data.business.verified, // Thêm trường verified
       };
       console.log("Dữ liệu business trước khi set:", {
         isAuthenticated: true,
@@ -49,8 +50,11 @@ const useBusinessLogin = () => {
         JSON.parse(localStorage.getItem("authBusiness"))
       );
 
-      // Kiểm tra status và hiển thị thông báo
-      if (businessData.status === "pending") {
+      // Kiểm tra verified trước, sau đó kiểm tra status
+      if (businessData.verified === false) {
+        message.info("Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để xác minh!");
+        navigate("/login"); // Hoặc có thể điều hướng đến trang khác nếu cần
+      } else if (businessData.status === "pending") {
         message.info("Tài khoản của bạn chưa được kích hoạt. Vui lòng chọn gói dịch vụ để tiếp tục.");
         navigate(`/subscription/plans/${businessData.id}`, {
           state: {
@@ -74,9 +78,16 @@ const useBusinessLogin = () => {
       }
     },
     onError: (error) => {
-      const errorMessage = error.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại!";
+      // Xử lý các trường hợp lỗi cụ thể
+      const errorMessage = error.response?.data?.message;
+      if (errorMessage === "Email does not exist") {
+        message.error("Email không tồn tại!");
+      } else if (errorMessage === "Incorrect password") {
+        message.error("Mật khẩu không chính xác!");
+      } else {
+        message.error(errorMessage || "Đăng nhập thất bại. Vui lòng thử lại!");
+      }
       console.error("Login error:", errorMessage);
-      message.error(errorMessage);
     },
   });
 };

@@ -9,7 +9,7 @@ export const useBusinessSignup = () => {
             console.log("Đăng ký thành công:", data);
         },
         onError: (error) => {
-            console.error("Lỗi đăng ký:", error);
+            message.error(error.message || "Đăng nhập thất bại!");
         },
     });
 };
