@@ -67,6 +67,7 @@ const Business = ({ businessData }) => {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
+                  marginTop: 8,
                 }}
               >
                 {business.location}
