@@ -13,7 +13,6 @@ const {
   deleteDishService,
   getDishesByMenuIdService,
   getListDishByBusinessIdService,
-  getDishService,
 } = require("../services/dish.service");
 
 const getListDish = async (req, res, next) => {
@@ -36,22 +35,13 @@ const getDishById = async (req, res, next) => {
   }
 };
 
-// const createDish = async (req, res, next) => {
-//   try {
-//     const dishData = req.body;
-//     const data = await createDishService(dishData);
-//     res.status(201).json(data);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
+//Tạo món trường hợp 1 hình ảnh
 const createDish = async (req, res) => {
   try {
     const dishData = req.body;
-    const imagePaths = req.files?.map((file) => file.path) || []; // Lấy danh sách đường dẫn ảnh
+    const imagePath = req.file?.path || "";
 
-    const newDish = await createDishService(dishData, imagePaths);
+    const newDish = await createDishService(dishData, imagePath);
 
     const menu = await Menu.findById(dishData.menu_id);
     const business = await getBusinessByIdService(menu.business_id);
@@ -73,23 +63,42 @@ const createDish = async (req, res) => {
   }
 };
 
-// const updateDish = async (req, res, next) => {
+//Update trường hợp mảng hình ảnh
+// const updateDish = async (req, res) => {
 //   try {
 //     const { id } = req.params;
 //     const dataUpdate = req.body;
-//     const data = await updateDishService(id, dataUpdate);
-//     res.status(200).json(data);
+//     const imagePaths = req.files?.map((file) => file.path) || [];
+
+//     const updatedDish = await updateDishService(id, dataUpdate, imagePaths);
+//     const menu = await Menu.findById(updatedDish.menu_id);
+//     const business = await getBusinessByIdService(menu.business_id);
+
+//     const dish_price_updated = updatedDish.dish_price;
+//     const dish_highest_cost = business.dish_highest_cost;
+//     const dish_lowest_cost = business.dish_lowest_cost;
+
+//     if (
+//       dish_price_updated < dish_lowest_cost ||
+//       dish_price_updated > dish_highest_cost
+//     ) {
+//       await updateDishCostBusinessService(menu.business_id);
+//     }
+
+//     res.json({ success: true, data: updatedDish });
 //   } catch (error) {
-//     next(error);
+//     res.status(500).json({ success: false, message: error.message });
 //   }
 // };
 
+//Update trường hợp 1 hình ảnh
 const updateDish = async (req, res) => {
   try {
     const { id } = req.params;
     const dataUpdate = req.body;
-    const imagePaths = req.files?.map((file) => file.path) || [];
-    const updatedDish = await updateDishService(id, dataUpdate, imagePaths);
+    const imagePath = req.file?.path || "";
+    const updatedDish = await updateDishService(id, dataUpdate, imagePath);
+
     const menu = await Menu.findById(updatedDish.menu_id);
     const business = await getBusinessByIdService(menu.business_id);
 

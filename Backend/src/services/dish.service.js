@@ -30,53 +30,83 @@ const deleteDishService = async (id) => {
 };
 
 //Api upload nhiều ảnh
-const uploadMultipleImagesService = async (imagePaths) => {
-  try {
-    const uploadPromises = imagePaths.map((path) =>
-      cloudinary.uploader.upload(path, { folder: "dishes" })
-    );
-    const uploadResults = await Promise.all(uploadPromises);
-    return uploadResults.map((result) => result.secure_url); // Trả về danh sách URL
-  } catch (error) {
-    throw new Error("Upload images failed: " + error.message);
+// const uploadMultipleImagesService = async (imagePaths) => {
+//   try {
+//     const uploadPromises = imagePaths.map((path) =>
+//       cloudinary.uploader.upload(path, { folder: "dishes" })
+//     );
+//     const uploadResults = await Promise.all(uploadPromises);
+//     return uploadResults.map((result) => result.secure_url); // Trả về danh sách URL
+//   } catch (error) {
+//     throw new Error("Upload images failed: " + error.message);
+//   }
+// };
+
+const createDishService = async (dishData, imagePath) => {
+  let imageUrl =
+    dishData.dish_url ||
+    "https://res.cloudinary.com/nienluan/image/upload/v1741509054/Default_Dish_Image_k1vxlz.png";
+
+  if (imagePath) {
+    const uploadResult = await cloudinary.uploader.upload(imagePath, {
+      folder: "dishes",
+    });
+    imageUrl = uploadResult.secure_url;
   }
+
+  return await Dish.create({ ...dishData, dish_url: imageUrl });
 };
 
-const createDishService = async (dishData, imagePaths) => {
-  let imageUrls = dishData.dish_url || []; // Giữ nguyên nếu có sẵn URL
+//Update trường hợp mảng hình ảnh
+// const updateDishService = async (id, dataUpdate, imagePaths) => {
+//   const existingDish = await Dish.findById(id);
+//   if (!existingDish) {
+//     throw new Error("Dish not found");
+//   }
 
-  if (imagePaths && imagePaths.length > 0) {
-    const uploadedUrls = await uploadMultipleImagesService(imagePaths);
-    imageUrls = [...imageUrls, ...uploadedUrls]; // Gộp ảnh mới vào danh sách
-  }
+//   let updatedImageUrls = dataUpdate.dish_url || [];
+//   let existingImageUrls = existingDish.dish_url || [];
 
-  return await Dish.create({ ...dishData, dish_url: imageUrls });
-};
+//   // Xóa các ảnh cũ nếu không có trong dữ liệu update
+//   const imagesToRemove = existingImageUrls.filter(
+//     (img) => !updatedImageUrls.includes(img)
+//   );
 
-// Hàm cập nhật món ăn với nhiều ảnh
-const updateDishService = async (id, dataUpdate, imagePaths) => {
-  // Lấy thông tin món ăn hiện tại từ database
+//   // Nếu có ảnh mới, upload lên Cloudinary
+//   if (imagePaths && imagePaths.length > 0) {
+//     const uploadedUrls = await uploadMultipleImagesService(imagePaths);
+//     updatedImageUrls = [...updatedImageUrls, ...uploadedUrls];
+//   }
+
+//   // Cập nhật dữ liệu món ăn
+//   const updatedDish = await Dish.findByIdAndUpdate(
+//     id,
+//     { ...dataUpdate, dish_url: updatedImageUrls },
+//     { new: true }
+//   );
+
+//   return updatedDish;
+// };
+
+//Update trường hợp 1 hình ảnh
+const updateDishService = async (id, dataUpdate, imagePath) => {
   const existingDish = await Dish.findById(id);
   if (!existingDish) {
     throw new Error("Dish not found");
   }
 
-  let imageUrls = existingDish.dish_url || []; // Giữ ảnh cũ
+  let imageUrl = dataUpdate.dish_url || existingDish.dish_url;
 
-  // Kiểm tra số lượng ảnh
-  if (imageUrls.length == 5) {
-    throw new Error("Cannot upload more than images for this dish");
-  }
-
-  // Nếu có ảnh mới, upload lên Cloudinary và thêm vào danh sách ảnh cũ
-  if (imagePaths && imagePaths.length > 0) {
-    const uploadedUrls = await uploadMultipleImagesService(imagePaths);
-    imageUrls = [...imageUrls, ...uploadedUrls];
+  if (imagePath) {
+    const uploadResult = await cloudinary.uploader.upload(imagePath, {
+      folder: "dishes",
+    });
+    imageUrl = uploadResult.secure_url;
   }
 
   return await Dish.findByIdAndUpdate(
     id,
-    { ...dataUpdate, dish_url: imageUrls }, // Cập nhật dữ liệu + giữ ảnh cũ
+    { ...dataUpdate, dish_url: imageUrl },
     { new: true }
   );
 };
@@ -104,7 +134,7 @@ const getListDishByBusinessIdService = async (businessId) => {
 module.exports = {
   getListDishService,
   getDishByIdService,
-  uploadMultipleImagesService,
+  // uploadMultipleImagesService,
   createDishService,
   updateDishService,
   deleteDishService,
