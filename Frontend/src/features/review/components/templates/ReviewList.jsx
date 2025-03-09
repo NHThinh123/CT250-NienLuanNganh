@@ -2,7 +2,6 @@ import { Avatar, List, Rate, Typography } from "antd";
 import { formatTime } from "../../../../constants/formatTime";
 
 const ReviewList = ({ reviewData }) => {
-  console.log("reviewData in ReviewList: ", reviewData);
   return (
     <>
       {reviewData.length > 0 ? (

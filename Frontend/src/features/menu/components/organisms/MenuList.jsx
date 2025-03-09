@@ -2,6 +2,7 @@ import { Button, Menu } from "antd";
 import { useContext, useState } from "react";
 import { MenuContext } from "../molecules/MenuContext";
 import DeleteMenu from "../molecules/DeleteMenu";
+import UpdateMenu from "../molecules/UpdateMenu";
 
 const MenuList = ({ menuData }) => {
   const menuContext = useContext(MenuContext);
@@ -26,6 +27,7 @@ const MenuList = ({ menuData }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          width: "100%",
         }}
       >
         <span
@@ -39,11 +41,25 @@ const MenuList = ({ menuData }) => {
         >
           {menu.menu_name.toUpperCase()}
         </span>
-        <DeleteMenu
-          menuName={menu.menu_name}
-          menuId={menu._id}
-          businessId={menu.business_id}
-        />
+        <div
+          style={{
+            display: "flex",
+            gap: "4px", // Khoảng cách giữa các nút
+          }}
+        >
+          <div>
+            <UpdateMenu
+              menuName={menu.menu_name}
+              menuId={menu._id}
+              businessId={menu.business_id}
+            />
+          </div>
+          <DeleteMenu
+            menuName={menu.menu_name}
+            menuId={menu._id}
+            businessId={menu.business_id}
+          />
+        </div>
       </div>
     ),
   }));

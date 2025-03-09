@@ -1,27 +1,49 @@
-import { PlusOutlined } from "@ant-design/icons";
 import {
+  Button,
   Col,
   Form,
   Input,
   InputNumber,
-  message,
   Modal,
   Row,
   Typography,
   Upload,
+  App,
 } from "antd";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import useUpdateDish from "../../../dish/hooks/useUpdateDish";
+import { UploadOutlined } from "@ant-design/icons";
 
-const MAX_IMAGES = 5;
-
-const ModalUpdateDish = ({ isModalOpen, handleCancel, dishData }) => {
-  const [form] = Form.useForm();
+const ModalUpdateDish = ({
+  isModalOpen,
+  handleOk,
+  handleCancel,
+  dishData,
+  form,
+  setIsModalOpen,
+}) => {
   const formRef = useRef(null);
-  const [imageList, setImageList] = useState(dishData.dish_url || []);
-  const [isImageError, setIsImageError] = useState(false);
+  const [image, setImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const { mutate: updateDish, isPending } = useUpdateDish();
+  const { message } = App.useApp();
+
+  useEffect(() => {
+    if (dishData) {
+      const formattedImage = dishData.dish_url
+        ? {
+            uid: "-1",
+            name: "image.jpg",
+            status: "done",
+            url: dishData.dish_url,
+          }
+        : null;
+
+      setImage(formattedImage);
+    }
+  }, [dishData, form]);
 
   const resetFormScroll = () => {
     if (formRef.current) {
@@ -30,40 +52,32 @@ const ModalUpdateDish = ({ isModalOpen, handleCancel, dishData }) => {
   };
 
   const handleImageChange = ({ fileList }) => {
-    setImageList(fileList);
-    form.setFieldsValue({ dish_image: fileList });
-    setIsImageError(fileList.length === 0);
+    const file = fileList.length > 0 ? fileList[0] : null;
+    if (file && !file.url && !file.preview) {
+      file.preview = URL.createObjectURL(file.originFileObj);
+    }
+    setImage(file);
   };
 
-  const onFinish = async (values) => {
+  const handlePreview = async (file) => {
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+  };
+
+  const onSubmit = async (values) => {
     try {
       await form.validateFields();
 
-      if (imageList.length === 0) {
-        message.error("Vui lòng tải lên ít nhất 1 ảnh món!");
-        setIsImageError(true);
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("dish_name", values.dish_name || "");
-      formData.append("dish_description", values.dish_description || "");
-      formData.append("dish_price", values.dish_price || 0);
-
-      imageList.forEach((file) => {
-        formData.append("dish_url", file.originFileObj || file.url);
-      });
+      const formattedImage = image.originFileObj || image.url;
 
       updateDish(
-        { _id: dishData._id, formData },
+        { id: dishData._id, data: { ...values, dish_url: formattedImage } },
         {
           onSuccess: () => {
             message.success("Món đã được cập nhật thành công!");
-            form.resetFields();
-            setImageList([]);
-            setIsImageError(false);
+            setImage(null);
             resetFormScroll();
-            handleCancel();
+            setIsModalOpen(false);
           },
           onError: () => {
             message.error("Lỗi khi cập nhật món!");
@@ -75,6 +89,21 @@ const ModalUpdateDish = ({ isModalOpen, handleCancel, dishData }) => {
     }
   };
 
+  const handleCloseModal = () => {
+    setImage(
+      dishData?.dish_url
+        ? {
+            uid: "-1",
+            name: "image.jpg",
+            status: "done",
+            url: dishData.dish_url,
+          }
+        : null
+    );
+    handleCancel();
+    resetFormScroll();
+  };
+
   return (
     <Modal
       title={
@@ -83,9 +112,9 @@ const ModalUpdateDish = ({ isModalOpen, handleCancel, dishData }) => {
         </Typography.Title>
       }
       open={isModalOpen}
-      onOk={() => form.submit()}
-      onCancel={handleCancel}
-      okText={isPending ? "Đang cập nhật..." : "Cập nhật"}
+      onOk={handleOk}
+      onCancel={handleCloseModal}
+      okText={isPending ? "Đang lưu..." : "Lưu"}
       cancelText="Hủy"
       maskClosable={false}
       centered
@@ -105,30 +134,28 @@ const ModalUpdateDish = ({ isModalOpen, handleCancel, dishData }) => {
         <Col span={24}>
           <Form
             form={form}
-            onFinish={onFinish}
+            onFinish={onSubmit}
             initialValues={{
-              dish_name: dishData.dish_name,
-              dish_description: dishData.dish_description,
-              dish_price: dishData.dish_price,
+              dish_name: dishData?.dish_name,
+              dish_description: dishData?.dish_description,
+              dish_price: dishData?.dish_price || 1000,
             }}
           >
             <Form.Item
+              label="Tên món:"
               name="dish_name"
               rules={[{ required: true, message: "Vui lòng nhập tên món!" }]}
             >
-              <Input size="large" placeholder="Nhập tên món" />
+              <Input size="large" />
             </Form.Item>
-            <Form.Item
-              name="dish_description"
-              rules={[{ required: true, message: "Vui lòng nhập mô tả món!" }]}
-            >
+            <Form.Item label="Mô tả món:" name="dish_description">
               <Input.TextArea
                 size="large"
-                placeholder="Nhập mô tả món"
                 autoSize={{ minRows: 4, maxRows: 10 }}
               />
             </Form.Item>
             <Form.Item
+              label="Giá món:"
               name="dish_price"
               rules={[
                 { required: true, message: "Vui lòng nhập giá món!" },
@@ -142,7 +169,6 @@ const ModalUpdateDish = ({ isModalOpen, handleCancel, dishData }) => {
               <InputNumber
                 size="large"
                 min={1000}
-                placeholder="Nhập giá món"
                 addonAfter="VND"
                 step={1000}
                 style={{ width: "100%" }}
@@ -153,42 +179,67 @@ const ModalUpdateDish = ({ isModalOpen, handleCancel, dishData }) => {
               />
             </Form.Item>
 
-            <div style={{ display: "flex" }}>
-              <p style={{ fontSize: 15, padding: 10 }}>Cập nhật ảnh món ăn:</p>
-              <Form.Item name="dish_image" valuePropName="fileList">
+            <Form.Item name="dish_url" label="Cập nhật ảnh món ăn:">
+              <div style={{ display: "flex", gap: "16px" }}>
                 <Upload
                   listType="picture-card"
-                  fileList={imageList}
+                  fileList={image ? [image] : []}
+                  showUploadList={{ showRemoveIcon: false }}
                   onChange={handleImageChange}
+                  onPreview={handlePreview}
                   beforeUpload={() => false}
-                  multiple
-                  className={isImageError ? "upload-error" : ""}
+                />
+
+                <Button
+                  onClick={() =>
+                    document.getElementById("upload-input").click()
+                  }
+                  style={{
+                    height: "100%",
+                  }}
                 >
-                  {imageList.length < MAX_IMAGES && (
-                    <div>
-                      <PlusOutlined />
-                      <p style={{ marginTop: 8, borderRadius: 5 }}>Thêm ảnh</p>
-                    </div>
-                  )}
-                </Upload>
-                {isImageError && (
-                  <span style={{ color: "red", fontSize: "14px" }}>
-                    Vui lòng tải lên ít nhất 1 ảnh!
-                  </span>
-                )}
-              </Form.Item>
-            </div>
+                  <div style={{ margin: "7px 0px" }}>
+                    <UploadOutlined />
+                    <p style={{ margin: 0 }}>Upload ảnh khác</p>
+                  </div>
+                </Button>
+
+                <input
+                  id="upload-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    if (e.target.files.length > 0) {
+                      const file = e.target.files[0];
+                      const newImage = {
+                        uid: "-1",
+                        name: file.name,
+                        status: "done",
+                        originFileObj: file,
+                        url: URL.createObjectURL(file),
+                      };
+                      setImage(newImage);
+                    }
+                  }}
+                />
+
+                <Modal
+                  open={previewOpen}
+                  footer={null}
+                  onCancel={() => setPreviewOpen(false)}
+                >
+                  <img
+                    alt="preview"
+                    style={{ width: "100%" }}
+                    src={previewImage}
+                  />
+                </Modal>
+              </div>
+            </Form.Item>
           </Form>
         </Col>
       </Row>
-      <style>
-        {`
-          .upload-error .ant-upload {
-            border: 1.5px solid red !important;
-            border-radius: 5px
-          }
-        `}
-      </style>
     </Modal>
   );
 };

@@ -26,19 +26,21 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
               >
                 <div>
                   <Row>
-                    <Col span={22}>
+                    <Col span={23}>
                       <div
                         style={{
                           color: "#6D6f71",
-                          fontSize: "14px",
-                          paddingBottom: "20px",
+                          fontSize: "15px",
+                          paddingBottom: "18px",
                         }}
                       >
                         {capitalizeMenuName(menu.menu_name)}
                       </div>
                     </Col>
-                    <Col span={2}>
-                      <AddDish menuData={menu} />
+                    <Col span={1}>
+                      <div>
+                        <AddDish menuData={menu} />
+                      </div>
                     </Col>
                   </Row>
                 </div>

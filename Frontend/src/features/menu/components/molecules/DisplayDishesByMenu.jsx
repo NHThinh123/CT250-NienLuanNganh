@@ -3,7 +3,7 @@ import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 import DeleteDish from "../../../dish/components/templates/DeleteDish";
 import { useState } from "react";
 import { SquarePlus } from "lucide-react";
-// import UpdateDish from "./UpdateDish";
+import UpdateDish from "./UpdateDish";
 
 const DisplayDishesByMenu = ({ menuId, businessId }) => {
   const { dishData } = useDishByMenuId(menuId);
@@ -39,7 +39,7 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
                   <Col span={4}>
                     <img
                       style={{ width: "70px", height: "70px" }}
-                      src={dish.dish_url[0]}
+                      src={dish.dish_url}
                       alt="Ảnh"
                     />
                   </Col>
@@ -113,7 +113,7 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
                           alignItems: "center",
                         }}
                       >
-                        {/* <UpdateDish dishId={dish._id} businessId={businessId} /> */}
+                        <UpdateDish dishId={dish._id} businessId={businessId} />
                         <DeleteDish
                           dishName={dish.dish_name}
                           dishId={dish._id}

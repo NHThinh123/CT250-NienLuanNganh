@@ -1,12 +1,10 @@
 import { Button, Form } from "antd";
 import { Pencil } from "lucide-react";
 import { useContext, useState } from "react";
-import ModalUpdateDish from "../atoms/ModalUpdateDish";
+import ModalUpdateMenu from "../atoms/ModalUpdateMenu";
 import { BusinessContext } from "../../../../contexts/business.context";
-import useDishById from "../../../dish/hooks/useDishById";
 
-const UpdateDish = ({ dishId, businessId }) => {
-  const dishData = useDishById(dishId);
+const UpdateMenu = ({ menuId, menuName, businessId }) => {
   const [hover, setHover] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -33,27 +31,32 @@ const UpdateDish = ({ dishId, businessId }) => {
             margin: 0,
             padding: 0,
             border: "none",
+            display: "grid",
+            placeItems: "center",
+            height: "100%",
           }}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
           <Pencil
-            size={20}
             strokeWidth={hover ? 2.75 : 0.75}
             color={hover ? "blue" : "blue"}
+            style={{ width: 20, height: 20 }}
+            size={10}
           />
         </Button>
       )}
-      <ModalUpdateDish
+      <ModalUpdateMenu
         form={form}
         isModalOpen={isModalOpen}
         handleOk={handleOk}
         handleCancel={handleCancel}
         setIsModalOpen={setIsModalOpen}
-        dishData={dishData.dishData}
+        menuId={menuId}
+        menuName={menuName}
       />
     </>
   );
 };
 
-export default UpdateDish;
+export default UpdateMenu;

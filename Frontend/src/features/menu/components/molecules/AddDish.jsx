@@ -6,6 +6,7 @@ import { BusinessContext } from "../../../../contexts/business.context";
 
 const AddDish = ({ menuData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [hover, setHover] = useState(false); //set hover cho delete button
   const [form] = Form.useForm();
 
   const { business } = useContext(BusinessContext);
@@ -26,8 +27,23 @@ const AddDish = ({ menuData }) => {
     <>
       {business.isAuthenticated &&
         business.business.id == menuData.business_id && (
-          <Button type="link" onClick={showModal} style={{ padding: 0 }}>
-            <SquarePlus strokeWidth={1} />
+          <Button
+            type="link"
+            onClick={showModal}
+            style={{
+              margin: 0,
+              padding: 0,
+              border: "none",
+              height: "100%",
+            }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+          >
+            <SquarePlus
+              strokeWidth={hover ? 2.75 : 0.75}
+              color={hover ? "blue" : "blue"}
+              size={25}
+            />
           </Button>
         )}
       <ModalAddDish
