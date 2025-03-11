@@ -11,13 +11,14 @@ import {
   Typography,
 } from "antd";
 import { Images, MapPinned, Tags } from "lucide-react";
-import UploadImage from "../atoms/UploadImage";
+
 import { useState } from "react";
 import UploadTag from "../atoms/UploadTag";
 import useCreatePost from "../../hooks/useCreatePost";
 
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
+import UploadMedia from "../atoms/UploadMedia";
 
 const ModalUploadPost = ({
   isModalOpen,
@@ -52,7 +53,7 @@ const ModalUploadPost = ({
     formData.append("content", values.content);
     formData.append("tags", JSON.stringify(tags));
     fileList.forEach((file) => {
-      formData.append("images", file.originFileObj);
+      formData.append("media", file.originFileObj);
     });
     // formData.forEach((value, key) => {
     //   console.log(key, value);
@@ -154,7 +155,7 @@ const ModalUploadPost = ({
         )}
         {isShowUploadImage && (
           <Col span={24}>
-            <UploadImage fileList={fileList} setFileList={setFileList} />
+            <UploadMedia fileList={fileList} setFileList={setFileList} />
           </Col>
         )}
       </Row>

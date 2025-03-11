@@ -1,12 +1,13 @@
 import { Avatar, Col, Divider, Row, Tag, Typography } from "antd";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import PostImages from "../molecules/PostImages";
+
 import PostFooter from "../molecules/PostFooter";
 import { useState } from "react";
 import CommentModal from "../../../comment/components/templates/CommentModal";
 import { formatTime } from "../../../../constants/formatTime";
 import { Link } from "react-router-dom";
 import { CheckCircleFilled } from "@ant-design/icons";
+import PostMedia from "../molecules/PostMedia";
 
 const PostDetail = ({ postData, isLoading, isError }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,7 +62,7 @@ const PostDetail = ({ postData, isLoading, isError }) => {
           <p style={{ fontSize: 18, marginBottom: "16px" }}>
             {postData?.content}
           </p>
-          <PostImages imagesData={postData?.images}></PostImages>
+          <PostMedia mediaData={postData?.media}></PostMedia>
           <PostFooter
             postData={postData}
             showModal={showModal}
