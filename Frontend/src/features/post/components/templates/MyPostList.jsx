@@ -8,6 +8,7 @@ import PostFilter from "../organisms/PostFilter";
 
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 import useMyPost from "../../hooks/useMyPost";
+import useDeletePost from "../../hooks/useDeletePost";
 
 const MyPostList = () => {
   const { entity } = useAuthEntity();
@@ -23,6 +24,7 @@ const MyPostList = () => {
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useMyPost(params);
+  const { mutate: deletePost, isLoading: isDeleting } = useDeletePost();
   const { ref, inView } = useInView();
 
   useEffect(() => {
@@ -42,11 +44,12 @@ const MyPostList = () => {
   const handleTagFilter = (selectedTags) => {
     setParams((prev) => ({
       ...prev,
-      filter: {
-        ...prev.filter,
-        tags: selectedTags,
-      },
+      filter: { ...prev.filter, tags: selectedTags },
     }));
+  };
+
+  const handleDeletePost = (post_id) => {
+    deletePost({ post_id, id: entity.id });
   };
 
   if (!entity.id) {
@@ -66,7 +69,12 @@ const MyPostList = () => {
           grid={{ gutter: 8, column: 1 }}
           renderItem={(item) => (
             <List.Item style={{ padding: "0px", margin: "0px" }}>
-              <PostItem postData={item} />
+              <PostItem
+                postData={item}
+                onDelete={handleDeletePost}
+                isDeleting={isDeleting}
+                isMyPost={true}
+              />
             </List.Item>
           )}
           locale={{ emptyText: "Bạn chưa có bài viết nào." }}
@@ -76,7 +84,7 @@ const MyPostList = () => {
             <Spin />
           </div>
         )}
-        <div ref={ref} style={{ height: "20px" }} />{" "}
+        <div ref={ref} style={{ height: "20px" }} />
       </Col>
       <Col
         xs={24}

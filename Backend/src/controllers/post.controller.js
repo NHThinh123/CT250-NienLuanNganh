@@ -85,9 +85,15 @@ const getMyPosts = async (req, res, next) => {
 
 const updatePost = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const dataUpdate = req.body;
-    const data = await updatePostService(id, dataUpdate);
+    const { post_id } = req.params;
+    const { id, dataUpdate, tags } = req.body;
+    const data = await updatePostService(
+      post_id,
+      id,
+      dataUpdate,
+      req.files,
+      tags
+    );
     res.status(200).json(data);
   } catch (error) {
     next(error);
@@ -95,8 +101,9 @@ const updatePost = async (req, res, next) => {
 };
 const deletePost = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const data = await deletePostService(id);
+    const { post_id } = req.params;
+    const { id } = req.query;
+    const data = await deletePostService(post_id, id);
     res.status(200).json(data);
   } catch (error) {
     next(error);

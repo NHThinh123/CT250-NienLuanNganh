@@ -1,5 +1,5 @@
 import { Avatar, Col, Row, Space, Tag, Typography } from "antd";
-import logo from "../../../../assets/logo/logo.png";
+
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import {
   CheckCircleFilled,
@@ -15,7 +15,9 @@ const PostCard = ({ post }) => {
     if (!firstMedia) {
       return (
         <img
-          src={logo}
+          src={
+            "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg"
+          }
           alt="Fallback"
           style={{ maxWidth: 400, objectFit: "cover" }}
         />
@@ -46,7 +48,9 @@ const PostCard = ({ post }) => {
     }
     return (
       <img
-        src={logo}
+        src={
+          "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg"
+        }
         alt="Fallback"
         style={{ maxWidth: 400, objectFit: "cover" }}
       />
@@ -81,7 +85,9 @@ const PostCard = ({ post }) => {
               }}
             >
               <div>
-                <h1 style={{ marginBottom: 4, fontSize: "1.5em" }}>
+                <h1
+                  style={{ marginBottom: 4, fontSize: "1.5em", marginTop: 8 }}
+                >
                   {post.title}
                 </h1>
                 <Col span={24} style={{ marginBottom: "8px" }}>
@@ -124,12 +130,15 @@ const PostCard = ({ post }) => {
                   <p style={{ marginBottom: "0" }}>
                     {post.author?.name}
                     {post?.business_id && (
-                      <Link
-                        style={{ fontSize: 14, marginLeft: 8 }}
-                        to={`/businesses/${post.author?.id}`}
+                      <Typography.Text
+                        style={{
+                          fontSize: 14,
+                          marginLeft: 8,
+                          color: "#1890ff",
+                        }}
                       >
                         <CheckCircleFilled /> - Quán ăn
-                      </Link>
+                      </Typography.Text>
                     )}
                   </p>
                 </Space>

@@ -22,9 +22,9 @@ const updatePostApi = (id, data) => {
   return axios.put(URL_API, data);
 };
 
-const deletePostApi = (id) => {
-  const URL_API = `/api/posts/${id}`;
-  return axios.delete(URL_API);
+const deletePostApi = (post_id, id) => {
+  const URL_API = `/api/posts/${post_id}`;
+  return axios.delete(URL_API, { params: { id } });
 };
 
 const likePostApi = (id, post_id) => {

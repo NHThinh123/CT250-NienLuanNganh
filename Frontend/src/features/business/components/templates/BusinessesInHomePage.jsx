@@ -6,6 +6,7 @@ const BusinessInHomePage = ({ businessData }) => {
   const navigate = useNavigate();
   const maxTitleLength = 20; // Giới hạn ký tự tiêu đề trước khi cắt
   const maxDescriptionLength = 30; // Giới hạn ký tự mô tả trước khi cắt
+  if (!businessData) return <>loading</>;
   return (
     <>
       <Row gutter={[16, 16]}>
@@ -33,9 +34,10 @@ const BusinessInHomePage = ({ businessData }) => {
               <div style={{ display: "inline-block" }}>
                 <Card.Meta
                   title={
-                    business.business_name.length > maxTitleLength
-                      ? business.business_name.slice(0, maxTitleLength) + "..."
-                      : business.business_name
+                    business?.business_name?.length > maxTitleLength
+                      ? business?.business_name?.slice(0, maxTitleLength) +
+                        "..."
+                      : business?.business_name
                   }
                   style={{ marginBottom: 8 }}
                 />
@@ -50,9 +52,10 @@ const BusinessInHomePage = ({ businessData }) => {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {business.location.length > maxDescriptionLength
-                      ? business.location.slice(0, maxDescriptionLength) + "..."
-                      : business.location}
+                    {business?.location?.length > maxDescriptionLength
+                      ? business?.location.slice(0, maxDescriptionLength) +
+                        "..."
+                      : business?.location}
                   </p>
                 </div>
               </div>
@@ -61,7 +64,7 @@ const BusinessInHomePage = ({ businessData }) => {
                   size={17}
                   style={{ marginRight: "8px", marginBottom: "-3px" }}
                 />
-                {business.open_hours} - {business.close_hours}
+                {business?.open_hours} - {business?.close_hours}
               </p>
             </Card>
           </Col>
