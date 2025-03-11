@@ -9,6 +9,7 @@ import logo from "../src/assets/logo/logo.png";
 import Footer from "./components/templates/Footer";
 import ScrollToTop from "./components/atoms/ScrollToTop";
 import "antd/dist/reset.css";
+import ScrollToTopButton from "./components/atoms/ScrollToTopButton";
 
 const { Header, Content } = Layout;
 
@@ -24,14 +25,14 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-      ? business.business?.avatar
-      : null;
+    ? business.business?.avatar
+    : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-      ? business.business?.business_name
-      : "";
+    ? business.business?.business_name
+    : "";
 
   const handleLogout = () => {
     setIsLoggingOut(true);
@@ -57,11 +58,15 @@ function App() {
         if (isUserLoggedIn) {
           navigate("/profile");
         } else if (isBusinessLoggedIn) {
-          const businessId = business?.business?.id || JSON.parse(localStorage.getItem("authBusiness"))?.business?.id;
+          const businessId =
+            business?.business?.id ||
+            JSON.parse(localStorage.getItem("authBusiness"))?.business?.id;
           if (businessId) {
             navigate(`/businesses/${businessId}`);
           } else {
-            message.error("Không tìm thấy thông tin doanh nghiệp. Vui lòng đăng nhập lại!");
+            message.error(
+              "Không tìm thấy thông tin doanh nghiệp. Vui lòng đăng nhập lại!"
+            );
             console.error("Không tìm thấy ID doanh nghiệp");
           }
         }
@@ -165,6 +170,7 @@ function App() {
       {/* Nội dung chính */}
       <Content style={{ paddingTop: "64px" }}>
         <ScrollToTop />
+        <ScrollToTopButton />
         <Outlet />
       </Content>
 

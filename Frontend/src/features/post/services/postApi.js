@@ -35,7 +35,11 @@ const unlikePostApi = (id, post_id) => {
   const URL_API = `api/user_like_post/unlike`;
   return axios.put(URL_API, { id, post_id });
 };
-
+const getMyPostsApi = ({ pageParam = 1, queryKey }) => {
+  const [, params] = queryKey;
+  const URL_API = `/api/posts/my-posts`;
+  return axios.get(URL_API, { params: { ...params, page: pageParam } });
+};
 export {
   getPostApi,
   createPostApi,
@@ -44,4 +48,5 @@ export {
   deletePostApi,
   likePostApi,
   unlikePostApi,
+  getMyPostsApi,
 };

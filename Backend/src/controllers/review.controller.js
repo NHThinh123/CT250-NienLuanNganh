@@ -34,10 +34,24 @@ const getReviewById = async (req, res, next) => {
 
 const createReview = async (req, res, next) => {
   try {
-    const reviewData = req.body;
-    const data = await createReviewService(reviewData);
-    await updateRatingAverageService(reviewData.business_id); //Cập nhật lại rating_average khi tạo một review
-    res.status(201).json(data);
+    const {
+      business_id,
+      review_rating,
+      review_contents,
+      user_id,
+      business_id_review,
+    } = req.body;
+
+    const newReview = await createReviewService(
+      business_id,
+      review_rating,
+      review_contents,
+      user_id,
+      business_id_review
+    );
+    await updateRatingAverageService(business_id); //Cập nhật lại rating_average khi tạo một review
+
+    res.status(201).json(newReview);
   } catch (error) {
     next(error);
   }

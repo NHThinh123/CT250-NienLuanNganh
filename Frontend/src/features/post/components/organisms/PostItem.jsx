@@ -13,9 +13,11 @@ const PostItem = ({ postData }) => {
   const showModal = () => {
     setIsModalOpen(true);
   };
+  const isBusiness = postData?.business_id ? true : false;
   return (
     <BoxContainer style={{ minWidth: "500px" }}>
       <PostHeader
+        isBusiness={isBusiness}
         userData={postData?.author}
         createAt={postData.createdAt}
       ></PostHeader>

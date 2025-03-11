@@ -4,7 +4,9 @@ import { updateDishApi } from "../services/dishApi";
 const useUpdateDish = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }) => updateDishApi(id, data),
+    mutationFn: async ({ id, data }) => {
+      return await updateDishApi(id, data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries("dishes"); // Làm mới danh sách món ăn
     },

@@ -262,7 +262,36 @@ const getListPostService = async ({
     },
   };
 };
+const getMyPostsService = async ({
+  id,
+  search,
+  sort,
+  page = 1,
+  limit = 10,
+  filter = {}, // Thêm mặc định để tránh undefined
+}) => {
+  console.log("Params received:", { id, search, sort, page, limit, filter });
 
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError("Invalid user ID", 400);
+  }
+
+  const objectId = new mongoose.Types.ObjectId(id);
+
+  const result = await getListPostService({
+    id,
+    search,
+    sort,
+    filter: {
+      id, // Lọc theo ID của user/business
+      ...filter, // Gộp thêm các filter khác (như tags) nếu có
+    },
+    page,
+    limit,
+  });
+
+  return result;
+};
 const getPostByIdService = async (post_id, id) => {
   if (!mongoose.Types.ObjectId.isValid(post_id)) {
     throw new AppError("Invalid post ID", 400);
@@ -501,4 +530,5 @@ module.exports = {
   createPostService,
   updatePostService,
   deletePostService,
+  getMyPostsService,
 };

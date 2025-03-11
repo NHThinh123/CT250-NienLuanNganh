@@ -1,5 +1,5 @@
 import { Button, Col, Form, Row, Typography } from "antd";
-import { ChefHat, Utensils } from "lucide-react";
+// import { ChefHat, Utensils } from "lucide-react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import { useState } from "react";
 import ModalUploadPost from "./ModalUploadPost";
@@ -54,7 +54,7 @@ const UpLoadPostContainer = () => {
           </Button>
         </Col>
       </Row>
-      <Row
+      {/* <Row
         justify={"center"}
         style={{ textAlign: "center", marginTop: "8px" }}
         gutter={[16, 16]}
@@ -78,7 +78,7 @@ const UpLoadPostContainer = () => {
             <ChefHat size={18} color="#ff4d4f" strokeWidth={2.5} /> Quán xịn
           </Button>
         </Col>
-      </Row>
+      </Row> */}
       <ModalUploadPost
         form={form}
         isModalOpen={isModalOpen}

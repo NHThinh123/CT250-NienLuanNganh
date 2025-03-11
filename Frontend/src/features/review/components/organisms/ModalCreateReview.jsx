@@ -2,6 +2,7 @@ import { Col, Form, Input, message, Modal, Rate, Row, Typography } from "antd";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import useCreateReview from "../../../review/hooks/useCreateReview";
 import { AuthContext } from "../../../../contexts/auth.context";
+import { BusinessContext } from "../../../../contexts/business.context";
 import { useContext, useState } from "react";
 
 const ModalCreateReview = ({
@@ -15,7 +16,9 @@ const ModalCreateReview = ({
   const desc = ["Rất tệ", "Tệ", "Bình thường", "Tốt", "Rất tốt"];
   const [value, setValue] = useState(5);
   const { auth } = useContext(AuthContext);
-  // console.log("auth", auth?.user);
+  const { business } = useContext(BusinessContext);
+  const user_id = auth?.user?.id;
+  const business_id = business?.business?.id;
   const { mutate: createReview, isPending } = useCreateReview();
 
   const onFinish = async (values) => {
@@ -24,7 +27,8 @@ const ModalCreateReview = ({
       console.log("Form values sau validate:", values);
 
       const formData = {
-        user_id: auth?.user.id,
+        user_id: user_id ? auth?.user?.id : null,
+        business_id_review: business_id ? business?.business?.id : null,
         business_id: businessId,
         review_rating: values.review_rating,
         review_contents: values.review_contents,
@@ -90,7 +94,11 @@ const ModalCreateReview = ({
             <div style={{ display: "flex", marginBottom: 10 }}>
               <img
                 style={{ width: "50px", height: "50px", borderRadius: "50%" }}
-                src={auth?.user.avatar}
+                src={
+                  user_id && !business_id
+                    ? auth?.user.avatar
+                    : business?.business.avatar
+                }
                 alt="Ảnh"
               ></img>
               <p
@@ -100,7 +108,9 @@ const ModalCreateReview = ({
                   placeContent: "center",
                 }}
               >
-                {auth?.user.name}
+                {user_id && !business_id
+                  ? auth?.user.name
+                  : business?.business.business_name}
               </p>
             </div>
             <Form.Item

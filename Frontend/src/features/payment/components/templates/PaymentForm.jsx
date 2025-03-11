@@ -142,7 +142,7 @@ const PaymentForm = ({ businessId, amount, email, businessName, planType }) => {
                 >
                     {/* Tiêu đề */}
                     <div style={{ textAlign: "center", marginBottom: "15px", marginTop: "-5px" }}>
-                        <CreditCardOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
+                        <CreditCardOutlined style={{ fontSize: "32px", color: "#52c41a" }} />
                         <h2 style={{ margin: "10px 0 5px", fontWeight: "bold", color: "#1a3353" }}>
                             Thanh toán phí
                         </h2>
@@ -351,15 +351,15 @@ const PaymentForm = ({ businessId, amount, email, businessName, planType }) => {
                                 height: "35px",
                                 fontSize: "16px",
                                 borderRadius: "8px",
-                                backgroundColor: "#1890ff",
-                                borderColor: "#1890ff",
+                                backgroundColor: "#52c41a",
+                                borderColor: "#52c41a",
                                 transition: "all 0.3s",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#40a9ff")}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#1890ff")}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#52c41a")}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#52c41a")}
                         >
                             {isPending ? (
                                 "Đang xử lý..."

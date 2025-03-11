@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const AppError = require("../utils/AppError");
 const Comment = require("../models/comment.model");
-const User = require("../models/user.model"); // Thêm model User
-const Business = require("../models/business.model"); // Thêm model Business
+const User = require("../models/user.model");
+const Business = require("../models/business.model");
 require("dotenv").config();
 
 const createCommentService = async (
@@ -24,7 +24,7 @@ const createCommentService = async (
 
   const objectId = new mongoose.Types.ObjectId(id);
 
-  // Kiểm tra xem id thuộc về user hay business
+  // Check if id belongs to user or business
   const user = await User.findById(objectId);
   const business = await Business.findById(objectId);
 
@@ -97,11 +97,13 @@ const getListCommentByPostService = async (query) => {
               id: "$user_id",
               name: "$user.name",
               avatar: "$user.avatar",
+              isBusiness: false,
             },
             else: {
               id: "$business_id",
               name: "$business.business_name",
               avatar: "$business.avatar",
+              isBusiness: true,
             },
           },
         },
@@ -185,11 +187,13 @@ const getCommentByIdService = async (comment_id, id) => {
               id: "$user_id",
               name: "$user.name",
               avatar: "$user.avatar",
+              isBusiness: false,
             },
             else: {
               id: "$business_id",
               name: "$business.business_name",
               avatar: "$business.avatar",
+              isBusiness: true,
             },
           },
         },
@@ -240,11 +244,13 @@ const getCommentByIdService = async (comment_id, id) => {
               id: "$user_id",
               name: "$user.name",
               avatar: "$user.avatar",
+              isBusiness: false,
             },
             else: {
               id: "$business_id",
               name: "$business.business_name",
               avatar: "$business.avatar",
+              isBusiness: true,
             },
           },
         },
@@ -318,11 +324,13 @@ const getReplyByCommentService = async (query) => {
               id: "$user_id",
               name: "$user.name",
               avatar: "$user.avatar",
+              isBusiness: false,
             },
             else: {
               id: "$business_id",
               name: "$business.business_name",
               avatar: "$business.avatar",
+              isBusiness: true,
             },
           },
         },

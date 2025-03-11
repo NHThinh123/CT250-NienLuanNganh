@@ -28,8 +28,40 @@ const getReviewByIdService = async (id) => {
     .populate("business_id", "business_name");
 };
 
-const createReviewService = async (reviewData) => {
-  return await Review.create(reviewData);
+const createReviewService = async (
+  business_id,
+  review_rating,
+  review_contents,
+  user_id = null,
+  business_id_review = null
+) => {
+  if (!business_id || !review_rating) {
+    throw new AppError("Missing required fields", 400);
+  }
+
+  // Đảm bảo chỉ có một trong hai trường `user_id` hoặc `business_id_review`
+  if (user_id && business_id_review) {
+    throw new AppError(
+      "Only one of user_id or business_id_review should be provided.",
+      400
+    );
+  }
+  if (!user_id && !business_id_review) {
+    throw new AppError(
+      "One of user_id or business_id_review is required.",
+      400
+    );
+  }
+
+  let result = await Review.create({
+    business_id,
+    review_rating,
+    review_contents,
+    user_id: user_id || null,
+    business_id_review: business_id_review || null,
+  });
+
+  return result;
 };
 
 // const updateReviewService = async (id, dataUpdate) => {
@@ -42,10 +74,9 @@ const deleteReviewService = async (id) => {
 
 const getReviewsByBusinessIdService = async (businessId) => {
   try {
-    const reviews = await Review.find({ business_id: businessId }).populate(
-      "user_id",
-      "avatar name"
-    );
+    const reviews = await Review.find({ business_id: businessId })
+      .populate("user_id", "avatar name")
+      .populate("business_id_review", "business_name avatar");
     return reviews;
   } catch (error) {
     throw new Error(error.message);

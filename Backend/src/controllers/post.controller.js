@@ -4,6 +4,7 @@ const {
   getPostByIdService,
   updatePostService,
   deletePostService,
+  getMyPostsService,
 } = require("../services/post.service");
 
 const getListPost = async (req, res, next) => {
@@ -63,6 +64,25 @@ const createPost = async (req, res, next) => {
   }
 };
 
+const getMyPosts = async (req, res, next) => {
+  try {
+    const { id, search, sort, page, limit, filter } = req.query;
+
+    const data = await getMyPostsService({
+      id,
+      search,
+      sort,
+      page,
+      limit,
+      filter,
+    });
+
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const updatePost = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -89,4 +109,5 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
+  getMyPosts,
 };

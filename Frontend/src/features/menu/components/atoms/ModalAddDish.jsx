@@ -14,8 +14,6 @@ import { useRef, useState } from "react";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import useCreateDish from "../../../dish/hooks/useCreateDish";
 
-const MAX_IMAGES = 5; //Giới hạn 5 ảnh tải lên
-
 const ModalAddDish = ({
   isModalOpen,
   handleCancel,
@@ -24,9 +22,10 @@ const ModalAddDish = ({
   setIsModalOpen,
   menuData,
 }) => {
-  const [imageList, setImageList] = useState([]);
+  const [image, setImage] = useState(null);
   const formRef = useRef(null);
-  const [isImageError, setIsImageError] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const { mutate: createDish, isPending } = useCreateDish();
 
   const resetFormScroll = () => {
@@ -37,53 +36,43 @@ const ModalAddDish = ({
 
   const handleModalClose = () => {
     handleCancel();
-    setImageList([]);
-    setIsImageError(false);
-    resetFormScroll(); // Reset thanh cuộn khi đóng modal
+    setImage(null);
+    resetFormScroll();
   };
 
   const handleImageChange = ({ fileList }) => {
-    setImageList(fileList);
-    form.setFieldsValue({ dish_image: fileList });
-    setIsImageError(fileList.length === 0);
+    if (fileList.length > 0) {
+      const file = fileList[0];
+      file.preview = URL.createObjectURL(file.originFileObj);
+      setImage(file);
+    } else {
+      setImage(null); // Cho phép không có ảnh
+    }
+  };
+
+  const handlePreview = async () => {
+    setPreviewImage(image?.url || image?.preview);
+    setPreviewOpen(true);
   };
 
   const onFinish = async (values) => {
     try {
       await form.validateFields();
-      // console.log("Form values sau validate:", values);
-
-      if (imageList.length === 0) {
-        message.error("Vui lòng tải lên ít nhất 1 ảnh món!");
-        setIsImageError(true);
-        return;
-      }
 
       const formData = new FormData();
       formData.append("dish_name", values.dish_name || "");
       formData.append("dish_description", values.dish_description || "");
       formData.append("dish_price", values.dish_price || 0);
       formData.append("menu_id", menuData._id || "");
-
-      if (imageList.length > 0) {
-        imageList.forEach((file) => {
-          formData.append(`dish_url`, file.originFileObj);
-        });
-      } else {
-        console.warn("⚠ Không có ảnh nào được chọn!");
+      if (image) {
+        formData.append("dish_url", image.originFileObj); // Chỉ thêm nếu có ảnh
       }
-
-      // console.log("📜 FormData trước khi gửi:");
-      // for (let pair of formData.entries()) {
-      //   console.log(`${pair[0]}:`, pair[1]);
-      // }
 
       createDish(formData, {
         onSuccess: () => {
           message.success("Món đã được tạo thành công!");
           form.resetFields();
-          setImageList([]);
-          setIsImageError(false);
+          setImage(null);
           resetFormScroll();
           setIsModalOpen(false);
         },
@@ -105,9 +94,7 @@ const ModalAddDish = ({
       }
       open={isModalOpen}
       onOk={handleOk}
-      onCancel={() => {
-        handleModalClose();
-      }}
+      onCancel={handleModalClose}
       okText={isPending ? "Đang tạo..." : "Tạo"}
       cancelText="Hủy"
       maskClosable={false}
@@ -132,25 +119,13 @@ const ModalAddDish = ({
             initialValues={{ dish_price: 1000 }}
           >
             <Form.Item
+              label="Tên món:"
               name="dish_name"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập tên món!",
-                },
-              ]}
+              rules={[{ required: true, message: "Vui lòng nhập tên món!" }]}
             >
               <Input size="large" placeholder="Nhập tên món" />
             </Form.Item>
-            <Form.Item
-              name="dish_description"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập mô tả món!",
-                },
-              ]}
-            >
+            <Form.Item label="Mô tả món:" name="dish_description">
               <Input.TextArea
                 size="large"
                 placeholder="Nhập mô tả món"
@@ -158,16 +133,14 @@ const ModalAddDish = ({
               />
             </Form.Item>
             <Form.Item
+              label="Giá món:"
               name="dish_price"
               rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập giá món!",
-                },
+                { required: true, message: "Vui lòng nhập giá món!" },
                 {
                   type: "number",
                   min: 1000,
-                  message: "Giá món phải lớn hơn hoặc bằng 1000 VND!",
+                  message: "Giá món phải từ 1000 VND!",
                 },
               ]}
             >
@@ -184,48 +157,38 @@ const ModalAddDish = ({
                 parser={(value) => value?.replace(/\D/g, "")}
               />
             </Form.Item>
-
-            <div style={{ display: "flex" }}>
-              <p style={{ fontSize: 15, padding: 10 }}>Thêm ảnh món ăn:</p>
-              <Form.Item
-                name="dish_image"
-                // label="Thêm ảnh món"
-                valuePropName="fileList"
-                getValueFromEvent={(e) => e?.fileList}
-              >
+            <Form.Item name="dish_image" label="Thêm ảnh món ăn:">
+              <div>
                 <Upload
                   listType="picture-card"
-                  fileList={imageList}
+                  fileList={image ? [image] : []}
                   onChange={handleImageChange}
-                  beforeUpload={() => false} // Không upload lên server ngay
-                  multiple
-                  className={isImageError ? "upload-error" : ""}
+                  onPreview={handlePreview}
+                  beforeUpload={() => false}
                 >
-                  {imageList.length < MAX_IMAGES && ( // Ẩn nút khi đạt giới hạn ảnh
+                  {!image && (
                     <div>
                       <PlusOutlined />
-                      <p style={{ marginTop: 8, borderRadius: 5 }}>Thêm ảnh</p>
+                      <p style={{ marginTop: 8 }}>Thêm ảnh</p>
                     </div>
                   )}
                 </Upload>
-                {isImageError && (
-                  <span style={{ color: "red", fontSize: "14px" }}>
-                    Vui lòng tải lên ít nhất 1 ảnh!
-                  </span>
-                )}
-              </Form.Item>
-            </div>
+                <Modal
+                  open={previewOpen}
+                  footer={null}
+                  onCancel={() => setPreviewOpen(false)}
+                >
+                  <img
+                    alt="preview"
+                    style={{ width: "100%" }}
+                    src={previewImage}
+                  />
+                </Modal>
+              </div>
+            </Form.Item>
           </Form>
         </Col>
       </Row>
-      <style>
-        {`
-          .upload-error .ant-upload {
-            border: 1.5px solid red !important;
-            border-radius: 5px
-          }
-        `}
-      </style>
     </Modal>
   );
 };

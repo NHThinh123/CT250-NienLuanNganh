@@ -41,7 +41,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
         <Row>
           <Col span={2}></Col>
           <MenuProvider>
-            <Col span={4}>
+            <Col span={5}>
               <div style={{ marginRight: "20px", position: "sticky", top: 70 }}>
                 <MenuList menuData={menuData}></MenuList>
                 <div
@@ -56,10 +56,10 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               </div>
             </Col>
             <Col
-              span={10}
+              span={9}
               style={{
                 backgroundColor: "#ffffff",
-                padding: "6px 15px",
+                padding: 15,
                 borderRadius: "5px",
               }}
             >

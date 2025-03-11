@@ -7,8 +7,12 @@ import { BookUser, CircleDollarSign, Clock, MapPinHouse } from "lucide-react";
 import { useState } from "react";
 import ProfileBusinessPage from "../../../../pages/ProfileBusinessPage";
 
-
-const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) => {
+const BusinessDetail = ({
+  businessData,
+  isLoading,
+  isError,
+  canEdit = false,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái modal
 
   const formatPrice = (price) => {
@@ -46,8 +50,8 @@ const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) =
       )}
 
       <Row>
-        <Col span={3}></Col>
-        <Col span={9}>
+        <Col span={2}></Col>
+        <Col span={7}>
           <div style={styles.businessAva}>
             <img
               style={styles.businessImage}
@@ -56,7 +60,7 @@ const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) =
             />
           </div>
         </Col>
-        <Col span={9}>
+        <Col span={7}>
           <div style={styles.businessDetail}>
             <div style={styles.businessBreadcrumb}>
               <Breadcrumb
@@ -76,10 +80,16 @@ const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) =
                 initialRating={businessData.rating_average}
                 readonly
                 emptySymbol={
-                  <FontAwesomeIcon icon={regularStar} style={{ fontSize: 20, color: "#ccc" }} />
+                  <FontAwesomeIcon
+                    icon={regularStar}
+                    style={{ fontSize: 20, color: "#ccc" }}
+                  />
                 }
                 fullSymbol={
-                  <FontAwesomeIcon icon={solidStar} style={{ fontSize: 20, color: "#FFD700" }} />
+                  <FontAwesomeIcon
+                    icon={solidStar}
+                    style={{ fontSize: 20, color: "#FFD700" }}
+                  />
                 }
                 fractions={10}
                 quiet={true}
@@ -113,9 +123,11 @@ const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) =
             </div>
           </div>
         </Col>
-        <Col span={3}></Col>
+        <Col span={4}>
+          <div style={{ backgroundColor: "red" }}></div>
+        </Col>
+        <Col span={2}></Col>
       </Row>
-
 
       <Modal
         title="Chỉnh sửa thông tin doanh nghiệp"
@@ -124,7 +136,10 @@ const BusinessDetail = ({ businessData, isLoading, isError, canEdit = false }) =
         footer={null} // Tắt footer mặc định nếu không cần nút OK/Cancel mặc định
         width={800} // Tùy chỉnh kích thước modal
       >
-        <ProfileBusinessPage businessId={businessData.id} onClose={handleModalClose} />
+        <ProfileBusinessPage
+          businessId={businessData.id}
+          onClose={handleModalClose}
+        />
       </Modal>
     </div>
   );
@@ -144,6 +159,7 @@ const styles = {
   },
   businessAva: {
     margin: "18px 0px 25px 0px",
+    width: "90%",
   },
   businessImage: {
     width: "100%",
@@ -172,9 +188,8 @@ const styles = {
   },
   ratingText: {
     fontSize: "15px",
-    marginLeft: "6px",
+    margin: "0px 0px 0px 6px",
     fontWeight: "bold",
-    marginTop: "3px",
   },
   businessTime: {
     fontSize: "15px",

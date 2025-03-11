@@ -10,6 +10,7 @@ const CreateReview = ({ businessId }) => {
   const { auth } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
   const user_id = auth?.user?.id;
+  const business_id = business?.business?.id;
   const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
     useState(false);
   const [form] = Form.useForm();
@@ -36,7 +37,7 @@ const CreateReview = ({ businessId }) => {
 
   // Hành động được bảo vệ (yêu cầu đăng nhập)
   const handleAction = (action) => {
-    if (!user_id) {
+    if (!user_id && !business_id) {
       showLoginRequiredModal();
     } else {
       action();
@@ -45,7 +46,7 @@ const CreateReview = ({ businessId }) => {
 
   return (
     <>
-      {!business.isAuthenticated && (
+      {!(business.business.id == businessId) && (
         <Button
           type="link"
           onClick={() => handleAction(showModal)}

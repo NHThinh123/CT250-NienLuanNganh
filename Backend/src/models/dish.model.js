@@ -6,12 +6,11 @@ const dishSchema = new mongoose.Schema(
     dish_name: { type: String, require: true, trim: true },
     dish_description: {
       type: String,
-      minlength: 1,
-      maxlength: 1000,
+      maxlength: 2000,
       trim: true,
     },
     dish_price: { type: Number, require: true, min: 1000 },
-    dish_url: { type: [String], require: true },
+    dish_url: { type: String },
     menu_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Menu",

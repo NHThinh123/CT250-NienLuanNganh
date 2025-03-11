@@ -19,7 +19,9 @@ const createDishApi = (formData) => {
 
 const updateDishApi = (id, data) => {
   const URL_API = `/api/dishes/${id}`;
-  return axios.put(URL_API, data);
+  return axios.put(URL_API, data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 
 const deleteDishApi = (id) => {
