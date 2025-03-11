@@ -148,7 +148,7 @@ const BusinessDetail = ({
 const styles = {
   businessPage: {
     backgroundColor: "#ffffff",
-    padding: "20px",
+    padding: "20px 0px",
     position: "relative",
   },
   editButtonContainer: {
