@@ -1,14 +1,18 @@
 import { List, Row, Col, Button } from "antd";
 import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 import DeleteDish from "../../../dish/components/templates/DeleteDish";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { SquarePlus } from "lucide-react";
 import UpdateDish from "./UpdateDish";
+import { BusinessContext } from "../../../../contexts/business.context";
 
 const DisplayDishesByMenu = ({ menuId, businessId }) => {
   const { dishData } = useDishByMenuId(menuId);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAllDishes, setShowAllDishes] = useState(false);
+  const { business } = useContext(BusinessContext);
+  const isBusinessOwner =
+    business.isAuthenticated && business.business.id == businessId;
   const MAX_LENGTH = 150; // Giới hạn số ký tự mô tả
   const MAX_VISIBLE_DISHES = 4; // Giới hạn số món ăn hiển thị ban đầu
 
@@ -43,7 +47,7 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
                       alt="Ảnh"
                     />
                   </Col>
-                  <Col span={14} style={{ padding: 0 }}>
+                  <Col span={isBusinessOwner ? 13 : 15} style={{ padding: 0 }}>
                     <Row>
                       <div
                         style={{
@@ -80,7 +84,7 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
                       </div>
                     </Row>
                   </Col>
-                  <Col span={5}>
+                  <Col span={isBusinessOwner ? 5 : 5}>
                     <div
                       style={{
                         fontSize: "16px",
@@ -97,31 +101,38 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
                       {formatPrice(dish.dish_price)}đ
                     </div>
                   </Col>
-                  <Col span={1}>
-                    <div
-                      style={{
-                        display: "grid",
-                        placeItems: "center",
-                        height: "100%",
-                      }}
-                    >
+                  {isBusinessOwner && (
+                    <Col span={2}>
                       <div
                         style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 7, // Khoảng cách giữa các nút
-                          alignItems: "center",
+                          display: "grid",
+                          placeItems: "center",
+                          height: "100%",
+                          width: "100%",
                         }}
                       >
-                        <UpdateDish dishId={dish._id} businessId={businessId} />
-                        <DeleteDish
-                          dishName={dish.dish_name}
-                          dishId={dish._id}
-                          businessId={businessId}
-                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 4,
+                            alignItems: "center",
+                          }}
+                        >
+                          <div>
+                            <UpdateDish
+                              dishId={dish._id}
+                              businessId={businessId}
+                            />
+                          </div>
+                          <DeleteDish
+                            dishName={dish.dish_name}
+                            dishId={dish._id}
+                            businessId={businessId}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </Col>
+                    </Col>
+                  )}
                 </Row>
                 <hr
                   style={{

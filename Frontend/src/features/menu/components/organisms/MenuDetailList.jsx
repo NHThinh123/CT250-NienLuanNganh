@@ -32,6 +32,7 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
                           color: "#6D6f71",
                           fontSize: "15px",
                           paddingBottom: "18px",
+                          fontWeight: "bold",
                         }}
                       >
                         {capitalizeMenuName(menu.menu_name)}
