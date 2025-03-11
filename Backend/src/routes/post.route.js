@@ -15,7 +15,7 @@ const router = express.Router();
 router.get("/", getListPost);
 router.get("/my-posts", getMyPosts);
 router.get("/detail/:id", getPostById);
-router.post("/create", uploadPost.array("images", 5), createPost);
+router.post("/create", uploadPost.array("media", 5), createPost);
 router.put("/:id", updatePost);
 router.delete("/:id", deletePost);
 

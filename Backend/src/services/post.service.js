@@ -78,7 +78,7 @@ const getListPostService = async ({
         from: "assets",
         localField: "_id",
         foreignField: "post_id",
-        as: "images",
+        as: "media",
       },
     },
     {
@@ -138,7 +138,7 @@ const getListPostService = async ({
       content: { $first: "$content" },
       createdAt: { $first: "$createdAt" },
       updatedAt: { $first: "$updatedAt" },
-      images: { $first: "$images" },
+      media: { $first: "$media" },
       tags: { $first: "$tags" },
       likes: { $first: "$likes" },
       comments: { $first: "$comments" },
@@ -206,7 +206,7 @@ const getListPostService = async ({
       content: 1,
       createdAt: 1,
       updatedAt: 1,
-      images: 1,
+      media: 1,
       tags: 1,
       likeCount: 1,
       commentCount: 1,
@@ -270,8 +270,6 @@ const getMyPostsService = async ({
   limit = 10,
   filter = {}, // Thêm mặc định để tránh undefined
 }) => {
-  console.log("Params received:", { id, search, sort, page, limit, filter });
-
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new AppError("Invalid user ID", 400);
   }
@@ -337,7 +335,7 @@ const getPostByIdService = async (post_id, id) => {
         from: "assets",
         localField: "_id",
         foreignField: "post_id",
-        as: "images",
+        as: "media",
       },
     },
     {
@@ -415,7 +413,7 @@ const getPostByIdService = async (post_id, id) => {
         content: 1,
         createdAt: 1,
         updatedAt: 1,
-        images: 1,
+        media: 1,
         tags: 1,
         likeCount: 1,
         commentCount: 1,
@@ -450,6 +448,7 @@ const createPostService = async (id, title, content, tags, files) => {
     throw new AppError("ID does not belong to any user or business", 404);
   }
 
+  // Tạo bài viết mới
   let result = await Post.create({
     user_id: user ? objectId : null,
     business_id: business ? objectId : null,
@@ -457,15 +456,26 @@ const createPostService = async (id, title, content, tags, files) => {
     content: content,
   });
 
+  // Xử lý files (ảnh và video) từ Cloudinary
   if (files && files.length > 0) {
-    const imageDocs = files.map((file) => ({
-      post_id: result._id,
-      type: "image",
-      url: file.path,
-    }));
-    await Asset.insertMany(imageDocs);
-  }
+    const mediaDocs = files.map((file) => {
+      let type;
+      if (file.mimetype.startsWith("image/")) {
+        type = "image";
+      } else if (file.mimetype.startsWith("video/")) {
+        type = "video";
+      } else {
+        throw new AppError("Unsupported file type", 400);
+      }
 
+      return {
+        post_id: result._id,
+        type: type,
+        url: file.path,
+      };
+    });
+    await Asset.insertMany(mediaDocs);
+  }
   // Xử lý tags
   if (tags && tags.length > 0) {
     for (const tag_name of tags) {
@@ -492,7 +502,9 @@ const createPostService = async (id, title, content, tags, files) => {
     }
   }
 
-  return result;
+  // Trả về thông tin bài viết đầy đủ (bao gồm media và tags)
+  const fullPost = await getPostByIdService(result._id.toString(), id);
+  return fullPost;
 };
 
 const updatePostService = async (id, dataUpdate) => {

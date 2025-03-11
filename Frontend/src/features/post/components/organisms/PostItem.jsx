@@ -3,10 +3,10 @@ import BoxContainer from "../../../../components/atoms/BoxContainer";
 import PostHeader from "../molecules/PostHeader";
 import PostBody from "../molecules/PostBody";
 import PostFooter from "../molecules/PostFooter";
-import PostImages from "../molecules/PostImages";
 
 import CommentModal from "../../../comment/components/templates/CommentModal";
 import { useState } from "react";
+import PostMedia from "../molecules/PostMedia";
 
 const PostItem = ({ postData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,8 +22,8 @@ const PostItem = ({ postData }) => {
         createAt={postData.createdAt}
       ></PostHeader>
       <PostBody postData={postData}></PostBody>
-      {postData?.images.length > 0 && (
-        <PostImages imagesData={postData?.images}></PostImages>
+      {postData?.media.length > 0 && (
+        <PostMedia mediaData={postData?.media}></PostMedia>
       )}
       <PostFooter
         postData={postData}

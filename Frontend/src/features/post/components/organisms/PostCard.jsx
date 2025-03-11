@@ -9,6 +9,50 @@ import {
 import { Link } from "react-router-dom";
 
 const PostCard = ({ post }) => {
+  // Hàm render media (ảnh hoặc video)
+  const renderMedia = () => {
+    const firstMedia = post.media?.[0];
+    if (!firstMedia) {
+      return (
+        <img
+          src={logo}
+          alt="Fallback"
+          style={{ maxWidth: 400, objectFit: "cover" }}
+        />
+      );
+    }
+
+    if (firstMedia.type === "image") {
+      return (
+        <img
+          src={firstMedia.url}
+          alt={post.title}
+          style={{ maxWidth: 400, objectFit: "cover" }}
+          onContextMenu={(e) => e.preventDefault()}
+          draggable="false"
+        />
+      );
+    } else if (firstMedia.type === "video") {
+      return (
+        <video
+          src={firstMedia.url}
+          muted
+          autoPlay={false}
+          style={{ maxWidth: 400, objectFit: "cover" }}
+          onContextMenu={(e) => e.preventDefault()}
+          draggable="false"
+        />
+      );
+    }
+    return (
+      <img
+        src={logo}
+        alt="Fallback"
+        style={{ maxWidth: 400, objectFit: "cover" }}
+      />
+    );
+  };
+
   return (
     <Link
       to={`/posts/${post._id}`}
@@ -25,23 +69,21 @@ const PostCard = ({ post }) => {
               marginRight: "32px",
             }}
           >
-            <img
-              src={post.images[0]?.url ? post.images[0].url : logo}
-              alt=""
-              style={{ maxWidth: 400 }}
-            />
+            {renderMedia()}
           </Col>
           <Col span={14}>
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-
                 height: "100%",
+                justifyContent: "space-between", // Cải thiện layout
               }}
             >
               <div>
-                <h1 style={{ marginBottom: 4 }}>{post.title}</h1>
+                <h1 style={{ marginBottom: 4, fontSize: "1.5em" }}>
+                  {post.title}
+                </h1>
                 <Col span={24} style={{ marginBottom: "8px" }}>
                   {post?.tags?.length > 0 &&
                     post.tags.map((tag) => (
@@ -54,7 +96,7 @@ const PostCard = ({ post }) => {
                   style={{
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
-                    WebkitLineClamp: 4, // Giới hạn tối đa 4 dòng
+                    WebkitLineClamp: 4,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     lineHeight: "1.5em",
@@ -78,10 +120,9 @@ const PostCard = ({ post }) => {
                       "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
                     }
                     size={20}
-                  ></Avatar>
+                  />
                   <p style={{ marginBottom: "0" }}>
                     {post.author?.name}
-
                     {post?.business_id && (
                       <Link
                         style={{ fontSize: 14, marginLeft: 8 }}
