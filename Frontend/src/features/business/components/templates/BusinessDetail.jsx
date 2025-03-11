@@ -50,8 +50,8 @@ const BusinessDetail = ({
       )}
 
       <Row>
-        <Col span={3}></Col>
-        <Col span={9}>
+        <Col span={2}></Col>
+        <Col span={7}>
           <div style={styles.businessAva}>
             <img
               style={styles.businessImage}
@@ -60,7 +60,7 @@ const BusinessDetail = ({
             />
           </div>
         </Col>
-        <Col span={9}>
+        <Col span={7}>
           <div style={styles.businessDetail}>
             <div style={styles.businessBreadcrumb}>
               <Breadcrumb
@@ -123,7 +123,10 @@ const BusinessDetail = ({
             </div>
           </div>
         </Col>
-        <Col span={3}></Col>
+        <Col span={4}>
+          <div style={{ backgroundColor: "red" }}></div>
+        </Col>
+        <Col span={2}></Col>
       </Row>
 
       <Modal
@@ -156,6 +159,7 @@ const styles = {
   },
   businessAva: {
     margin: "18px 0px 25px 0px",
+    width: "90%",
   },
   businessImage: {
     width: "100%",
