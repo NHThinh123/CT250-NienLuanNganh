@@ -42,8 +42,7 @@ const getBusinessById = async (req, res, next) => {
 const updateBusiness = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { business_name, close_hours, open_hours, contact_info, location } =
-      req.body;
+    const { business_name, close_hours, open_hours, contact_info, location, address } = req.body;
     let updateData = {};
 
     // Tìm doanh nghiệp trước khi cập nhật
@@ -58,6 +57,7 @@ const updateBusiness = async (req, res, next) => {
     if (close_hours) updateData.close_hours = close_hours;
     if (contact_info) updateData.contact_info = contact_info;
     if (location) updateData.location = location;
+    if (address) updateData.address = address;
 
     // Nếu có file ảnh mới => upload lên Cloudinary
     if (req.file) {
@@ -78,9 +78,7 @@ const updateBusiness = async (req, res, next) => {
 
     // Kiểm tra nếu không có dữ liệu nào để cập nhật
     if (Object.keys(updateData).length === 0) {
-      return res
-        .status(400)
-        .json({ error: "Không có dữ liệu nào để cập nhật!" });
+      return res.status(400).json({ error: "Không có dữ liệu nào để cập nhật!" });
     }
 
     // Cập nhật thông tin business
@@ -94,6 +92,10 @@ const updateBusiness = async (req, res, next) => {
       return res.status(500).json({ error: "Cập nhật thông tin thất bại!" });
     }
 
+    // Gửi thông báo qua WebSocket
+    const notifyClients = req.app.get("notifyClients");
+    notifyClients(id);
+
     // Trả về thông tin business sau khi cập nhật
     res.status(200).json({
       message: "Cập nhật thông tin thành công",
@@ -103,6 +105,7 @@ const updateBusiness = async (req, res, next) => {
         email: updatedBusiness.email,
         contact_info: updatedBusiness.contact_info,
         location: updatedBusiness.location,
+        address: updatedBusiness.address,
         avatar: updatedBusiness.avatar,
         open_hours: updatedBusiness.open_hours,
         close_hours: updatedBusiness.close_hours,
@@ -113,6 +116,7 @@ const updateBusiness = async (req, res, next) => {
     res.status(500).json({ error: "Lỗi server. Vui lòng thử lại!" });
   }
 };
+
 
 // Signup
 const signupBusiness = async (req, res, next) => {
@@ -126,6 +130,19 @@ const signupBusiness = async (req, res, next) => {
       email,
       password,
     } = req.body;
+
+    // Phân tích chuỗi address thành đối tượng
+    const address = JSON.parse(req.body.address);
+
+    // Kiểm tra các trường bắt buộc
+    if (!business_name || !open_hours || !close_hours || !location || !address || !contact_info || !email || !password) {
+      return res.status(400).json({ message: "Vui lòng cung cấp đầy đủ thông tin bắt buộc!" });
+    }
+
+    // Kiểm tra định dạng address
+    if (!address.type || !address.coordinates || !Array.isArray(address.coordinates) || address.coordinates.length !== 2) {
+      return res.status(400).json({ message: "Dữ liệu vị trí (location) không hợp lệ!" });
+    }
 
     const existingBusiness = await Business.findOne({ email });
     if (existingBusiness) {
@@ -143,6 +160,10 @@ const signupBusiness = async (req, res, next) => {
       business_name,
       open_hours,
       close_hours,
+      address: {
+        type: address.type || "Point", // Đảm bảo type là "Point"
+        coordinates: [parseFloat(address.coordinates[0]), parseFloat(address.coordinates[1])], // Chuyển thành số
+      },
       location,
       contact_info,
       email,
@@ -152,17 +173,18 @@ const signupBusiness = async (req, res, next) => {
     });
 
     await newBusiness.save();
-    await sendBusinessVerificationEmail(newBusiness)
+    await sendBusinessVerificationEmail(newBusiness);
+
     res.status(201).json({
       status: "PENDING",
-      message:
-        "Tài khoản đã được tạo! Vui lòng hoàn tất thanh toán để kích hoạt.",
+      message: "Tài khoản đã được tạo! Vui lòng hoàn tất thanh toán để kích hoạt.",
       business: {
         id: newBusiness._id,
         business_name: newBusiness.business_name,
         email: newBusiness.email,
         contact_info: newBusiness.contact_info,
         location: newBusiness.location,
+        address: newBusiness.address,
         avatar: newBusiness.avatar,
         open_hours: newBusiness.open_hours,
         close_hours: newBusiness.close_hours,
@@ -170,6 +192,7 @@ const signupBusiness = async (req, res, next) => {
       redirectTo: `/payment/activation/${newBusiness._id}`,
     });
   } catch (error) {
+    console.error("Error in signupBusiness:", error);
     res.status(500).json({ message: error.message });
   }
 };
