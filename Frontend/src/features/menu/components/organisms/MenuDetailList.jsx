@@ -3,16 +3,42 @@ import DisplayDishesByMenu from "../molecules/DisplayDishesByMenu";
 import { useContext } from "react";
 import { MenuContext } from "../molecules/MenuContext";
 import AddDish from "../molecules/AddDish";
+import BoxContainer from "../../../../components/atoms/BoxContainer";
+import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 
-const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
+// Hàm chuyển đổi chuỗi thành dạng không dấu
+const removeAccents = (str) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+};
+
+const MenuDetailList = ({ menuData, capitalizeMenuName, searchKeyword }) => {
   const { menuRefs } = useContext(MenuContext);
 
+  // Lọc các menu có món ăn khớp với từ khóa tìm kiếm không dấu
+  const filteredMenuData = menuData.filter((menu) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { dishData } = useDishByMenuId(menu._id);
+    return dishData.some(
+      (dish) =>
+        removeAccents(dish.dish_name.toLowerCase()).includes(
+          removeAccents(searchKeyword.toLowerCase())
+        ) ||
+        removeAccents(dish.dish_description.toLowerCase()).includes(
+          removeAccents(searchKeyword.toLowerCase())
+        )
+    );
+  });
+
   return (
-    <>
-      {menuData.length > 0 ? (
+    <BoxContainer>
+      {filteredMenuData.length > 0 ? (
         <List
           grid={{ gutter: 16, column: 1 }}
-          dataSource={menuData}
+          dataSource={filteredMenuData}
           renderItem={(menu) => (
             <List.Item>
               <div
@@ -48,6 +74,7 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
                 <DisplayDishesByMenu
                   menuId={menu._id}
                   businessId={menuData[0]?.business_id}
+                  searchKeyword={searchKeyword}
                 />
               </div>
             </List.Item>
@@ -63,10 +90,23 @@ const MenuDetailList = ({ menuData, capitalizeMenuName }) => {
             display: "flex",
           }}
         >
-          Chưa có thực đơn! Vui lòng thêm thực đơn!
+          Không tìm thấy món nào!
         </div>
       )}
-    </>
+      {menuData.length <= 0 && (
+        <div
+          style={{
+            placeContent: "center",
+            padding: "20px",
+            fontSize: "16px",
+            color: "#888",
+            display: "flex",
+          }}
+        >
+          Chưa có menu nào! Vui lòng thêm menu!
+        </div>
+      )}
+    </BoxContainer>
   );
 };
 

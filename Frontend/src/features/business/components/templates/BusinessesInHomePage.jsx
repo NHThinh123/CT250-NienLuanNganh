@@ -3,6 +3,7 @@ import { Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const BusinessInHomePage = ({ businessData }) => {
+  console.log("business data", businessData);
   const navigate = useNavigate();
   const maxTitleLength = 20;
   const maxDescriptionLength = 30;
@@ -14,7 +15,15 @@ const BusinessInHomePage = ({ businessData }) => {
   return (
     <Row gutter={[16, 16]}>
       {businessData.slice(0, 8).map((business) => (
-        <Col key={business._id} xs={24} sm={12} md={8} lg={6} xl={6} style={{ padding: "10px" }}>
+        <Col
+          key={business._id}
+          xs={24}
+          sm={12}
+          md={8}
+          lg={6}
+          xl={6}
+          style={{ padding: "10px" }}
+        >
           <Card
             hoverable
             cover={
@@ -34,14 +43,24 @@ const BusinessInHomePage = ({ businessData }) => {
               }
               style={{ marginBottom: 8 }}
             />
-            <p style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <p
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {(business.location?.length || 0) > maxDescriptionLength
                 ? business.location.slice(0, maxDescriptionLength) + "..."
                 : business.location || "No Address"}
             </p>
             <p>
-              <Clock size={17} style={{ marginRight: "8px", marginBottom: "-3px" }} />
-              {business.open_hours || "00:00"} - {business.close_hours || "00:00"}
+              <Clock
+                size={17}
+                style={{ marginRight: "8px", marginBottom: "-3px" }}
+              />
+              {business.open_hours || "00:00"} -{" "}
+              {business.close_hours || "00:00"}
             </p>
           </Card>
         </Col>
@@ -49,7 +68,5 @@ const BusinessInHomePage = ({ businessData }) => {
     </Row>
   );
 };
-
-
 
 export default BusinessInHomePage;

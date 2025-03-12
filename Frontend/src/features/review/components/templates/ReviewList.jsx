@@ -1,12 +1,13 @@
 import { Avatar, List, Rate, Typography } from "antd";
 import { formatTime } from "../../../../constants/formatTime";
+import BoxContainer from "../../../../components/atoms/BoxContainer";
 
 const ReviewList = ({ reviewData }) => {
   return (
-    <>
+    <BoxContainer>
       {reviewData.length > 0 ? (
         <List
-          style={{ padding: "20px 10px 0px 10px", justifyContent: "center" }}
+          style={{ padding: 10, justifyContent: "center" }}
           grid={{ gutter: 16, column: 1 }}
           pagination={{
             size: "large",
@@ -65,7 +66,7 @@ const ReviewList = ({ reviewData }) => {
           Chưa có đánh giá!
         </div>
       )}
-    </>
+    </BoxContainer>
   );
 };
 

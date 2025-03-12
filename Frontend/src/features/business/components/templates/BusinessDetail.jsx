@@ -1,9 +1,27 @@
-import { Breadcrumb, Col, Row, Button, Modal, Card, Typography, Tag, Space } from "antd"; // Thêm Card, Typography, Tag, Space
+import {
+  Breadcrumb,
+  Col,
+  Row,
+  Button,
+  Modal,
+  Card,
+  Typography,
+  Tag,
+  Space,
+} from "antd"; // Thêm Card, Typography, Tag, Space
 import Rating from "react-rating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
-import { BookUser, CircleDollarSign, Clock, MapPinHouse, DollarSign, Store, BadgeDollarSign } from "lucide-react"; // Thêm DollarSign
+import {
+  BookUser,
+  CircleDollarSign,
+  Clock,
+  MapPinHouse,
+  DollarSign,
+  Store,
+  BadgeDollarSign,
+} from "lucide-react"; // Thêm DollarSign
 import { useState, useEffect, useRef } from "react";
 import ProfileBusinessPage from "../../../../pages/ProfileBusinessPage";
 import { Map as ReactMapGL, Marker } from "react-map-gl";
@@ -13,7 +31,12 @@ import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
 
 const { Title, Text } = Typography;
 
-const CustomMarker = ({ longitude = 0, latitude = 0, color = "red", ...props }) => (
+const CustomMarker = ({
+  longitude = 0,
+  latitude = 0,
+  color = "red",
+  ...props
+}) => (
   <Marker longitude={longitude} latitude={latitude} color={color} {...props} />
 );
 
@@ -45,7 +68,8 @@ const BusinessDetail = ({
   };
 
   const getPaymentStatus = () => {
-    if (!businessData.nextPaymentDueDate) return { text: "Chưa kích hoạt", color: "orange" };
+    if (!businessData.nextPaymentDueDate)
+      return { text: "Chưa kích hoạt", color: "orange" };
     const today = new Date();
     const dueDate = new Date(businessData.nextPaymentDueDate);
     return today > dueDate
@@ -82,7 +106,12 @@ const BusinessDetail = ({
   const mapboxToken = import.meta.env.VITE_TOKENMAPBOX;
 
   useEffect(() => {
-    if (!mapRef.current || !mapboxToken || isNaN(longitude) || isNaN(latitude)) {
+    if (
+      !mapRef.current ||
+      !mapboxToken ||
+      isNaN(longitude) ||
+      isNaN(latitude)
+    ) {
       console.error("Cannot initialize directions:", {
         map: !!mapRef.current,
         token: !!mapboxToken,
@@ -123,7 +152,11 @@ const BusinessDetail = ({
     <div style={styles.businessPage}>
       {canEdit && (
         <div style={styles.editButtonContainer}>
-          <Button type="primary" onClick={handleEdit} style={{ marginBottom: "10px" }}>
+          <Button
+            type="primary"
+            onClick={handleEdit}
+            style={{ marginBottom: "10px" }}
+          >
             Chỉnh sửa thông tin
           </Button>
           <Button type="primary" onClick={handlePaymentStatus}>
@@ -150,7 +183,7 @@ const BusinessDetail = ({
               <Breadcrumb
                 separator=">"
                 items={[
-                  { title: "Trang chủ" },
+                  { title: "Trang chủ", href: "/" },
                   { title: "Quán ăn", href: "/businesses" },
                   { title: `${businessData.business_name}` },
                 ]}
@@ -230,11 +263,16 @@ const BusinessDetail = ({
                 doubleClickZoom={false}
                 dragPan={true}
               >
-                <CustomMarker longitude={longitude} latitude={latitude} color="red" />
+                <CustomMarker
+                  longitude={longitude}
+                  latitude={latitude}
+                  color="red"
+                />
               </ReactMapGL>
             ) : (
               <p style={styles.errorText}>
-                Không thể hiển thị bản đồ: {mapboxToken ? "Tọa độ không hợp lệ" : "Thiếu Mapbox token"}
+                Không thể hiển thị bản đồ:{" "}
+                {mapboxToken ? "Tọa độ không hợp lệ" : "Thiếu Mapbox token"}
               </p>
             )}
           </div>
@@ -276,32 +314,110 @@ const BusinessDetail = ({
           }}
         >
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <Text strong style={{ fontSize: "16px", color: "#555", display: "flex", alignItems: "center" }}>
-                <Store color="#52c41a" strokeWidth={1.5} size={18} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text
+                strong
+                style={{
+                  fontSize: "16px",
+                  color: "#555",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Store
+                  color="#52c41a"
+                  strokeWidth={1.5}
+                  size={18}
+                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                />
                 Doanh nghiệp ẩm thực
               </Text>
-              <Text style={{ fontSize: "16px", color: "#333", lineHeight: "18px", fontWeight: "bolder" }}>
+              <Text
+                style={{
+                  fontSize: "16px",
+                  color: "#333",
+                  lineHeight: "18px",
+                  fontWeight: "bolder",
+                }}
+              >
                 {businessData.business_name}
               </Text>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <Text strong style={{ fontSize: "16px", color: "#555", display: "flex", alignItems: "center" }}>
-                <BadgeDollarSign color="#52c41a" strokeWidth={1.5} size={18} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text
+                strong
+                style={{
+                  fontSize: "16px",
+                  color: "#555",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <BadgeDollarSign
+                  color="#52c41a"
+                  strokeWidth={1.5}
+                  size={18}
+                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                />
                 Ngày thanh toán gần nhất
               </Text>
-              <Text style={{ fontSize: "16px", color: "#333", lineHeight: "18px", fontWeight: "bolder" }}>
+              <Text
+                style={{
+                  fontSize: "16px",
+                  color: "#333",
+                  lineHeight: "18px",
+                  fontWeight: "bolder",
+                }}
+              >
                 {formatDate(businessData.lastPaymentDate)}
               </Text>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <Text strong style={{ fontSize: "16px", color: "#555", display: "flex", alignItems: "center" }}>
-                <BadgeDollarSign color="#52c41a" strokeWidth={1.5} size={18} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text
+                strong
+                style={{
+                  fontSize: "16px",
+                  color: "#555",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <BadgeDollarSign
+                  color="#52c41a"
+                  strokeWidth={1.5}
+                  size={18}
+                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                />
                 Ngày thanh toán tiếp theo
               </Text>
-              <Text style={{ fontSize: "16px", color: "#333", lineHeight: "18px", fontWeight: "bolder" }}>
+              <Text
+                style={{
+                  fontSize: "16px",
+                  color: "#333",
+                  lineHeight: "18px",
+                  fontWeight: "bolder",
+                }}
+              >
                 {formatDate(businessData.nextPaymentDueDate)}
               </Text>
             </div>
@@ -315,7 +431,7 @@ const BusinessDetail = ({
 const styles = {
   businessPage: {
     backgroundColor: "#ffffff",
-    padding: "20px",
+    padding: "20px 0px",
     position: "relative",
   },
   editButtonContainer: {
@@ -329,7 +445,7 @@ const styles = {
   },
   businessAva: {
     margin: "18px 0px 25px 0px",
-    width: "90%",
+    width: "95%",
   },
   businessImage: {
     width: "100%",
@@ -340,6 +456,7 @@ const styles = {
   },
   businessDetail: {
     margin: "0px",
+    width: "95%",
   },
   businessBreadcrumb: {
     marginBottom: "7px",

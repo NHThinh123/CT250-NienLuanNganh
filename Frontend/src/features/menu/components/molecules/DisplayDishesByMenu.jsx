@@ -6,7 +6,15 @@ import { SquarePlus } from "lucide-react";
 import UpdateDish from "./UpdateDish";
 import { BusinessContext } from "../../../../contexts/business.context";
 
-const DisplayDishesByMenu = ({ menuId, businessId }) => {
+const removeAccents = (str) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+};
+
+const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
   const { dishData } = useDishByMenuId(menuId);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAllDishes, setShowAllDishes] = useState(false);
@@ -25,10 +33,26 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
     return price.toLocaleString("vi-VN");
   };
 
+  // Lọc món ăn dựa trên từ khóa tìm kiếm không dấu
+  const filteredDishes = dishData.filter(
+    (dish) =>
+      removeAccents(dish.dish_name.toLowerCase()).includes(
+        removeAccents(searchKeyword.toLowerCase())
+      ) ||
+      removeAccents(dish.dish_description.toLowerCase()).includes(
+        removeAccents(searchKeyword.toLowerCase())
+      )
+  );
+
   // Danh sách món ăn hiển thị
   const visibleDishes = showAllDishes
-    ? dishData
-    : dishData.slice(0, MAX_VISIBLE_DISHES);
+    ? filteredDishes
+    : filteredDishes.slice(0, MAX_VISIBLE_DISHES);
+
+  // Nếu không có món ăn nào khớp với từ khóa tìm kiếm, không hiển thị menu
+  if (filteredDishes.length === 0) {
+    return null;
+  }
 
   return (
     <>
@@ -38,7 +62,7 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
             grid={{ gutter: 16, column: 1 }}
             dataSource={visibleDishes}
             renderItem={(dish) => (
-              <List.Item styles={{ paddingRight: 0 }}>
+              <List.Item styles={{ paddingRight: 0, boderRadius: 8 }}>
                 <Row style={{ padding: 0 }}>
                   <Col span={4}>
                     <img
@@ -145,17 +169,6 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
               </List.Item>
             )}
           />
-          {dishData.length > MAX_VISIBLE_DISHES && (
-            <div style={{ textAlign: "center", marginTop: "10px" }}>
-              <Button
-                type="link"
-                onClick={() => setShowAllDishes(!showAllDishes)}
-                style={{ fontSize: "14px", color: "#1890ff" }}
-              >
-                {showAllDishes ? "Ẩn bớt món" : "Xem thêm món..."}
-              </Button>
-            </div>
-          )}
         </>
       ) : (
         <div
@@ -169,6 +182,17 @@ const DisplayDishesByMenu = ({ menuId, businessId }) => {
         >
           Chưa có món! Vui lòng nhấn vào nút <SquarePlus strokeWidth={1} /> để
           thêm!
+        </div>
+      )}
+      {filteredDishes.length > MAX_VISIBLE_DISHES && (
+        <div style={{ textAlign: "center" }}>
+          <Button
+            type="link"
+            onClick={() => setShowAllDishes(!showAllDishes)}
+            style={{ fontSize: "14px", color: "#1890ff" }}
+          >
+            {showAllDishes ? "Ẩn bớt món" : "Xem thêm món..."}
+          </Button>
         </div>
       )}
     </>

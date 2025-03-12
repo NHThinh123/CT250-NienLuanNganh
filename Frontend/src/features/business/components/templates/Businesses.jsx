@@ -32,7 +32,7 @@ const Business = ({ businessData }) => {
                   borderTopRightRadius: "8px",
                 }}
                 alt="business avatar"
-                src={business.avatar}
+                src={business.avatar || "N/A"}
               />
             }
             onClick={() => navigate(`/businesses/${business._id}`)}
@@ -56,7 +56,7 @@ const Business = ({ businessData }) => {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {business.business_name}
+                    {business.business_name || "N/A"}
                   </span>
                 }
               />
@@ -70,7 +70,7 @@ const Business = ({ businessData }) => {
                   marginTop: 8,
                 }}
               >
-                {business.location}
+                {business.location || "N/A"}
               </div>
             </div>
             <p
@@ -81,7 +81,7 @@ const Business = ({ businessData }) => {
               }}
             >
               <Clock size={17} style={{ marginRight: "8px" }} />
-              {business.open_hours} - {business.close_hours}
+              {business.open_hours || "N/A"} - {business.close_hours || "N/A"}
             </p>
           </Card>
         </Col>
