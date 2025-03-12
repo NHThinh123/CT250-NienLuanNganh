@@ -13,7 +13,7 @@ const SubscriptionPlansPage = () => {
     const location = useLocation();
     const [selectedPlan, setSelectedPlan] = useState("monthly");
 
-    const { email, businessName } = location.state || {};
+    const { email, businessName, fromBusinessDetail } = location.state || {};
 
     const handlePlanChange = (plan) => {
         setSelectedPlan(plan);
@@ -21,10 +21,9 @@ const SubscriptionPlansPage = () => {
 
     const handleUpgrade = () => {
         const amount = selectedPlan === "monthly" ? 50 : 500;
-        const planType = selectedPlan; // "monthly" hoặc "yearly"
-        console.log("Navigating with data:", { businessId, amount, planType, email, businessName });
+        const planType = selectedPlan;
         navigate(`/payment/activation/${businessId}`, {
-            state: { amount, planType, email, businessName },
+            state: { amount, planType, email, businessName, businessId, fromBusinessDetail },
         });
     };
 
@@ -44,7 +43,7 @@ const SubscriptionPlansPage = () => {
                     }}
                 >
                     <Title level={2} style={{ textAlign: "center" }}>
-                        Kích hoạt tài khoản của bạn
+                        {fromBusinessDetail ? "Gia hạn tài khoản" : "Kích hoạt tài khoản của bạn"}
                     </Title>
                     <FeaturesList />
                     <BillingInfo />

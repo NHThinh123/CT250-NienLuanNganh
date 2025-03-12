@@ -15,7 +15,7 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
 
     // Trạng thái để lưu tọa độ từ bản đồ
     const [coordinates, setCoordinates] = useState(
-        business.address?.coordinates || [106.6297, 10.8231] // Tọa độ mặc định (TP.HCM)
+        business.address?.coordinates || [106.6297, 10.8231]
     );
     const [longitude, latitude] = coordinates;
 

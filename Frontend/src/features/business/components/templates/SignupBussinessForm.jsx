@@ -168,7 +168,7 @@ const SignupBusinessForm = () => {
         const formData = new FormData();
         formData.append("business_name", values.businessName);
         formData.append("email", values.email);
-        formData.append("location", values.location); // Gửi address từ dropdown hoặc bản đồ
+        formData.append("location", values.location);
         formData.append("address", JSON.stringify({ type: "Point", coordinates: mapAddress.coordinates }));
         formData.append("contact_info", values.contactInfo);
         formData.append("open_hours", dayjs(values.openHours).format("HH:mm"));

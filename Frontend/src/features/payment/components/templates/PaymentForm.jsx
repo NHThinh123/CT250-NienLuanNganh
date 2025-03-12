@@ -1,392 +1,124 @@
-// features/payment/components/PaymentForm.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Col, Button, Alert, Typography, Spin } from "antd";
-import {
-    CardNumberElement,
-    CardExpiryElement,
-    CardCvcElement,
-    useStripe,
-    useElements,
-} from "@stripe/react-stripe-js";
-import { usePayment } from "../../hooks/usePayment";
-import {
-    CreditCardOutlined,
-    LockOutlined,
-    InfoCircleOutlined,
-    MailOutlined,
-    ShopOutlined,
-    CheckCircleOutlined,
-} from "@ant-design/icons";
+import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import axios from "../../../../services/axios.customize"
+import { Button, Form, Typography } from "antd";
 
-const { Text } = Typography;
+const { Title } = Typography;
 
-const PaymentForm = ({ businessId, amount, email, businessName, planType }) => {
+const PaymentForm = ({
+    businessId,
+    amount,
+    planType,
+    email,
+    businessName,
+    onPaymentSuccess,
+    fromBusinessDetail,
+}) => {
     const stripe = useStripe();
     const elements = useElements();
-    const navigate = useNavigate();
-    const { mutate: processPayment, isPending, error } = usePayment(businessId);
-    const [paymentError, setPaymentError] = useState(null);
-    const [paymentSuccess, setPaymentSuccess] = useState(false);
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setPaymentError(null);
-        setPaymentSuccess(false);
+    console.log("PaymentForm rendered, stripe:", stripe, "loading:", loading);
+
+    const handleSubmit = async () => {
+        console.log("handleSubmit triggered");
+        setLoading(true);
+        setError(null);
 
         if (!stripe || !elements) {
-            setPaymentError("Stripe chưa sẵn sàng. Vui lòng đợi.");
+            console.log("Stripe or Elements not initialized");
+            setError("Stripe chưa được khởi tạo.");
+            setLoading(false);
             return;
         }
 
-        const cardNumberElement = elements.getElement(CardNumberElement);
-        const cardExpiryElement = elements.getElement(CardExpiryElement);
-        const cardCvcElement = elements.getElement(CardCvcElement);
+        try {
+            console.log("Creating payment method...");
+            const { paymentMethod, error: paymentMethodError } = await stripe.createPaymentMethod({
+                type: "card",
+                card: elements.getElement(CardElement),
+                billing_details: { email },
+            });
 
-        if (!cardNumberElement || !cardExpiryElement || !cardCvcElement) {
-            setPaymentError("Vui lòng nhập đầy đủ thông tin thẻ.");
-            return;
-        }
-
-        const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
-            type: "card",
-            card: cardNumberElement,
-        });
-
-        if (stripeError) {
-            setPaymentError(stripeError.message);
-            return;
-        }
-
-        processPayment(
-            {
-                paymentMethodId: paymentMethod.id,
-                amount: Number(amount),
-                planType
-            },
-            {
-                onSuccess: () => {
-                    setPaymentSuccess(true);
-                    setTimeout(() => {
-                        navigate("/loginBusiness");
-                    }, 6000);
-                },
-                onError: (err) => {
-                    setPaymentError(err.response?.data?.message || "Thanh toán thất bại.");
-                },
+            if (paymentMethodError) {
+                console.log("Stripe error:", paymentMethodError.message);
+                setError(paymentMethodError.message);
+                setLoading(false);
+                return;
             }
-        );
-    };
 
-    const elementOptions = {
-        style: {
-            base: {
-                fontSize: "16px",
-                color: "#1a3353",
-                "::placeholder": {
-                    color: "#aab7c4",
-                },
-            },
-            invalid: {
-                color: "#ff4d4f",
-                iconColor: "#ff4d4f",
-            },
-        },
+            console.log("Payment method created:", paymentMethod.id);
+
+            const apiUrl = fromBusinessDetail
+                ? `/api/businesss/payment/monthly/${businessId}`
+                : `/api/businesss/payment/activation/${businessId}`;
+            console.log("Sending request to API:", {
+                url: apiUrl,
+                businessId,
+                paymentMethodId: paymentMethod.id,
+                amount,
+                planType,
+                email,
+                businessName,
+            });
+
+            const responseData = await axios.post(apiUrl, {
+                paymentMethodId: paymentMethod.id,
+                amount,
+                planType,
+                email,
+                businessName,
+            });
+
+            console.log("API response:", responseData);
+
+            if (!responseData) {
+                throw new Error("Không nhận được phản hồi từ server.");
+            }
+
+            const { message, business } = responseData; // Destructure trực tiếp từ responseData
+            if (!business) {
+                console.error("Business data missing in response:", responseData);
+                setError("Dữ liệu doanh nghiệp không hợp lệ từ server.");
+                setLoading(false);
+                return;
+            }
+
+            console.log("Calling onPaymentSuccess with:", { business });
+            onPaymentSuccess({ business });
+            setLoading(false);
+        } catch (err) {
+            console.error("Payment error:", err.message || err);
+            setError(err.message || "Đã xảy ra lỗi trong quá trình thanh toán.");
+            setLoading(false);
+        }
     };
 
     return (
-        <>
-            {/* Overlay loading toàn màn hình */}
-            {isPending && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        width: "100vw",
-                        height: "100vh",
-                        backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        zIndex: 9999,
-                    }}
-                >
-                    <Spin size="large" tip="Đang xử lý thanh toán..." />
-                </div>
-            )}
-
-            <Col
-                xs={24}
-                md={12}
-                style={{
-                    padding: "50px",
-                    //background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    minHeight: "100vh",
-                }}
+        <Form
+            form={form}
+            onFinish={handleSubmit}
+            style={{ maxWidth: 400, margin: "0 auto" }}
+        >
+            <Title level={3}>Thanh toán</Title>
+            <p>Số tiền: ${amount}</p>
+            <p>Gói: {planType}</p>
+            <p>Email: {email}</p>
+            <p>Tên doanh nghiệp: {businessName}</p>
+            <CardElement options={{ style: { base: { fontSize: "16px" } } }} />
+            {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+            <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                disabled={!stripe || loading}
+                style={{ marginTop: 20 }}
             >
-                <div
-                    style={{
-                        maxWidth: "600px",
-                        width: "100%",
-                        padding: "30px",
-                        backgroundColor: "#ffffff",
-                        borderRadius: "12px",
-                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-                        border: "1px solid #e8ecef",
-                        opacity: isPending ? 0.5 : 1,
-                    }}
-                >
-                    {/* Tiêu đề */}
-                    <div style={{ textAlign: "center", marginBottom: "15px", marginTop: "-5px" }}>
-                        <CreditCardOutlined style={{ fontSize: "32px", color: "#52c41a" }} />
-                        <h2 style={{ margin: "10px 0 5px", fontWeight: "bold", color: "#1a3353" }}>
-                            Thanh toán phí
-                        </h2>
-
-                    </div>
-
-                    {/* Thông báo thành công */}
-                    {paymentSuccess && (
-                        <Alert
-                            message="Thanh toán thành công!"
-                            description={`Phí thanh toán $${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} đã được thanh toán thành công. Bạn sẽ được chuyển hướng đến trang đăng nhập Business`}
-                            type="success"
-                            showIcon
-                            icon={<CheckCircleOutlined />}
-                            style={{ marginBottom: "20px", borderRadius: "8px" }}
-                        />
-                    )}
-
-                    {/* Thông báo lỗi */}
-                    {error && (
-                        <Alert
-                            message="Lỗi hệ thống"
-                            description={error.response?.data?.message || "Có lỗi xảy ra."}
-                            type="error"
-                            showIcon
-                            icon={<InfoCircleOutlined />}
-                            style={{ marginBottom: "20px", borderRadius: "8px" }}
-                        />
-                    )}
-                    {paymentError && (
-                        <Alert
-                            message="Lỗi thanh toán"
-                            description={paymentError}
-                            type="error"
-                            showIcon
-                            icon={<InfoCircleOutlined />}
-                            style={{ marginBottom: "20px", borderRadius: "8px" }}
-                        />
-                    )}
-
-                    <form onSubmit={handleSubmit}>
-                        {/* Tên doanh nghiệp */}
-                        <div style={{ marginBottom: "20px" }}>
-                            <label
-                                style={{
-                                    display: "block",
-                                    marginBottom: "8px",
-                                    fontWeight: "500",
-                                    color: "#1a3353",
-                                }}
-                            >
-                                <ShopOutlined style={{ marginRight: "8px" }} />
-                                Tên doanh nghiệp ẩm thực
-                            </label>
-                            <div
-                                style={{
-                                    padding: "12px",
-                                    border: "1px solid #d9d9d9",
-                                    borderRadius: "6px",
-                                    backgroundColor: "#f5f5f5",
-                                    color: "#1a3353",
-                                }}
-                            >
-                                {businessName || "Không có thông tin"}
-                            </div>
-                        </div>
-
-                        {/* Email */}
-                        <div style={{ marginBottom: "20px" }}>
-                            <label
-                                style={{
-                                    display: "block",
-                                    marginBottom: "8px",
-                                    fontWeight: "500",
-                                    color: "#1a3353",
-                                }}
-                            >
-                                <MailOutlined style={{ marginRight: "8px" }} />
-                                Email
-                            </label>
-                            <div
-                                style={{
-                                    padding: "12px",
-                                    border: "1px solid #d9d9d9",
-                                    borderRadius: "6px",
-                                    backgroundColor: "#f5f5f5",
-                                    color: "#1a3353",
-                                }}
-                            >
-                                {email || "Không có thông tin"}
-                            </div>
-                        </div>
-
-                        {/* Số thẻ */}
-                        <div style={{ marginBottom: "20px" }}>
-                            <label
-                                style={{
-                                    display: "block",
-                                    marginBottom: "8px",
-                                    fontWeight: "500",
-                                    color: "#1a3353",
-                                }}
-                            >
-                                <CreditCardOutlined style={{ marginRight: "8px" }} />
-                                Số thẻ tín dụng
-                            </label>
-                            <div
-                                style={{
-                                    padding: "12px",
-                                    border: "1px solid #d9d9d9",
-                                    borderRadius: "6px",
-                                    backgroundColor: "#fafafa",
-                                    transition: "border-color 0.3s",
-                                }}
-                            >
-                                <CardNumberElement options={elementOptions} />
-                            </div>
-                        </div>
-
-                        {/* MM/YY và CVC */}
-                        <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
-                            <div style={{ flex: 1 }}>
-                                <label
-                                    style={{
-                                        display: "block",
-                                        marginBottom: "8px",
-                                        fontWeight: "500",
-                                        color: "#1a3353",
-                                    }}
-                                >
-                                    MM/YY
-                                </label>
-                                <div
-                                    style={{
-                                        padding: "12px",
-                                        border: "1px solid #d9d9d9",
-                                        borderRadius: "6px",
-                                        backgroundColor: "#fafafa",
-                                        transition: "border-color 0.3s",
-                                    }}
-                                >
-                                    <CardExpiryElement options={elementOptions} />
-                                </div>
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <label
-                                    style={{
-                                        display: "block",
-                                        marginBottom: "8px",
-                                        fontWeight: "500",
-                                        color: "#1a3353",
-                                    }}
-                                >
-                                    CVC
-                                </label>
-                                <div
-                                    style={{
-                                        padding: "12px",
-                                        border: "1px solid #d9d9d9",
-                                        borderRadius: "6px",
-                                        backgroundColor: "#fafafa",
-                                        transition: "border-color 0.3s",
-                                    }}
-                                >
-                                    <CardCvcElement options={elementOptions} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Số tiền */}
-                        <div style={{ marginBottom: "25px" }}>
-                            <label
-                                style={{
-                                    display: "block",
-                                    marginBottom: "8px",
-                                    fontWeight: "500",
-                                    color: "#1a3353",
-                                }}
-                            >
-                                Số tiền (USD)
-                            </label>
-                            <div
-                                style={{
-                                    padding: "12px",
-                                    border: "1px solid #d9d9d9",
-                                    borderRadius: "6px",
-                                    backgroundColor: "#f5f5f5",
-                                    fontSize: "16px",
-                                    fontWeight: "bold",
-                                    color: "#1a3353",
-                                }}
-                            >
-                                ${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </div>
-                        </div>
-
-                        {/* Nút thanh toán */}
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            disabled={!stripe || isPending}
-                            loading={isPending}
-                            block
-                            size="large"
-                            style={{
-                                height: "35px",
-                                fontSize: "16px",
-                                borderRadius: "8px",
-                                backgroundColor: "#52c41a",
-                                borderColor: "#52c41a",
-                                transition: "all 0.3s",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#52c41a")}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#52c41a")}
-                        >
-                            {isPending ? (
-                                "Đang xử lý..."
-                            ) : (
-                                <>
-
-                                    Thanh Toán
-                                </>
-                            )}
-                        </Button>
-                    </form>
-
-                    {/* Bảo mật */}
-                    <Text
-                        type="secondary"
-                        style={{
-                            display: "block",
-                            textAlign: "center",
-                            marginTop: "15px",
-                            fontSize: "12px",
-                        }}
-                    >
-                        <LockOutlined /> Thanh toán được mã hóa và bảo mật bởi Stripe
-                    </Text>
-                </div>
-            </Col>
-        </>
+                Thanh toán ngay
+            </Button>
+        </Form>
     );
 };
 

@@ -7,11 +7,13 @@ import { BookUser, CircleDollarSign, Clock, MapPinHouse, DollarSign, Store, Badg
 import { useState, useEffect, useRef } from "react";
 import ProfileBusinessPage from "../../../../pages/ProfileBusinessPage";
 import { Map as ReactMapGL, Marker } from "react-map-gl";
+import { useNavigate } from "react-router-dom";
 import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
 
 const { Title, Text } = Typography;
+
 
 const CustomMarker = ({ longitude = 0, latitude = 0, color = "red", ...props }) => (
   <Marker longitude={longitude} latitude={latitude} color={color} {...props} />
@@ -27,6 +29,7 @@ const BusinessDetail = ({
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const mapRef = useRef(null);
   const directionsRef = useRef(null);
+  const navigate = useNavigate();
 
   const formatPrice = (price) => {
     if (typeof price !== "number" || isNaN(price)) {
@@ -73,6 +76,17 @@ const BusinessDetail = ({
   };
 
   const handlePaymentModalClose = () => {
+    setIsPaymentModalOpen(false);
+  };
+  const handlePaymentClick = () => {
+    navigate(`/subscription/plans/${businessData.id}`, {
+      state: {
+        businessId: businessData.id,
+        email: businessData.email,
+        businessName: businessData.business_name,
+        fromBusinessDetail: true,
+      },
+    });
     setIsPaymentModalOpen(false);
   };
 
@@ -264,7 +278,32 @@ const BusinessDetail = ({
         }
         open={isPaymentModalOpen}
         onCancel={handlePaymentModalClose}
-        footer={null}
+        footer={[
+          <Button
+            key="register"
+            type="primary"
+            style={{
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
+              borderRadius: "5px",
+              height: "40px",
+              fontWeight: "bold"
+            }}
+            onClick={handlePaymentClick} // Bạn cần định nghĩa hàm này trong component
+          >
+            Thanh Toán
+          </Button>,
+          <Button
+            key="cancel"
+            onClick={handlePaymentModalClose}
+            style={{
+              borderRadius: "5px",
+              height: "35px"
+            }}
+          >
+            Đóng
+          </Button>
+        ]}
         width={600}
         bodyStyle={{ padding: "20px", backgroundColor: "#f5f5f5" }}
       >
