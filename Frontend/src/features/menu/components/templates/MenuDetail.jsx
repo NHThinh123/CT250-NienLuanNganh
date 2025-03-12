@@ -6,9 +6,18 @@ import ReviewList from "../../../review/components/templates/ReviewList";
 import useReviewByBusinessId from "../../../review/hooks/useReviewByBusinessId";
 import AddMenu from "../molecules/AddMenu";
 import CreateReview from "../../../review/components/templates/CreateReview";
+import DishSearch from "../molecules/DishSearch";
+import { useContext, useState } from "react";
+import { BusinessContext } from "../../../../contexts/business.context";
 
 const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
   const reviewData = useReviewByBusinessId(business_id);
+  const { business } = useContext(BusinessContext);
+  const isBusinessOwner =
+    business.isAuthenticated && business.business.id == business_id;
+
+  const [searchKeyword, setSearchKeyword] = useState("");
+
   if (isLoadingMenu) {
     return <h1>Loading...</h1>;
   }
@@ -21,83 +30,63 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
   const capitalizeMenuName = (name) => {
     return name.toUpperCase();
   };
+
+  const handleSearch = (keyword) => {
+    setSearchKeyword(keyword);
+  };
+
   return (
     <>
       <div style={styles.menuPage}>
         <Row>
           <Col span={2}></Col>
           <Col span={5}>
-            <div style={{ padding: "13px 26px" }}>
+            <div style={{ padding: "13px 26px 0px" }}>
               <p style={styles.titleMenu}>THỰC ĐƠN</p>
             </div>
           </Col>
           <Col span={9}></Col>
           <Col span={8}>
-            <div style={{ padding: "13px 26px", marginLeft: 20 }}>
+            <div style={{ padding: "13px 26px 0px" }}>
               <p style={styles.titleMenu}>ĐÁNH GIÁ</p>
             </div>
           </Col>
+          <Col span={2}></Col>
         </Row>
         <Row>
           <Col span={2}></Col>
           <MenuProvider>
             <Col span={5}>
-              <div style={{ marginRight: "20px", position: "sticky", top: 70 }}>
-                <MenuList menuData={menuData}></MenuList>
-                <div
-                  style={{
-                    backgroundColor: "white",
-                    borderRadius: "5px",
-                    marginTop: "10px",
-                  }}
-                >
-                  <AddMenu businessId={business_id} />
-                </div>
+              <div style={{ position: "sticky", top: 70 }}>
+                {menuData.length > 0 && (
+                  <MenuList
+                    menuData={menuData}
+                    searchKeyword={searchKeyword}
+                  ></MenuList>
+                )}
+                {isBusinessOwner && <AddMenu businessId={business_id} />}
               </div>
             </Col>
-            <Col
-              span={9}
-              style={{
-                backgroundColor: "#ffffff",
-                padding: 15,
-                borderRadius: "5px",
-              }}
-            >
+            <Col span={9}>
+              <div style={{ position: "sticky", top: 63.8, zIndex: 10 }}>
+                <DishSearch onSearch={handleSearch} />
+              </div>
               <MenuDetailList
                 menuData={menuData}
                 capitalizeMenuName={capitalizeMenuName}
-              ></MenuDetailList>
+                searchKeyword={searchKeyword}
+              />
             </Col>
           </MenuProvider>
           <Col span={6}>
             <div
               style={{
-                backgroundColor: "#ffffff",
-                marginLeft: "20px",
-                borderRadius: 5,
                 position: "sticky",
                 top: 70,
               }}
             >
-              <div>
-                <ReviewList reviewData={reviewData.reviewData} />
-              </div>
-              <hr
-                style={{
-                  height: "3px",
-                  border: "no",
-                  opacity: "0.5",
-                  margin: "15px 15px 5px 15px",
-                }}
-              />
-              <div
-                style={{
-                  backgroundColor: "white",
-                  borderRadius: "5px",
-                }}
-              >
-                <CreateReview businessId={business_id} />
-              </div>
+              <ReviewList reviewData={reviewData.reviewData} />
+              {!isBusinessOwner && <CreateReview businessId={business_id} />}
             </div>
           </Col>
           <Col span={2}></Col>

@@ -66,7 +66,7 @@ const BusinessDetail = ({
               <Breadcrumb
                 separator=">"
                 items={[
-                  { title: "Trang chủ" },
+                  { title: "Trang chủ", href: "/" },
                   { title: "Quán ăn", href: "/businesses" },
                   { title: `${businessData.business_name}` },
                 ]}
@@ -123,8 +123,8 @@ const BusinessDetail = ({
             </div>
           </div>
         </Col>
-        <Col span={4}>
-          <div style={{ backgroundColor: "red" }}></div>
+        <Col span={6} style={{ backgroundColor: "blue" }}>
+          <div></div>
         </Col>
         <Col span={2}></Col>
       </Row>
@@ -159,7 +159,7 @@ const styles = {
   },
   businessAva: {
     margin: "18px 0px 25px 0px",
-    width: "90%",
+    width: "95%",
   },
   businessImage: {
     width: "100%",
@@ -170,6 +170,7 @@ const styles = {
   },
   businessDetail: {
     margin: "0px",
+    width: "95%",
   },
   businessBreadcrumb: {
     marginBottom: "7px",

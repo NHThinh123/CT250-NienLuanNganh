@@ -4,6 +4,7 @@ import ModalCreateReview from "../organisms/ModalCreateReview";
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
 import { AuthContext } from "../../../../contexts/auth.context";
 import { BusinessContext } from "../../../../contexts/business.context";
+import BoxContainer from "../../../../components/atoms/BoxContainer";
 
 const CreateReview = ({ businessId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,17 +46,16 @@ const CreateReview = ({ businessId }) => {
   };
 
   return (
-    <>
+    <BoxContainer>
       {!(business.business.id == businessId) && (
         <Button
           type="link"
           onClick={() => handleAction(showModal)}
           style={{
-            margin: 4,
             cursor: "pointer",
             border: "none",
             fontSize: 13,
-            width: "calc(100% - 8px)",
+            width: "100%",
             height: 35,
           }}
           onMouseEnter={(e) => {
@@ -88,7 +88,7 @@ const CreateReview = ({ businessId }) => {
         isModalOpen={isLoginRequiredModalOpen}
         handleCancel={handleCancelLoginRequiredModal}
       />
-    </>
+    </BoxContainer>
   );
 };
 

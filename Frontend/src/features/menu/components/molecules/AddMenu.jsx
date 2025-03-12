@@ -3,6 +3,7 @@ import { SquarePlus } from "lucide-react";
 import { useContext, useState } from "react";
 import ModalAddMenu from "../atoms/ModalAddMenu";
 import { BusinessContext } from "../../../../contexts/business.context";
+import BoxContainer from "../../../../components/atoms/BoxContainer";
 
 const AddMenu = ({ businessId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,17 +24,16 @@ const AddMenu = ({ businessId }) => {
   };
 
   return (
-    <>
+    <BoxContainer>
       {business.isAuthenticated && business.business.id == businessId && (
         <Button
           type="link"
           onClick={showModal}
           style={{
-            margin: 4,
             cursor: "pointer",
             border: "none",
             fontSize: 13,
-            width: "calc(100% - 8px)",
+            width: "100%",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = "#CDE5FF";
@@ -70,7 +70,7 @@ const AddMenu = ({ businessId }) => {
         setIsModalOpen={setIsModalOpen}
         businessId={businessId}
       />
-    </>
+    </BoxContainer>
   );
 };
 

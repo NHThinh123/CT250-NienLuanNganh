@@ -3,6 +3,7 @@ import { Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const BusinessInHomePage = ({ businessData }) => {
+  console.log("business data", businessData);
   const navigate = useNavigate();
   const maxTitleLength = 20; // Giới hạn ký tự tiêu đề trước khi cắt
   const maxDescriptionLength = 30; // Giới hạn ký tự mô tả trước khi cắt
@@ -35,7 +36,7 @@ const BusinessInHomePage = ({ businessData }) => {
                   title={
                     business.business_name.length > maxTitleLength
                       ? business.business_name.slice(0, maxTitleLength) + "..."
-                      : business.business_name
+                      : business.business_name || "N/A"
                   }
                   style={{ marginBottom: 8 }}
                 />
@@ -50,9 +51,9 @@ const BusinessInHomePage = ({ businessData }) => {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {business.location.length > maxDescriptionLength
+                    {business.location?.length > maxDescriptionLength
                       ? business.location.slice(0, maxDescriptionLength) + "..."
-                      : business.location}
+                      : business.location || "N/A"}
                   </p>
                 </div>
               </div>
