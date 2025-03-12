@@ -7,6 +7,17 @@ const BusinessSchema = new mongoose.Schema(
     business_name: { type: String, required: true },
     open_hours: { type: String, required: true },
     close_hours: { type: String, required: true },
+    address: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
     location: { type: String, required: true },
     contact_info: { type: String, required: true },
     avatar: { type: String, default: "" },
@@ -35,6 +46,9 @@ const BusinessSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Tạo index 2dsphere để hỗ trợ truy vấn địa lý (nếu cần sau này)
+BusinessSchema.index({ address: "2dsphere" });
 
 // Thêm plugin xóa mềm
 BusinessSchema.plugin(mongooseDelete, {

@@ -8,21 +8,25 @@ import { BusinessContext } from "../../src/contexts/business.context";
 
 const BusinessDetailPage = () => {
   const { id } = useParams();
+  const { business } = useContext(BusinessContext);
   const { businessData, isLoadingBusiness, isErrorBusiness } = useBusinessById(id);
   const { menuData, isLoadingMenu, isErrorMenu } = useMenuByBusinessId(id);
-  const { business } = useContext(BusinessContext);
-
 
   const canEdit = business.isAuthenticated && business.business.id === id;
+  const displayData = businessData || (business.isAuthenticated && business.business.id === id ? business.business : null);
+
+  if (!displayData) {
+    return <p>Không tìm thấy thông tin doanh nghiệp.</p>;
+  }
 
   return (
     <>
       <div>
         <BusinessDetail
-          businessData={businessData}
-          isLoading={isLoadingBusiness} // Điều chỉnh tên prop cho đồng bộ với BusinessDetail
-          isError={isErrorBusiness}     // Điều chỉnh tên prop cho đồng bộ với BusinessDetail
-          canEdit={canEdit}             // Truyền prop canEdit
+          businessData={displayData}
+          isLoading={isLoadingBusiness}
+          isError={isErrorBusiness}
+          canEdit={canEdit}
         />
       </div>
       <div>
@@ -36,5 +40,6 @@ const BusinessDetailPage = () => {
     </>
   );
 };
+
 
 export default BusinessDetailPage;
