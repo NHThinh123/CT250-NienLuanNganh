@@ -78,10 +78,11 @@ const BusinessDetail = ({
   const handlePaymentModalClose = () => {
     setIsPaymentModalOpen(false);
   };
+
   const handlePaymentClick = () => {
-    navigate(`/subscription/plans/${businessData.id}`, {
+    navigate(`/subscription/plans/${businessData._id}`, {
       state: {
-        businessId: businessData.id,
+        businessId: businessData._id,
         email: businessData.email,
         businessName: businessData.business_name,
         fromBusinessDetail: true,

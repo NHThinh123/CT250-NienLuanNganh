@@ -65,7 +65,7 @@ const PlansSelector = ({ selectedPlan, onPlanChange, onUpgrade }) => {
                 onClick={handleUpgrade}
                 disabled={loading}
             >
-                {loading ? "Đang xử lý..." : "Kích hoạt ngay"}
+                {loading ? "Đang xử lý..." : "Chọn gói cước"}
             </Button>
         </div>
     );
