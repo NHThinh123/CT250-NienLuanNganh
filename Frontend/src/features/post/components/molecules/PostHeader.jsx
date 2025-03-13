@@ -3,6 +3,7 @@ import { Avatar, Button, Col, Row, Typography, Dropdown, Modal } from "antd"; //
 import { formatTime } from "../../../../constants/formatTime";
 import { Link } from "react-router-dom";
 import { useState } from "react"; // Thêm useState để quản lý trạng thái Modal
+import UpLoadPostContainer from "./UpLoadPostContainer";
 
 const PostHeader = ({
   userData,
@@ -12,8 +13,18 @@ const PostHeader = ({
   isDeleting,
   post_id,
   isMyPost = false,
+  postData,
+  isEditMode,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false); // Trạng thái hiển thị Modal
+  const [isShowModalEdit, setIsShowModalEdit] = useState(false); // Trạng thái hiển thị Modal chỉnh sửa
+
+  const showModalEdit = () => {
+    setIsShowModalEdit(true);
+  };
+  const cancelModalEdit = () => {
+    setIsShowModalEdit(false);
+  };
 
   // Hàm mở Modal xác nhận
   const showDeleteConfirm = () => {
@@ -34,14 +45,23 @@ const PostHeader = ({
   const items = [
     {
       label: (
-        <Button type="text" onClick={showDeleteConfirm} loading={isDeleting}>
+        <Button
+          style={{ color: "black" }}
+          type="link"
+          onClick={showDeleteConfirm}
+          loading={isDeleting}
+        >
           Xóa
         </Button>
       ),
       key: "0",
     },
     {
-      label: <Button type="text">Sửa</Button>,
+      label: (
+        <Button type="link" onClick={showModalEdit} style={{ color: "black" }}>
+          Sửa
+        </Button>
+      ),
       key: "1",
     },
   ];
@@ -80,6 +100,7 @@ const PostHeader = ({
               }}
               trigger={["click"]}
               disabled={isDeleting}
+              placement="bottom"
             >
               <Button type="text" loading={isDeleting}>
                 <EllipsisOutlined />
@@ -88,7 +109,12 @@ const PostHeader = ({
           </Col>
         )}
       </Row>
-
+      <UpLoadPostContainer
+        isEditMode={isEditMode}
+        postData={postData}
+        isShowModalEdit={isShowModalEdit}
+        cancelModalEdit={cancelModalEdit}
+      />
       {/* Modal xác nhận xóa */}
       <Modal
         title="Xác nhận xóa bài viết"

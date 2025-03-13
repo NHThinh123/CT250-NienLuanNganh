@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   Avatar,
   Button,
@@ -11,14 +12,13 @@ import {
   Typography,
 } from "antd";
 import { Images, MapPinned, Tags } from "lucide-react";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UploadTag from "../atoms/UploadTag";
 import useCreatePost from "../../hooks/useCreatePost";
-
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 import UploadMedia from "../atoms/UploadMedia";
+import useUpdatePost from "../../hooks/useUpdatePost"; // Giả sử bạn đã tạo hook này
 
 const ModalUploadPost = ({
   isModalOpen,
@@ -26,15 +26,38 @@ const ModalUploadPost = ({
   handleOk,
   form,
   setIsModalOpen,
+  postData = null,
+  isEditMode = false,
 }) => {
   const { entity } = useAuthEntity();
-  const { mutate: createPost, isPending } = useCreatePost();
+  const { mutate: createPost, isPending: isCreating } = useCreatePost();
+  const { mutate: updatePost, isPending: isUpdating } = useUpdatePost();
   const [tags, setTags] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [isShowUploadImage, setIsShowUploadImage] = useState(false);
   const [isShowUploadTag, setIsShowUploadTag] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
+
+  // Điền dữ liệu mặc định khi ở chế độ chỉnh sửa
+  useEffect(() => {
+    if (isEditMode && postData) {
+      form.setFieldsValue({
+        title: postData.title,
+        content: postData.content,
+      });
+      setTags(postData.tags.map((tag) => tag.tag_name));
+      setFileList(
+        postData.media.map((media) => ({
+          uid: media._id,
+          name: media.url.split("/").pop(),
+          status: "done",
+          url: media.url,
+        }))
+      );
+      setIsShowUploadImage(postData.media.length > 0); // Hiển thị phần ảnh nếu có
+      setIsShowUploadTag(postData.tags.length > 0); // Hiển thị phần tag nếu có
+    }
+  }, [isEditMode, postData, form]);
 
   const handleShowUploadImage = () => {
     setIsShowUploadImage(true);
@@ -53,52 +76,79 @@ const ModalUploadPost = ({
     formData.append("content", values.content);
     formData.append("tags", JSON.stringify(tags));
     fileList.forEach((file) => {
-      formData.append("media", file.originFileObj);
+      if (file.originFileObj) {
+        formData.append("media", file.originFileObj); // Chỉ thêm file mới
+      }
     });
-    // formData.forEach((value, key) => {
-    //   console.log(key, value);
-    // });
-    createPost(formData, {
-      onSuccess: () => {
-        message.success("Bài viết đã được tạo thành công!");
-        form.resetFields();
-        setIsShowUploadImage(false);
-        setIsShowUploadTag(false);
-        setIsShowUploadLocation(false);
-        setFileList([]);
-        setTags([]);
-        setIsModalOpen(false);
-      },
-      onError: () => {
-        message.error("Lỗi khi tạo bài viết!");
-      },
-    });
+
+    if (isEditMode) {
+      formData.append("post_id", postData._id); // ID bài viết cần chỉnh sửa
+
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+      updatePost(formData, {
+        onSuccess: () => {
+          message.success("Bài viết đã được cập nhật thành công!");
+          handleCancel();
+        },
+        onError: () => {
+          message.error("Lỗi khi cập nhật bài viết!");
+        },
+      });
+    } else {
+      createPost(formData, {
+        onSuccess: () => {
+          message.success("Bài viết đã được tạo thành công!");
+          resetForm();
+          setIsModalOpen(false);
+        },
+        onError: () => {
+          message.error("Lỗi khi tạo bài viết!");
+        },
+      });
+    }
+  };
+
+  const resetForm = () => {
+    form.resetFields();
+    setIsShowUploadImage(false);
+    setIsShowUploadTag(false);
+    setIsShowUploadLocation(false);
+    setFileList([]);
+    setTags([]);
   };
 
   return (
     <Modal
       title={
         <Typography.Title level={4} style={{ textAlign: "center" }}>
-          Tạo bài viết
+          {isEditMode ? "Chỉnh sửa bài viết" : "Tạo bài viết"}
         </Typography.Title>
       }
       open={isModalOpen}
       onOk={handleOk}
       onCancel={() => {
         handleCancel();
-        setIsShowUploadImage(false);
-        setIsShowUploadTag(false);
-        setIsShowUploadLocation(false);
-        setFileList([]);
-        setTags([]);
+        if (!isEditMode) {
+          resetForm();
+        }
       }}
-      okText={isPending ? "Đang đăng..." : "Đăng tải"}
+      okText={
+        isEditMode
+          ? isUpdating
+            ? "Đang cập nhật..."
+            : "Cập nhật"
+          : isCreating
+          ? "Đang đăng..."
+          : "Đăng tải"
+      }
       cancelText="Hủy"
       maskClosable={false}
       centered
       style={{ minWidth: "50%" }}
     >
-      {isPending && <SpinLoading />}
+      {(isCreating || isUpdating) && <SpinLoading />}
       <Row>
         <Col span={2}>
           <Avatar src={entity?.avatar}></Avatar>
@@ -136,7 +186,7 @@ const ModalUploadPost = ({
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tiêu nội dung viết!",
+                  message: "Vui lòng nhập nội dung bài viết!",
                 },
               ]}
             >
@@ -197,7 +247,6 @@ const ModalUploadPost = ({
             </Popover>
           </Button>
         </Col>
-
         <Col span={4}>
           <Button
             type="text"

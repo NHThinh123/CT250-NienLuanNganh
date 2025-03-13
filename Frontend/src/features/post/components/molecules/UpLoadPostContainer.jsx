@@ -7,7 +7,13 @@ import LoginRequiredModal from "../../../../components/organisms/LoginRequiredMo
 
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 
-const UpLoadPostContainer = () => {
+const UpLoadPostContainer = ({
+  postData,
+  isEditMode,
+  isCreate,
+  isShowModalEdit,
+  cancelModalEdit,
+}) => {
   const { entity } = useAuthEntity();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
@@ -40,6 +46,25 @@ const UpLoadPostContainer = () => {
       action();
     }
   };
+  if (isEditMode || !isCreate) {
+    return (
+      <>
+        <ModalUploadPost
+          form={form}
+          isModalOpen={isShowModalEdit}
+          handleCancel={cancelModalEdit}
+          handleOk={handleOk}
+          setIsModalOpen={setIsModalOpen}
+          postData={postData}
+          isEditMode={isEditMode}
+        />
+        <LoginRequiredModal
+          isModalOpen={isLoginRequiredModalOpen}
+          handleCancel={handleCancelLoginRequiredModal}
+        />
+      </>
+    );
+  }
   return (
     <BoxContainer>
       <Row>
@@ -54,37 +79,15 @@ const UpLoadPostContainer = () => {
           </Button>
         </Col>
       </Row>
-      {/* <Row
-        justify={"center"}
-        style={{ textAlign: "center", marginTop: "8px" }}
-        gutter={[16, 16]}
-      >
-        <Col span={12}>
-          <Button
-            type="default"
-            style={{ width: "100%", color: "#03c200" }}
-            onClick={() => handleAction(showModal)}
-          >
-            <Utensils size={18} color="#03c200" strokeWidth={2.5} />
-            Món ngon
-          </Button>
-        </Col>
-        <Col span={12}>
-          <Button
-            type="default"
-            style={{ width: "100%", color: "#ff4d4f" }}
-            onClick={() => handleAction(showModal)}
-          >
-            <ChefHat size={18} color="#ff4d4f" strokeWidth={2.5} /> Quán xịn
-          </Button>
-        </Col>
-      </Row> */}
+
       <ModalUploadPost
         form={form}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         handleOk={handleOk}
         setIsModalOpen={setIsModalOpen}
+        postData={postData}
+        isEditMode={isEditMode}
       />
       <LoginRequiredModal
         isModalOpen={isLoginRequiredModalOpen}

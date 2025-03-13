@@ -8,7 +8,7 @@ import CommentModal from "../../../comment/components/templates/CommentModal";
 import { useState } from "react";
 import PostMedia from "../molecules/PostMedia";
 
-const PostItem = ({ postData, onDelete, isDeleting, isMyPost }) => {
+const PostItem = ({ postData, onDelete, isDeleting, isMyPost, isEditMode }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
@@ -24,6 +24,8 @@ const PostItem = ({ postData, onDelete, isDeleting, isMyPost }) => {
         isDeleting={isDeleting}
         post_id={postData?._id}
         isMyPost={isMyPost}
+        isEditMode={isEditMode}
+        postData={postData}
       ></PostHeader>
       <PostBody postData={postData}></PostBody>
       {postData?.media.length > 0 && (

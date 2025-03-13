@@ -2,10 +2,10 @@
 import SearchingPostContainer from "../molecules/SearchingPostContainer";
 import UpLoadPostContainer from "../molecules/UpLoadPostContainer";
 
-const SideBar = () => {
+const SideBar = ({ isCreate }) => {
   return (
     <>
-      <UpLoadPostContainer />
+      <UpLoadPostContainer isCreate={isCreate} />
       <SearchingPostContainer />
 
       {/* <HotTopicList /> */}

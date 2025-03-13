@@ -25,6 +25,7 @@ const MyPostList = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useMyPost(params);
   const { mutate: deletePost, isLoading: isDeleting } = useDeletePost();
+
   const { ref, inView } = useInView();
 
   useEffect(() => {
@@ -74,6 +75,7 @@ const MyPostList = () => {
                 onDelete={handleDeletePost}
                 isDeleting={isDeleting}
                 isMyPost={true}
+                isEditMode={true}
               />
             </List.Item>
           )}
@@ -99,7 +101,7 @@ const MyPostList = () => {
           overflowY: "auto",
         }}
       >
-        <SideBar />
+        <SideBar isCreate={true} />
       </Col>
     </Row>
   );

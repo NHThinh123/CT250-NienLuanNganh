@@ -88,7 +88,7 @@ const PostList = () => {
               overflowY: "auto",
             }}
           >
-            <SideBar />
+            <SideBar isCreate={true} />
           </Col>
         )}
       </Row>
