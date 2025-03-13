@@ -58,7 +58,6 @@ const wss = new WebSocketServer({ server });
 const clients = new Map();
 
 wss.on("connection", (ws) => {
-  console.log("New WebSocket client connected");
 
   ws.on("message", (message) => {
     const data = JSON.parse(message);
@@ -68,7 +67,6 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    console.log("WebSocket client disconnected");
     clients.delete(ws);
   });
 });

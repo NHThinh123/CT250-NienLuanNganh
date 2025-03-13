@@ -203,6 +203,85 @@ const processActivationPayment = async (req, res) => {
   const { paymentMethodId, amount, planType } = req.body;
 
   try {
+    if (!amount || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ message: "Số tiền không hợp lệ." });
+    }
+
+    if (!planType || !["monthly", "yearly"].includes(planType)) {
+      return res.status(400).json({ message: "Loại gói không hợp lệ." });
+    }
+
+    const business = await Business.findById(businessId);
+    if (!business) {
+      return res.status(404).json({ message: "Không tìm thấy tài khoản" });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100),
+      currency: "usd",
+      payment_method: paymentMethodId,
+      confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never",
+      },
+    });
+
+    if (paymentIntent.status === "succeeded") {
+      const isActivation = business.status === "suspended" || !business.activationPayment;
+
+      business.status = "active";
+      business.lastPaymentDate = new Date();
+      business.nextPaymentDueDate = new Date(
+        business.lastPaymentDate.getTime() +
+        (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
+      );
+      if (isActivation) {
+        business.activationPayment = true;
+      }
+      business.reminderSent = false;
+      await business.save();
+
+      const payment = new Payment({
+        businessId: business._id,
+        businessName: business.business_name,
+        amount: amount,
+        type: isActivation ? "activation" : "renewal",
+      });
+      await payment.save();
+
+      res.status(200).json({
+        message: isActivation
+          ? "Thanh toán thành công! Tài khoản đã được kích hoạt."
+          : "Thanh toán thành công! Gói đã được gia hạn.",
+        amount: amount,
+        paymentId: payment._id,
+        business: {
+          id: business._id,
+          business_name: business.business_name,
+          email: business.email,
+          lastPaymentDate: business.lastPaymentDate,
+          nextPaymentDueDate: business.nextPaymentDueDate,
+          status: business.status,
+        },
+      });
+    } else {
+      res.status(400).json({
+        message: "Thanh toán chưa hoàn tất.",
+        status: paymentIntent.status,
+      });
+    }
+  } catch (error) {
+    console.error("Error in processActivationPayment:", error.message, error.stack);
+    res.status(500).json({ message: error.message || "Lỗi server nội bộ." });
+  }
+};
+// Xử lý thanh toán phí duy trì
+const processMonthlyPayment = async (req, res) => {
+  const { businessId } = req.params;
+  const { paymentMethodId, amount, planType } = req.body;
+
+  try {
     // Kiểm tra amount
     if (!amount || isNaN(amount) || amount <= 0) {
       return res.status(400).json({ message: "Số tiền không hợp lệ." });
@@ -218,10 +297,10 @@ const processActivationPayment = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy tài khoản" });
     }
 
-    // Tạo PaymentIntent với Stripe
+    // Tạo thanh toán qua Stripe
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100),
-      currency: "usd",
+      amount: amount * 100,
+      currency: "usd", // Đồng bộ với processActivationPayment (đổi từ "vnd" sang "usd")
       payment_method: paymentMethodId,
       confirm: true,
       automatic_payment_methods: {
@@ -231,99 +310,20 @@ const processActivationPayment = async (req, res) => {
     });
 
     if (paymentIntent.status === "succeeded") {
-      const isActivation = business.status === "suspended" || !business.activationPayment;
-
-      // Cập nhật Business
-      business.status = "active";
-      business.lastPaymentDate = new Date();
-
-      // Cập nhật nextPaymentDueDate dựa trên planType
-      if (planType === "yearly") {
-        business.nextPaymentDueDate = new Date(
-          business.lastPaymentDate.getTime() + 365 * 24 * 60 * 60 * 1000
-        );
-      } else {
-        business.nextPaymentDueDate = new Date(
-          business.lastPaymentDate.getTime() + 30 * 24 * 60 * 60 * 1000
-        );
-      }
-
-      // Chỉ đặt activationPayment = true nếu là kích hoạt
-      if (isActivation) {
-        business.activationPayment = true;
-      }
-
-      // Đặt lại reminderSent để chuẩn bị cho chu kỳ mới
-      business.reminderSent = false;
-
-      await business.save();
-
-      const payment = new Payment({
-        businessId: business._id,
-        businessName: business.business_name,
-        amount: amount,
-        type: isActivation ? "activation" : "renewal", // Phân biệt loại thanh toán
-      });
-      await payment.save();
-
-      res.status(200).json({
-        message: isActivation
-          ? "Thanh toán thành công! Tài khoản đã được kích hoạt."
-          : "Thanh toán thành công! Gói đã được gia hạn.",
-        amount: amount,
-        paymentId: payment._id,
-      });
-    } else {
-      console.log("PaymentIntent status:", paymentIntent.status);
-      res.status(400).json({
-        message: "Thanh toán chưa hoàn tất.",
-        status: paymentIntent.status,
-      });
-    }
-  } catch (error) {
-    console.error(
-      "Error in processActivationPayment:",
-      error.message,
-      error.stack
-    );
-    res.status(500).json({ message: error.message || "Lỗi server nội bộ." });
-  }
-};
-// Xử lý thanh toán phí duy trì
-const processMonthlyPayment = async (req, res) => {
-  const { businessId } = req.params;
-  const { paymentMethodId, amount } = req.body;
-
-  try {
-    const business = await Business.findById(businessId);
-    if (!business) {
-      return res.status(404).json({ message: "Không tìm thấy tài khoản" });
-    }
-
-    // Tạo thanh toán qua Stripe
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100,
-      currency: "vnd",
-      payment_method: paymentMethodId,
-      confirm: true,
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: "never", // Chỉ chấp nhận thanh toán không cần redirect
-      },
-    });
-
-    if (paymentIntent.status === "succeeded") {
       business.lastPaymentDate = new Date();
       business.nextPaymentDueDate = new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000
+        business.lastPaymentDate.getTime() +
+        (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
       );
       business.status = "active";
+      business.reminderSent = false; // Đặt lại reminderSent
       await business.save();
 
       const payment = new Payment({
         businessId: business._id,
         businessName: business.business_name,
         amount: amount,
+        type: "renewal",
       });
       await payment.save();
 
@@ -331,12 +331,21 @@ const processMonthlyPayment = async (req, res) => {
         message: "Thanh toán phí duy trì thành công!",
         amount: amount,
         paymentId: payment._id,
+        business: {
+          id: business._id,
+          business_name: business.business_name,
+          email: business.email,
+          lastPaymentDate: business.lastPaymentDate,
+          nextPaymentDueDate: business.nextPaymentDueDate,
+          status: business.status,
+        },
       });
     } else {
       res.status(400).json({ message: "Thanh toán thất bại" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error in processMonthlyPayment:", error.message, error.stack);
+    res.status(500).json({ message: error.message || "Lỗi server nội bộ." });
   }
 };
 //Đăng nhập
