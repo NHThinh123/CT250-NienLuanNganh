@@ -13,14 +13,15 @@ const postSchema = new mongoose.Schema(
     },
     title: { type: String, required: true },
     content: { type: String, required: true },
+    edited: { type: Boolean, default: false }, // Thêm trường edited
   },
-  { timestamps: true }
+  { timestamps: true } // Tự động thêm createdAt và updatedAt
 );
 
 // Thêm plugin xóa mềm
 postSchema.plugin(mongooseDelete, {
-  deletedAt: true, // Tự động thêm trường `deletedAt`
-  overrideMethods: "all", // Ghi đè các phương thức mặc định (find, findOne, count...)
+  deletedAt: true, // Tự động thêm trường deletedAt
+  overrideMethods: "all", // Ghi đè các phương thức mặc định
 });
 
 const Post = mongoose.model("Post", postSchema);

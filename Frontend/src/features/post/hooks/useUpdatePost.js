@@ -3,10 +3,14 @@ import { updatePostApi } from "../services/postApi";
 
 const useUpdatePost = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ id, data }) => updatePostApi(id, data),
+    mutationFn: (formData) => updatePostApi(formData), // Nhận FormData trực tiếp
     onSuccess: () => {
-      queryClient.invalidateQueries("posts"); // Làm mới danh sách bài viết
+      queryClient.invalidateQueries("posts"); // Làm mới danh sách bài viết của người dùng
+    },
+    onError: (error) => {
+      console.error("Lỗi khi cập nhật bài viết:", error); // Log lỗi để debug
     },
   });
 };

@@ -17,9 +17,15 @@ const createPostApi = (formData) => {
   });
 };
 
-const updatePostApi = (id, data) => {
-  const URL_API = `/api/posts/${id}`;
-  return axios.put(URL_API, data);
+const updatePostApi = async (formData) => {
+  const post_id = formData.get("post_id");
+  const URL_API = `/api/posts/${post_id}`;
+
+  return axios.patch(URL_API, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 const deletePostApi = (post_id, id) => {
