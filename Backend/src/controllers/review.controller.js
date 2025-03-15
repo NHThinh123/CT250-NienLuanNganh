@@ -1,9 +1,12 @@
-const { updateRatingAverageService } = require("../services/business.service");
+const {
+  updateRatingAverageService,
+  updateTotalReviews,
+} = require("../services/business.service");
 const {
   getListReviewService,
   createReviewService,
   getReviewByIdService,
-  // updateReviewService,
+  getNumberOfReviewsByBusinessIdService,
   deleteReviewService,
   getReviewsByBusinessIdService,
 } = require("../services/review.service");
@@ -50,6 +53,7 @@ const createReview = async (req, res, next) => {
       business_id_review
     );
     await updateRatingAverageService(business_id); //Cập nhật lại rating_average khi tạo một review
+    await updateTotalReviews(business_id); //Cập nhật lại số lượng review của business khi tạo một review
 
     res.status(201).json(newReview);
   } catch (error) {
@@ -72,6 +76,7 @@ const deleteReview = async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = await deleteReviewService(id);
+    await updateTotalReviews(data.business_id); //Cập nhật lại số lượng review của business khi tạo một review
     res.status(200).json(data);
   } catch (error) {
     next(error);
@@ -88,11 +93,26 @@ const getReviewsByBusinessId = async (req, res, next) => {
   }
 };
 
+const getNumberOfReviewsByBusinessId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "Business ID is required" });
+    }
+
+    const totalReviews = await getNumberOfReviewsByBusinessIdService(id);
+
+    return res.status(200).json({ totalReviews });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getListReview,
   getReviewById,
   createReview,
-  // updateReview,
+  getNumberOfReviewsByBusinessId,
   deleteReview,
   getReviewsByBusinessId,
 };

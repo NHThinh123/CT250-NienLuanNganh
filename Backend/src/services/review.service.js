@@ -83,11 +83,22 @@ const getReviewsByBusinessIdService = async (businessId) => {
   }
 };
 
+const getNumberOfReviewsByBusinessIdService = async (businessId) => {
+  try {
+    const totalReviews = await Review.countDocuments({
+      business_id: businessId,
+    });
+    return totalReviews;
+  } catch (error) {
+    throw new Error(error.mesage);
+  }
+};
+
 module.exports = {
   getListReviewService,
   getReviewByIdService,
   createReviewService,
-  // updateReviewService,
+  getNumberOfReviewsByBusinessIdService,
   deleteReviewService,
   getReviewsByBusinessIdService,
 };

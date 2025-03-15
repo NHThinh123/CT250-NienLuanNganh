@@ -47,5 +47,5 @@ export {
   deleteBusinessApi,
   signUpBusinessApi,
   loginBusinessApi,
-  requestBusinessResetPassword
+  requestBusinessResetPassword,
 };

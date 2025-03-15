@@ -12,6 +12,7 @@ const BusinessDetailPage = () => {
   const { business } = useContext(BusinessContext);
   const { businessData, isLoadingBusiness, isErrorBusiness } =
     useBusinessById(id);
+  console.log("businessData in BusinessDetailPage", businessData);
   const { menuData, isLoadingMenu, isErrorMenu } = useMenuByBusinessId(id);
 
   const canEdit = business.isAuthenticated && business.business.id === id;
