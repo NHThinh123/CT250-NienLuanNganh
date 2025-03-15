@@ -14,7 +14,7 @@ const BusinessInHomePage = ({ businessData }) => {
 
   return (
     <Row gutter={[16, 16]}>
-      {businessData.slice(0, 8).map((business) => (
+      {businessData.slice(0, 10).map((business) => (
         <Col
           key={business._id}
           xs={24}
@@ -28,7 +28,7 @@ const BusinessInHomePage = ({ businessData }) => {
             hoverable
             cover={
               <img
-                style={{ width: "100%", height: "150px" }}
+                style={{ width: "100%", height: "200px" }}
                 alt="business avatar"
                 src={business.avatar || "default-image.jpg"}
               />

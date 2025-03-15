@@ -12,11 +12,12 @@ const stripe = require("../config/stripe");
 const Payment = require("../models/payment.model");
 const Business = require("../models/business.model");
 const cloudinary = require("cloudinary").v2;
-const ResetTokenBusiness = require("../models/businessResetPassword.model")
-const { sendBusinessVerificationEmail, sendBusinessResetPasswordEmail } = require("../services/email.service");
+const ResetTokenBusiness = require("../models/businessResetPassword.model");
+const {
+  sendBusinessVerificationEmail,
+  sendBusinessResetPasswordEmail,
+} = require("../services/email.service");
 const crypto = require("crypto");
-
-
 
 const getBusiness = async (req, res, next) => {
   try {
@@ -42,7 +43,14 @@ const getBusinessById = async (req, res, next) => {
 const updateBusiness = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { business_name, close_hours, open_hours, contact_info, location, address } = req.body;
+    const {
+      business_name,
+      close_hours,
+      open_hours,
+      contact_info,
+      location,
+      address,
+    } = req.body;
     let updateData = {};
 
     // Tìm doanh nghiệp trước khi cập nhật
@@ -78,7 +86,9 @@ const updateBusiness = async (req, res, next) => {
 
     // Kiểm tra nếu không có dữ liệu nào để cập nhật
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ error: "Không có dữ liệu nào để cập nhật!" });
+      return res
+        .status(400)
+        .json({ error: "Không có dữ liệu nào để cập nhật!" });
     }
 
     // Cập nhật thông tin business
@@ -117,7 +127,6 @@ const updateBusiness = async (req, res, next) => {
   }
 };
 
-
 // Signup
 const signupBusiness = async (req, res, next) => {
   try {
@@ -135,13 +144,31 @@ const signupBusiness = async (req, res, next) => {
     const address = JSON.parse(req.body.address);
 
     // Kiểm tra các trường bắt buộc
-    if (!business_name || !open_hours || !close_hours || !location || !address || !contact_info || !email || !password) {
-      return res.status(400).json({ message: "Vui lòng cung cấp đầy đủ thông tin bắt buộc!" });
+    if (
+      !business_name ||
+      !open_hours ||
+      !close_hours ||
+      !location ||
+      !address ||
+      !contact_info ||
+      !email ||
+      !password
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Vui lòng cung cấp đầy đủ thông tin bắt buộc!" });
     }
 
     // Kiểm tra định dạng address
-    if (!address.type || !address.coordinates || !Array.isArray(address.coordinates) || address.coordinates.length !== 2) {
-      return res.status(400).json({ message: "Dữ liệu vị trí (location) không hợp lệ!" });
+    if (
+      !address.type ||
+      !address.coordinates ||
+      !Array.isArray(address.coordinates) ||
+      address.coordinates.length !== 2
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Dữ liệu vị trí (location) không hợp lệ!" });
     }
 
     const existingBusiness = await Business.findOne({ email });
@@ -162,7 +189,10 @@ const signupBusiness = async (req, res, next) => {
       close_hours,
       address: {
         type: address.type || "Point", // Đảm bảo type là "Point"
-        coordinates: [parseFloat(address.coordinates[0]), parseFloat(address.coordinates[1])], // Chuyển thành số
+        coordinates: [
+          parseFloat(address.coordinates[0]),
+          parseFloat(address.coordinates[1]),
+        ], // Chuyển thành số
       },
       location,
       contact_info,
@@ -177,7 +207,8 @@ const signupBusiness = async (req, res, next) => {
 
     res.status(201).json({
       status: "PENDING",
-      message: "Tài khoản đã được tạo! Vui lòng hoàn tất thanh toán để kích hoạt.",
+      message:
+        "Tài khoản đã được tạo! Vui lòng hoàn tất thanh toán để kích hoạt.",
       business: {
         id: newBusiness._id,
         business_name: newBusiness.business_name,
@@ -231,7 +262,8 @@ const processActivationPayment = async (req, res) => {
     });
 
     if (paymentIntent.status === "succeeded") {
-      const isActivation = business.status === "suspended" || !business.activationPayment;
+      const isActivation =
+        business.status === "suspended" || !business.activationPayment;
 
       // Cập nhật Business
       business.status = "active";
@@ -352,7 +384,7 @@ const loginBusiness = async (req, res, next) => {
     if (!business.verified) {
       return res.status(403).json({
         status: "FAILED",
-        message: "Email chưa được xác minh. Vui lòng kiểm tra hộp thư của bạn."
+        message: "Email chưa được xác minh. Vui lòng kiểm tra hộp thư của bạn.",
       });
     }
 
@@ -410,6 +442,7 @@ const updateDishCostBusiness = async (req, res, next) => {
     next(error);
   }
 };
+
 //Gửi yêu cầu đặt lại mật khẩu
 const requestBusinessPasswordReset = async (req, res) => {
   console.log("Request body received:", req.body);
@@ -450,8 +483,14 @@ const resetBusinessPassword = async (req, res) => {
 
     const resetToken = await ResetTokenBusiness.findOne({ token });
 
-    if (!resetToken || !resetToken.businessId || resetToken.expiresAt < Date.now()) {
-      return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
+    if (
+      !resetToken ||
+      !resetToken.businessId ||
+      resetToken.expiresAt < Date.now()
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
     }
 
     // Mã hóa mật khẩu mới
@@ -465,7 +504,9 @@ const resetBusinessPassword = async (req, res) => {
     );
 
     if (!updatedBusiness) {
-      return res.status(400).json({ message: "Không tìm thấy người dùng, đặt lại mật khẩu thất bại!" });
+      return res.status(400).json({
+        message: "Không tìm thấy người dùng, đặt lại mật khẩu thất bại!",
+      });
     }
 
     // Xóa token đặt lại mật khẩu sau khi sử dụng
@@ -519,6 +560,5 @@ module.exports = {
   processMonthlyPayment,
   requestBusinessPasswordReset,
   resetBusinessPassword,
-  getBusinessEmail
-
+  getBusinessEmail,
 };

@@ -9,6 +9,7 @@ import CreateReview from "../../../review/components/templates/CreateReview";
 import DishSearch from "../molecules/DishSearch";
 import { useContext, useState } from "react";
 import { BusinessContext } from "../../../../contexts/business.context";
+// import MenuFilter from "../organisms/MenuFilter";
 
 const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
   const reviewData = useReviewByBusinessId(business_id);
@@ -65,6 +66,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
                   ></MenuList>
                 )}
                 {isBusinessOwner && <AddMenu businessId={business_id} />}
+                {/* <MenuFilter /> */}
               </div>
             </Col>
             <Col span={9}>

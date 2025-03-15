@@ -7,7 +7,6 @@ const transporter = require("../config/emailConfig");
 const Review = require("../models/review.model");
 const { getListDishByBusinessIdService } = require("./dish.service");
 
-
 const getBusinessService = async (req, res) => {
   try {
     const business = await Business.find();
@@ -123,6 +122,17 @@ const updateDishCostBusinessService = async (businessId) => {
   }
 };
 
+const updateTotalReviews = async (businessId) => {
+  try {
+    const totalReviews = await Review.countDocuments({
+      business_id: businessId,
+    });
+    await Business.findByIdAndUpdate(businessId, { totalReviews });
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   // createBusinessService,
   getBusinessService,
@@ -130,4 +140,5 @@ module.exports = {
   updateBusinessService,
   updateRatingAverageService,
   updateDishCostBusinessService,
+  updateTotalReviews,
 };

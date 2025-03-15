@@ -22,7 +22,7 @@ const MenuList = ({ menuData, searchKeyword }) => {
     console.error("MenuList must be used within a MenuProvider");
     return null;
   }
-  const MAX_VISIBLE_ITEMS = 4; // Giới hạn số lượng menu hiển thị ban đầu
+  const MAX_VISIBLE_ITEMS = 20; // Giới hạn số lượng menu hiển thị ban đầu
 
   // Lọc các menu có món ăn khớp với từ khóa tìm kiếm
   const filteredMenu = menuData.filter((menu) => {
