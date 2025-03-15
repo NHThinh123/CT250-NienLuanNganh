@@ -16,7 +16,7 @@ router.get("/", getListPost);
 router.get("/my-posts", getMyPosts);
 router.get("/detail/:id", getPostById);
 router.post("/create", uploadPost.array("media", 5), createPost);
-router.put("/:post_id", updatePost);
+router.patch("/:post_id", uploadPost.array("media", 5), updatePost);
 router.delete("/:post_id", deletePost);
 
 module.exports = router;

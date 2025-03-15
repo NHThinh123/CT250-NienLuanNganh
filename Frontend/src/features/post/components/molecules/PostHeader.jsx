@@ -1,10 +1,21 @@
 import { CheckCircleFilled, EllipsisOutlined } from "@ant-design/icons";
-import { Avatar, Button, Col, Row, Typography, Dropdown, Modal } from "antd"; // Thêm Modal
+import {
+  Avatar,
+  Button,
+  Col,
+  Row,
+  Typography,
+  Dropdown,
+  Modal,
+  Form,
+} from "antd"; // Thêm Modal
 import { formatTime } from "../../../../constants/formatTime";
 import { Link } from "react-router-dom";
 import { useState } from "react"; // Thêm useState để quản lý trạng thái Modal
+import ModalUpdatePost from "./ModalUpdatePost";
 
 const PostHeader = ({
+  postData,
   userData,
   createAt,
   isBusiness,
@@ -15,6 +26,20 @@ const PostHeader = ({
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false); // Trạng thái hiển thị Modal
 
+  const [isShowModalUpdatePost, setIsShowModalUpdatePost] = useState(false); // Trạng thái hiển thị Modal cập nhật bài viết
+
+  const [form] = Form.useForm();
+
+  const handleShowModalUpdatePost = () => {
+    setIsShowModalUpdatePost(true);
+  };
+  const handleCancelModalUpdatePost = () => {
+    setIsShowModalUpdatePost(false);
+  };
+  const handleSubmit = async () => {
+    form.submit();
+    // setIsModalOpen(false);
+  };
   // Hàm mở Modal xác nhận
   const showDeleteConfirm = () => {
     setIsModalVisible(true);
@@ -41,7 +66,11 @@ const PostHeader = ({
       key: "0",
     },
     {
-      label: <Button type="text">Sửa</Button>,
+      label: (
+        <Button type="text" onClick={handleShowModalUpdatePost}>
+          Sửa
+        </Button>
+      ),
       key: "1",
     },
   ];
@@ -102,6 +131,14 @@ const PostHeader = ({
       >
         <p>Bạn có chắc chắn muốn xóa bài viết này không?</p>
       </Modal>
+      <ModalUpdatePost
+        handleCancel={handleCancelModalUpdatePost}
+        handleOk={handleSubmit}
+        isModalOpen={isShowModalUpdatePost}
+        form={form}
+        postData={postData}
+        setIsModalOpen={setIsShowModalUpdatePost}
+      />
     </>
   );
 };

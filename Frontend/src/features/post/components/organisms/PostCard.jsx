@@ -68,7 +68,7 @@ const PostCard = ({ post }) => {
             span={10}
             style={{
               maxWidth: 400,
-              maxHeight: 250,
+              maxHeight: 230,
               overflow: "hidden",
               marginRight: "32px",
             }}
@@ -90,6 +90,11 @@ const PostCard = ({ post }) => {
                 >
                   {post.title}
                 </h1>
+                {post?.edited && (
+                  <Typography.Text type="secondary">
+                    (Đã chỉnh sửa)
+                  </Typography.Text>
+                )}
                 <Col span={24} style={{ marginBottom: "8px" }}>
                   {post?.tags?.length > 0 &&
                     post.tags.map((tag) => (
@@ -102,11 +107,10 @@ const PostCard = ({ post }) => {
                   style={{
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
-                    WebkitLineClamp: 4,
+                    WebkitLineClamp: 3,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    lineHeight: "1.5em",
-                    maxHeight: "6em",
+                    // maxHeight: "6em",
                   }}
                 >
                   <p style={{ margin: 0 }}>{post.content}</p>
@@ -116,9 +120,7 @@ const PostCard = ({ post }) => {
                     Xem thêm
                   </Typography.Text>
                 )}
-              </div>
-
-              <div>
+                <br />
                 <Space align="center" style={{ marginTop: "8px" }}>
                   <Avatar
                     src={

@@ -86,14 +86,27 @@ const getMyPosts = async (req, res, next) => {
 const updatePost = async (req, res, next) => {
   try {
     const { post_id } = req.params;
-    const { id, dataUpdate, tags } = req.body;
-    const data = await updatePostService(
-      post_id,
-      id,
-      dataUpdate,
-      req.files,
-      tags
-    );
+    const { id, title, content, tags, deletedMediaIds } = req.body;
+    const files = req.files;
+    console.log("id", id);
+    console.log("title", title);
+    console.log("content", content);
+    console.log("tags", tags);
+    console.log("deletedMediaIds", deletedMediaIds);
+    console.log("files", files);
+    console.log("files", files);
+    const parsedTags = tags ? JSON.parse(tags) : undefined;
+    const parsedDeletedMediaIds = deletedMediaIds
+      ? JSON.parse(deletedMediaIds)
+      : [];
+
+    const data = await updatePostService(post_id, id, {
+      title,
+      content,
+      tags: parsedTags,
+      deletedMediaIds: parsedDeletedMediaIds,
+      files,
+    });
     res.status(200).json(data);
   } catch (error) {
     next(error);

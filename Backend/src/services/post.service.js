@@ -115,6 +115,7 @@ const getListPostService = async ({
       title: { $first: "$title" },
       content: { $first: "$content" },
       createdAt: { $first: "$createdAt" },
+      edited: { $first: "$edited" },
       updatedAt: { $first: "$updatedAt" },
       media: { $first: "$media" },
       tags: { $first: "$tags" },
@@ -174,6 +175,7 @@ const getListPostService = async ({
       business_id: 1,
       title: 1,
       content: 1,
+      edited: 1,
       createdAt: 1,
       updatedAt: 1,
       media: 1,
@@ -360,6 +362,7 @@ const getPostByIdService = async (post_id, id) => {
         business_id: 1,
         title: 1,
         content: 1,
+        edited: 1,
         createdAt: 1,
         updatedAt: 1,
         media: 1,
@@ -392,6 +395,7 @@ const createPostService = async (id, title, content, tags, files) => {
     business_id: business ? objectId : null,
     title,
     content,
+    edited: false,
   });
 
   if (files && files.length > 0) {
@@ -420,7 +424,7 @@ const createPostService = async (id, title, content, tags, files) => {
   return await getPostByIdService(result._id.toString(), id);
 };
 
-const updatePostService = async (post_id, id, dataUpdate, files, tags) => {
+const updatePostService = async (post_id, id, updateData) => {
   if (!mongoose.Types.ObjectId.isValid(post_id))
     throw new AppError("Invalid post ID", 400);
   if (!mongoose.Types.ObjectId.isValid(id))
@@ -437,21 +441,42 @@ const updatePostService = async (post_id, id, dataUpdate, files, tags) => {
       404
     );
 
-  const updateFields = {};
-  if (dataUpdate?.title) updateFields.title = dataUpdate.title;
-  if (dataUpdate?.content) updateFields.content = dataUpdate.content;
+  const { title, content, tags, deletedMediaIds, files } = updateData;
 
-  if (Object.keys(updateFields).length > 0) {
+  // Cập nhật title, content và đánh dấu edited nếu có thay đổi
+  const updateFields = {};
+  if (title) updateFields.title = title;
+  if (content) updateFields.content = content;
+
+  // Kiểm tra xem có thay đổi nào không để đánh dấu edited
+  const hasChanges =
+    Object.keys(updateFields).length > 0 || // Thay đổi title hoặc content
+    (tags !== undefined && (tags.length > 0 || post.tags?.length > 0)) || // Thay đổi tags
+    (deletedMediaIds && deletedMediaIds.length > 0) || // Xóa media
+    (files && files.length > 0); // Thêm media
+
+  if (hasChanges) {
+    updateFields.edited = true; // Đánh dấu đã chỉnh sửa
     const updatedPost = await Post.findOneAndUpdate(
       { _id: post_id },
       { $set: updateFields },
-      { new: true }
+      { new: true, runValidators: true } // runValidators để kiểm tra required
     );
     if (!updatedPost) throw new AppError("Failed to update post", 500);
   }
 
+  // Xóa media cũ nếu có deletedMediaIds
+  if (deletedMediaIds && deletedMediaIds.length > 0) {
+    await Asset.deleteMany({
+      post_id: post_id,
+      _id: {
+        $in: deletedMediaIds.map((id) => new mongoose.Types.ObjectId(id)),
+      },
+    });
+  }
+
+  // Thêm media mới nếu có files
   if (files && files.length > 0) {
-    await Asset.deleteMany({ post_id: post_id });
     const mediaDocs = files.map((file) => {
       let type = file.mimetype.startsWith("image/")
         ? "image"
@@ -464,14 +489,17 @@ const updatePostService = async (post_id, id, dataUpdate, files, tags) => {
     await Asset.insertMany(mediaDocs);
   }
 
-  if (tags && tags.length >= 0) {
+  // Cập nhật tags nếu được cung cấp
+  if (tags !== undefined) {
     await Post_Tag.deleteMany({ post_id: post_id });
     if (tags.length > 0) {
       for (const tag_name of tags) {
         let tag =
           (await Tag.findOne({ tag_name })) ||
           (await createTagService(tag_name));
-        await Post_Tag.create({ post_id: post_id, tag_id: tag._id });
+        if (!(await Post_Tag.findOne({ post_id: post_id, tag_id: tag._id }))) {
+          await Post_Tag.create({ post_id: post_id, tag_id: tag._id });
+        }
       }
     }
   }

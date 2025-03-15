@@ -8,6 +8,9 @@ const PostBody = ({ postData }) => {
           <Typography.Title style={{ margin: "8px 0px" }} level={4}>
             {postData?.title}
           </Typography.Title>
+          {postData?.edited && (
+            <Typography.Text type="secondary">(Đã chỉnh sửa)</Typography.Text>
+          )}
         </Col>
       </Row>
       <Row>

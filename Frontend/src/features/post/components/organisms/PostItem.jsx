@@ -17,6 +17,7 @@ const PostItem = ({ postData, onDelete, isDeleting, isMyPost }) => {
   return (
     <BoxContainer style={{ minWidth: "500px" }}>
       <PostHeader
+        postData={postData}
         isBusiness={isBusiness}
         userData={postData?.author}
         createAt={postData.createdAt}

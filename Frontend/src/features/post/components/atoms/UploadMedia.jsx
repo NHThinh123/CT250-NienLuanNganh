@@ -1,26 +1,31 @@
 import { Typography, Upload, message } from "antd";
 import { ImageUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const UploadMedia = ({ fileList, setFileList }) => {
   const [previewURLs, setPreviewURLs] = useState([]);
 
-  const MAX_FILE_SIZE_MB = 10; // Giới hạn kích thước file (MB)
-  const ACCEPTED_FILE_TYPES = ["image/*", "video/*"]; // Các loại file được phép
+  const MAX_FILE_SIZE_MB = 10;
+  const ACCEPTED_FILE_TYPES = ["image/*", "video/*"];
+
+  // Cập nhật previewURLs khi fileList thay đổi
+  useEffect(() => {
+    const urls = fileList
+      .map((file) => {
+        if (!file) return null; // Kiểm tra file có tồn tại không
+        if (file.url) return file.url; // URL từ backend
+        if (file.originFileObj) return URL.createObjectURL(file.originFileObj); // File mới
+        return null;
+      })
+      .filter(Boolean);
+    setPreviewURLs(urls);
+  }, [fileList]);
 
   const handleChange = ({ fileList: newFileList }) => {
-    // Cập nhật fileList
-    setFileList(newFileList);
-
-    // Tạo URL preview cho từng file
-    const newPreviewURLs = newFileList.map((file) =>
-      file.originFileObj ? URL.createObjectURL(file.originFileObj) : file.url
-    );
-    setPreviewURLs(newPreviewURLs);
+    setFileList(newFileList); // Cập nhật fileList qua callback từ parent
   };
 
   const beforeUpload = (file) => {
-    // Ràng buộc loại file
     const isValidType =
       file.type.startsWith("image/") || file.type.startsWith("video/");
     if (!isValidType) {
@@ -28,20 +33,26 @@ const UploadMedia = ({ fileList, setFileList }) => {
       return Upload.LIST_IGNORE;
     }
 
-    // Ràng buộc kích thước file
-    const fileSizeMB = file.size / 1024 / 1024; // Chuyển sang MB
-    const isWithinSizeLimit = fileSizeMB <= MAX_FILE_SIZE_MB;
-    if (!isWithinSizeLimit) {
+    const fileSizeMB = file.size / 1024 / 1024;
+    if (fileSizeMB > MAX_FILE_SIZE_MB) {
       message.error(`File phải nhỏ hơn ${MAX_FILE_SIZE_MB}MB!`);
       return Upload.LIST_IGNORE;
     }
 
-    return false; // Ngăn upload tự động, chờ form submit
+    return false; // Ngăn upload tự động
   };
 
-  // Tùy chỉnh render preview
   const renderPreview = (src, file, index) => {
-    if (file.type.startsWith("image/")) {
+    // Kiểm tra file có tồn tại không trước khi truy cập thuộc tính
+    if (!file || !src) return null;
+
+    const isImage =
+      file.type?.startsWith("image/") ||
+      file.url?.match(/\.(jpg|jpeg|png|gif)$/i);
+    const isVideo =
+      file.type?.startsWith("video/") || file.url?.match(/\.(mp4|mov|avi)$/i);
+
+    if (isImage) {
       return (
         <img
           key={index}
@@ -55,7 +66,7 @@ const UploadMedia = ({ fileList, setFileList }) => {
           }}
         />
       );
-    } else if (file.type.startsWith("video/")) {
+    } else if (isVideo) {
       return (
         <video
           key={index}
@@ -86,7 +97,7 @@ const UploadMedia = ({ fileList, setFileList }) => {
         beforeUpload={beforeUpload}
         onChange={handleChange}
         fileList={fileList}
-        accept={ACCEPTED_FILE_TYPES.join(",")} // "image/*,video/*"
+        accept={ACCEPTED_FILE_TYPES.join(",")}
         style={{
           maxHeight: "200px",
           marginBottom: "16px",
