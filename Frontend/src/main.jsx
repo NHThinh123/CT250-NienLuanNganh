@@ -30,6 +30,9 @@ import { ConfigProvider, App as AntdApp } from "antd";
 import ResetBusinessPasswordPage from "./pages/ResetBusinessPasswordPage.jsx";
 import MyPostList from "./features/post/components/templates/MyPostList.jsx";
 import ProtectedRoute from "./components/molecules/ProtectedRoute.jsx";
+import FAQPage from "./pages/FAQPage.jsx";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
+import TermsOfUsePage from "./pages/TermsOfUsePage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +104,18 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/faq",
+        element: <FAQPage />,
+      },
+      {
+        path: "/privacy-policy",
+        element: <PrivacyPolicyPage />,
+      },
+      {
+        path: "/terms-of-use",
+        element: <TermsOfUsePage />,
+      },
     ],
   },
   {
@@ -159,4 +174,3 @@ createRoot(document.getElementById("root")).render(
     <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>
 );
-

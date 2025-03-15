@@ -29,13 +29,13 @@ const Footer = () => {
         <Typography.Title level={4}>Hỗ trợ</Typography.Title>
         <List>
           <List.Item>
-            <Link> FAQ </Link>
+            <Link to={"/faq"}> FAQ </Link>
           </List.Item>
           <List.Item>
-            <Link>Chính sách bảo mật</Link>
+            <Link to={"/privacy-policy"}>Chính sách bảo mật</Link>
           </List.Item>
           <List.Item>
-            <Link>Điều khoản sử dụng</Link>
+            <Link to={"/terms-of-use"}>Điều khoản sử dụng</Link>
           </List.Item>
         </List>
       </Col>
@@ -43,20 +43,19 @@ const Footer = () => {
         <Typography.Title level={4}>Liên hệ</Typography.Title>
         <List>
           <List.Item>
-            <Link>
+            <a href="https://facebook.com">
               <FacebookOutlined /> Facebook
-            </Link>
+            </a>
           </List.Item>
           <List.Item>
-            <Link>
+            <a href="https://discord.com">
               <DiscordOutlined /> Discord
-            </Link>
+            </a>
           </List.Item>
           <List.Item>
-            <Link>
-              {" "}
+            <a href="https://github.com/">
               <GithubOutlined /> Github
-            </Link>
+            </a>
           </List.Item>
         </List>
       </Col>
