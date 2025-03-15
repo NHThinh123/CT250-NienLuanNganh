@@ -59,7 +59,12 @@ const PostHeader = ({
   const items = [
     {
       label: (
-        <Button type="text" onClick={showDeleteConfirm} loading={isDeleting}>
+        <Button
+          type="link"
+          style={{ color: "black" }}
+          onClick={showDeleteConfirm}
+          loading={isDeleting}
+        >
           Xóa
         </Button>
       ),
@@ -67,7 +72,11 @@ const PostHeader = ({
     },
     {
       label: (
-        <Button type="text" onClick={handleShowModalUpdatePost}>
+        <Button
+          type="link"
+          style={{ color: "black" }}
+          onClick={handleShowModalUpdatePost}
+        >
           Sửa
         </Button>
       ),
