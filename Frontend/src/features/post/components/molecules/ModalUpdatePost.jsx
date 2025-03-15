@@ -23,8 +23,6 @@ import useUpdatePost from "../../hooks/useUpdatePost";
 const ModalUpdatePost = ({
   isModalOpen,
   handleCancel,
-  handleOk,
-  form,
   setIsModalOpen,
   postData,
   onPostUpdated, // Callback để cập nhật dữ liệu ở parent
@@ -32,6 +30,7 @@ const ModalUpdatePost = ({
   const { entity } = useAuthEntity();
   const { mutate: updatePost, isPending } = useUpdatePost();
 
+  const [form] = Form.useForm();
   // Trạng thái ban đầu từ postData
   const initialTags = postData?.tags.map((tag) => tag.tag_name) || [];
   const initialFileList =

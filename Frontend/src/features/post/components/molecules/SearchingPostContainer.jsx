@@ -24,10 +24,9 @@ const SearchingPostContainer = ({ listType, onChange }) => {
             justifyContent: "flex-start",
             paddingTop: "20px",
             paddingBottom: "20px",
-            fontWeight: listType === "my-posts" ? "bold" : "normal",
+            fontWeight: "bold",
+            color: listType === "my-posts" ? "#52c41a" : "black",
             fontSize: "16px",
-            backgroundColor:
-              listType === "my-posts" ? "#f5f5f5" : "transparent",
           }}
         >
           <UserPen size={20} strokeWidth={2.5} />
@@ -42,10 +41,9 @@ const SearchingPostContainer = ({ listType, onChange }) => {
             justifyContent: "flex-start",
             paddingTop: "20px",
             paddingBottom: "20px",
-            fontWeight: listType === "liked-posts" ? "bold" : "normal",
+            fontWeight: "bold",
+            color: listType === "liked-posts" ? "#52c41a" : "black",
             fontSize: "16px",
-            backgroundColor:
-              listType === "liked-posts" ? "#f5f5f5" : "transparent",
           }}
         >
           <ThumbsUp size={20} strokeWidth={2.5} />
@@ -60,10 +58,9 @@ const SearchingPostContainer = ({ listType, onChange }) => {
             justifyContent: "flex-start",
             paddingTop: "20px",
             paddingBottom: "20px",
-            fontWeight: listType === "commented-posts" ? "bold" : "normal",
+            fontWeight: "bold",
+            color: listType === "commented-posts" ? "#52c41a" : "black",
             fontSize: "16px",
-            backgroundColor:
-              listType === "commented-posts" ? "#f5f5f5" : "transparent",
           }}
         >
           <MessageCircleMore size={20} strokeWidth={2.5} />
