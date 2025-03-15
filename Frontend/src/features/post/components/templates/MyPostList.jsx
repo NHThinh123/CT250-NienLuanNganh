@@ -7,8 +7,9 @@ import SideBar from "../organisms/SideBar";
 import PostFilter from "../organisms/PostFilter";
 
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
-import useMyPost from "../../hooks/useMyPost";
+import { useLikedPosts, useCommentedPosts } from "../../hooks/usePost"; // Sử dụng các hook từ usePost
 import useDeletePost from "../../hooks/useDeletePost";
+import useMyPost from "../../hooks/useMyPost";
 
 const MyPostList = () => {
   const { entity } = useAuthEntity();
@@ -21,9 +22,17 @@ const MyPostList = () => {
       tags: [],
     },
   });
+  const [listType, setListType] = useState("my-posts"); // Mặc định là "my-posts"
 
+  // Chọn hook dựa trên listType
+  const postHooks = {
+    "my-posts": useMyPost,
+    "liked-posts": useLikedPosts,
+    "commented-posts": useCommentedPosts,
+  };
+  const useSelectedPostHook = postHooks[listType];
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useMyPost(params);
+    useSelectedPostHook(params);
   const { mutate: deletePost, isLoading: isDeleting } = useDeletePost();
   const { ref, inView } = useInView();
 
@@ -48,6 +57,10 @@ const MyPostList = () => {
     }));
   };
 
+  const handleListTypeChange = (value) => {
+    setListType(value);
+  };
+
   const handleDeletePost = (post_id) => {
     deletePost({ post_id, id: entity.id });
   };
@@ -64,7 +77,6 @@ const MyPostList = () => {
           handleSortChange={handleSortChange}
           handleTagFilter={handleTagFilter}
         />
-
         <List
           dataSource={data?.pages?.flatMap((page) => page.posts)}
           grid={{ gutter: 8, column: 1 }}
@@ -72,13 +84,22 @@ const MyPostList = () => {
             <List.Item style={{ padding: "0px", margin: "0px" }}>
               <PostItem
                 postData={item}
-                onDelete={handleDeletePost}
+                onDelete={
+                  listType === "my-posts" ? handleDeletePost : undefined
+                } // Chỉ hiển thị nút xóa cho "my-posts"
                 isDeleting={isDeleting}
-                isMyPost={true}
+                isMyPost={listType === "my-posts"} // Chỉ bật isMyPost cho "my-posts"
               />
             </List.Item>
           )}
-          locale={{ emptyText: "Bạn chưa có bài viết nào." }}
+          locale={{
+            emptyText:
+              listType === "my-posts"
+                ? "Bạn chưa có bài viết nào."
+                : listType === "liked-posts"
+                ? "Bạn chưa thích bài viết nào."
+                : "Bạn chưa bình luận bài viết nào.",
+          }}
         />
         {isFetchingNextPage && (
           <div style={{ textAlign: "center", padding: "10px" }}>
@@ -100,7 +121,7 @@ const MyPostList = () => {
           overflowY: "auto",
         }}
       >
-        <SideBar />
+        <SideBar listType={listType} onChange={handleListTypeChange} />
       </Col>
     </Row>
   );

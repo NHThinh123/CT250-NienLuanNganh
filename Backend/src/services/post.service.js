@@ -7,6 +7,8 @@ const Asset = require("../models/asset.model");
 const Post_Tag = require("../models/post_tag.model");
 const { createTagService } = require("./tag.service");
 const Tag = require("../models/tag.model");
+const User_Like_Post = require("../models/user_like_post.model");
+const Comment = require("../models/comment.model");
 
 require("dotenv").config();
 
@@ -379,6 +381,439 @@ const getPostByIdService = async (post_id, id) => {
   return result[0];
 };
 
+const getLikedPostsService = async ({
+  id,
+  search,
+  sort,
+  page = 1,
+  limit = 10,
+  filter = {},
+}) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new AppError("Invalid user ID", 400);
+
+  const objectId = new mongoose.Types.ObjectId(id);
+
+  let pipeline = [
+    // Match các lượt thích của user hoặc business
+    {
+      $match: {
+        $or: [{ user_id: objectId }, { business_id: objectId }],
+      },
+    },
+    // Join với bảng posts
+    {
+      $lookup: {
+        from: "posts",
+        localField: "post_id",
+        foreignField: "_id",
+        as: "post",
+      },
+    },
+    { $unwind: "$post" },
+    // Lọc bài viết chưa bị xóa mềm
+    { $match: { "post.deleted": { $ne: true } } },
+  ];
+
+  // Thêm điều kiện tìm kiếm nếu có
+  if (search) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { "post.title": { $regex: search, $options: "i" } },
+          { "post.content": { $regex: search, $options: "i" } },
+        ],
+      },
+    });
+  }
+
+  // Thêm các lookup và aggregation
+  pipeline.push(
+    {
+      $lookup: {
+        from: "users",
+        localField: "post.user_id",
+        foreignField: "_id",
+        as: "post.user",
+      },
+    },
+    { $unwind: { path: "$post.user", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "post.business_id",
+        foreignField: "_id",
+        as: "post.business",
+      },
+    },
+    { $unwind: { path: "$post.business", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "assets",
+        localField: "post._id",
+        foreignField: "post_id",
+        as: "post.media",
+      },
+    },
+    {
+      $lookup: {
+        from: "post_tags",
+        localField: "post._id",
+        foreignField: "post_id",
+        as: "post.postTags",
+      },
+    },
+    {
+      $lookup: {
+        from: "tags",
+        localField: "post.postTags.tag_id",
+        foreignField: "_id",
+        as: "post.tags",
+      },
+    },
+    {
+      $lookup: {
+        from: "user_like_posts", // Tên collection thực tế trong DB
+        localField: "post._id",
+        foreignField: "post_id",
+        as: "post.likes",
+      },
+    },
+    {
+      $lookup: {
+        from: "comments",
+        localField: "post._id",
+        foreignField: "post_id",
+        as: "post.comments",
+      },
+    },
+    // Lọc bình luận chưa bị xóa mềm
+    {
+      $match: {
+        "post.comments.deleted": { $ne: true },
+      },
+    }
+  );
+
+  // Thêm các trường tính toán
+  pipeline.push({
+    $addFields: {
+      "post.likeCount": { $size: "$post.likes" },
+      "post.commentCount": { $size: "$post.comments" },
+      "post.isLike": 1, // Vì đây là danh sách bài đã thích
+      "post.author": {
+        $cond: {
+          if: { $ne: ["$post.user_id", null] },
+          then: {
+            id: "$post.user_id",
+            name: "$post.user.name",
+            avatar: "$post.user.avatar",
+          },
+          else: {
+            id: "$post.business_id",
+            name: "$post.business.business_name",
+            avatar: "$post.business.avatar",
+          },
+        },
+      },
+    },
+  });
+
+  // Sắp xếp
+  let sortOptions = { "post.createdAt": -1 };
+  if (sort === "oldest") sortOptions = { "post.createdAt": 1 };
+  if (sort === "most_likes") sortOptions = { "post.likeCount": -1 };
+  if (sort === "most_comments") sortOptions = { "post.commentCount": -1 };
+  pipeline.push({ $sort: sortOptions });
+
+  // Phân trang
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+  pipeline.push({ $skip: skip }, { $limit: parseInt(limit) });
+
+  // Dự án các trường cần thiết
+  pipeline.push({
+    $project: {
+      "post._id": 1,
+      "post.user_id": 1,
+      "post.business_id": 1,
+      "post.title": 1,
+      "post.content": 1,
+      "post.edited": 1,
+      "post.createdAt": 1,
+      "post.updatedAt": 1,
+      "post.media": 1,
+      "post.tags": 1,
+      "post.likeCount": 1,
+      "post.commentCount": 1,
+      "post.isLike": 1,
+      "post.author": 1,
+    },
+  });
+
+  const result = await User_Like_Post.aggregate(pipeline);
+
+  // Tổng số bài viết đã thích
+  const countPipeline = [
+    {
+      $match: {
+        $or: [{ user_id: objectId }, { business_id: objectId }],
+      },
+    },
+    {
+      $lookup: {
+        from: "posts",
+        localField: "post_id",
+        foreignField: "_id",
+        as: "post",
+      },
+    },
+    { $unwind: "$post" },
+    { $match: { "post.deleted": { $ne: true } } },
+    { $group: { _id: null, totalPosts: { $sum: 1 } } },
+  ];
+  const countResult = await User_Like_Post.aggregate(countPipeline);
+  const totalPosts = countResult.length > 0 ? countResult[0].totalPosts : 0;
+
+  return {
+    posts: result.map((item) => item.post),
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(totalPosts / limit),
+      totalPosts,
+    },
+  };
+};
+
+const getCommentedPostsService = async ({
+  id,
+  search,
+  sort,
+  page = 1,
+  limit = 10,
+  filter = {},
+}) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new AppError("Invalid user ID", 400);
+
+  const objectId = new mongoose.Types.ObjectId(id);
+
+  let pipeline = [
+    // Match các bình luận của user hoặc business
+    {
+      $match: {
+        $or: [{ user_id: objectId }, { business_id: objectId }],
+        deleted: { $ne: true }, // Lọc bình luận chưa bị xóa mềm
+      },
+    },
+    // Nhóm theo post_id để loại bỏ trùng lặp
+    {
+      $group: {
+        _id: "$post_id", // Nhóm theo post_id
+      },
+    },
+    // Join với bảng posts
+    {
+      $lookup: {
+        from: "posts",
+        localField: "_id",
+        foreignField: "_id",
+        as: "post",
+      },
+    },
+    { $unwind: "$post" },
+    // Lọc bài viết chưa bị xóa mềm
+    { $match: { "post.deleted": { $ne: true } } },
+  ];
+
+  // Thêm điều kiện tìm kiếm nếu có
+  if (search) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { "post.title": { $regex: search, $options: "i" } },
+          { "post.content": { $regex: search, $options: "i" } },
+        ],
+      },
+    });
+  }
+
+  // Thêm các lookup và aggregation
+  pipeline.push(
+    {
+      $lookup: {
+        from: "users",
+        localField: "post.user_id",
+        foreignField: "_id",
+        as: "post.user",
+      },
+    },
+    { $unwind: { path: "$post.user", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "post.business_id",
+        foreignField: "_id",
+        as: "post.business",
+      },
+    },
+    { $unwind: { path: "$post.business", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "assets",
+        localField: "post._id",
+        foreignField: "post_id",
+        as: "post.media",
+      },
+    },
+    {
+      $lookup: {
+        from: "post_tags",
+        localField: "post._id",
+        foreignField: "post_id",
+        as: "post.postTags",
+      },
+    },
+    {
+      $lookup: {
+        from: "tags",
+        localField: "post.postTags.tag_id",
+        foreignField: "_id",
+        as: "post.tags",
+      },
+    },
+    {
+      $lookup: {
+        from: "user_like_posts",
+        localField: "post._id",
+        foreignField: "post_id",
+        as: "post.likes",
+      },
+    },
+    {
+      $lookup: {
+        from: "comments",
+        localField: "post._id",
+        foreignField: "post_id",
+        as: "post.comments",
+      },
+    },
+    // Lọc bình luận chưa bị xóa mềm
+    {
+      $match: {
+        "post.comments.deleted": { $ne: true },
+      },
+    }
+  );
+
+  // Thêm các trường tính toán
+  pipeline.push({
+    $addFields: {
+      "post.likeCount": { $size: "$post.likes" },
+      "post.commentCount": { $size: "$post.comments" },
+      "post.isLike": {
+        $cond: {
+          if: {
+            $or: [
+              { $in: [objectId, "$post.likes.user_id"] },
+              { $in: [objectId, "$post.likes.business_id"] },
+            ],
+          },
+          then: 1,
+          else: 0,
+        },
+      },
+      "post.author": {
+        $cond: {
+          if: { $ne: ["$post.user_id", null] },
+          then: {
+            id: "$post.user_id",
+            name: "$post.user.name",
+            avatar: "$post.user.avatar",
+          },
+          else: {
+            id: "$post.business_id",
+            name: "$post.business.business_name",
+            avatar: "$post.business.avatar",
+          },
+        },
+      },
+    },
+  });
+
+  // Sắp xếp
+  let sortOptions = { "post.createdAt": -1 };
+  if (sort === "oldest") sortOptions = { "post.createdAt": 1 };
+  if (sort === "most_likes") sortOptions = { "post.likeCount": -1 };
+  if (sort === "most_comments") sortOptions = { "post.commentCount": -1 };
+  pipeline.push({ $sort: sortOptions });
+
+  // Phân trang
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+  pipeline.push({ $skip: skip }, { $limit: parseInt(limit) });
+
+  // Dự án các trường cần thiết
+  pipeline.push({
+    $project: {
+      "post._id": 1,
+      "post.user_id": 1,
+      "post.business_id": 1,
+      "post.title": 1,
+      "post.content": 1,
+      "post.edited": 1,
+      "post.createdAt": 1,
+      "post.updatedAt": 1,
+      "post.media": 1,
+      "post.tags": 1,
+      "post.likeCount": 1,
+      "post.commentCount": 1,
+      "post.isLike": 1,
+      "post.author": 1,
+    },
+  });
+
+  const result = await Comment.aggregate(pipeline);
+
+  // Tổng số bài viết đã bình luận
+  const countPipeline = [
+    {
+      $match: {
+        $or: [{ user_id: objectId }, { business_id: objectId }],
+        deleted: { $ne: true }, // Lọc bình luận chưa bị xóa mềm
+      },
+    },
+    // Nhóm theo post_id để đếm số bài viết duy nhất
+    {
+      $group: {
+        _id: "$post_id",
+      },
+    },
+    {
+      $lookup: {
+        from: "posts",
+        localField: "_id",
+        foreignField: "_id",
+        as: "post",
+      },
+    },
+    { $unwind: "$post" },
+    { $match: { "post.deleted": { $ne: true } } },
+    { $group: { _id: null, totalPosts: { $sum: 1 } } },
+  ];
+  const countResult = await Comment.aggregate(countPipeline);
+  const totalPosts = countResult.length > 0 ? countResult[0].totalPosts : 0;
+
+  return {
+    posts: result.map((item) => item.post),
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(totalPosts / limit),
+      totalPosts,
+    },
+  };
+};
+
 const createPostService = async (id, title, content, tags, files) => {
   if (!title || !content) throw new AppError("Missing required fields", 400);
   if (!id || !mongoose.Types.ObjectId.isValid(id))
@@ -538,4 +973,6 @@ module.exports = {
   updatePostService,
   deletePostService,
   getMyPostsService,
+  getLikedPostsService,
+  getCommentedPostsService,
 };

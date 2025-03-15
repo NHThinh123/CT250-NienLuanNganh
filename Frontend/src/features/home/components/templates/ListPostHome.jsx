@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { Button, Col, List, Row } from "antd";
 
-import usePost from "../../../post/hooks/usePost";
+import { usePost } from "../../../post/hooks/usePost";
 import PostCard from "../../../post/components/organisms/PostCard";
 import { useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";

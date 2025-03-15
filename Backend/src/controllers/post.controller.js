@@ -5,6 +5,8 @@ const {
   updatePostService,
   deletePostService,
   getMyPostsService,
+  getLikedPostsService,
+  getCommentedPostsService,
 } = require("../services/post.service");
 
 const getListPost = async (req, res, next) => {
@@ -40,6 +42,39 @@ const getPostById = async (req, res, next) => {
     const { id } = req.params;
     const { user_id } = req.query;
     const data = await getPostByIdService(id, user_id);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+const getLikedPosts = async (req, res, next) => {
+  try {
+    const { id, search, sort, page, limit, filter } = req.query;
+    const data = await getLikedPostsService({
+      id,
+      search,
+      sort,
+      page,
+      limit,
+      filter,
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getCommentedPosts = async (req, res, next) => {
+  try {
+    const { id, search, sort, page, limit, filter } = req.query;
+    const data = await getCommentedPostsService({
+      id,
+      search,
+      sort,
+      page,
+      limit,
+      filter,
+    });
     res.status(200).json(data);
   } catch (error) {
     next(error);
@@ -130,4 +165,6 @@ module.exports = {
   updatePost,
   deletePost,
   getMyPosts,
+  getLikedPosts,
+  getCommentedPosts,
 };

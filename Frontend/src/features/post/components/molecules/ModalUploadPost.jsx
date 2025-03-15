@@ -101,7 +101,12 @@ const ModalUploadPost = ({
       {isPending && <SpinLoading />}
       <Row>
         <Col span={2}>
-          <Avatar src={entity?.avatar}></Avatar>
+          <Avatar
+            src={
+              entity?.avatar ||
+              "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
+            }
+          ></Avatar>
         </Col>
         <Col span={20}>
           <Typography.Text style={{ fontWeight: "bold" }}>

@@ -46,6 +46,17 @@ const getMyPostsApi = ({ pageParam = 1, queryKey }) => {
   const URL_API = `/api/posts/my-posts`;
   return axios.get(URL_API, { params: { ...params, page: pageParam } });
 };
+const getLikedPostsApi = ({ pageParam = 1, queryKey }) => {
+  const [, params] = queryKey;
+  const URL_API = `/api/posts/liked-posts`;
+  return axios.get(URL_API, { params: { ...params, page: pageParam } });
+};
+
+const getCommentedPostsApi = ({ pageParam = 1, queryKey }) => {
+  const [, params] = queryKey;
+  const URL_API = `/api/posts/commented-posts`;
+  return axios.get(URL_API, { params: { ...params, page: pageParam } });
+};
 export {
   getPostApi,
   createPostApi,
@@ -55,4 +66,6 @@ export {
   likePostApi,
   unlikePostApi,
   getMyPostsApi,
+  getLikedPostsApi,
+  getCommentedPostsApi,
 };

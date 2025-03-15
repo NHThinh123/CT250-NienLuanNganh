@@ -6,6 +6,8 @@ const {
   updatePost,
   deletePost,
   getMyPosts,
+  getLikedPosts,
+  getCommentedPosts,
 } = require("../controllers/post.controller");
 const uploadPost = require("../middleware/uploadPost");
 
@@ -14,6 +16,8 @@ const router = express.Router();
 //Public routes
 router.get("/", getListPost);
 router.get("/my-posts", getMyPosts);
+router.get("/liked-posts", getLikedPosts);
+router.get("/commented-posts", getCommentedPosts);
 router.get("/detail/:id", getPostById);
 router.post("/create", uploadPost.array("media", 5), createPost);
 router.patch("/:post_id", uploadPost.array("media", 5), updatePost);

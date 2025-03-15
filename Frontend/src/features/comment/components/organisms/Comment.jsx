@@ -17,6 +17,7 @@ import useReplyComment from "../../hooks/useReplyComment";
 import useCreateReply from "../../hooks/useCreateReply";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 import { Link } from "react-router-dom";
+import { formatTime } from "../../../../constants/formatTime";
 
 const Comment = ({ commentData, post_id, minWidth }) => {
   const { entity } = useAuthEntity();
@@ -130,6 +131,17 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           <Typography.Text>{commentData?.comment_content}</Typography.Text>
         </div>
         <div style={{ display: "flex", gap: "4px" }}>
+          <Typography.Text
+            style={{
+              padding: "0px",
+              marginTop: 10,
+              fontSize: "12px",
+              lineHeight: "1",
+              color: "gray",
+            }}
+          >
+            {formatTime(commentData?.createdAt)}
+          </Typography.Text>
           <Button
             type="link"
             style={{ padding: "0px", fontSize: "12px", lineHeight: "1" }}

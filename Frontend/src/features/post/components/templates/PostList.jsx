@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Col, List, Row, Spin } from "antd";
 import { useInView } from "react-intersection-observer";
 
-import usePost from "../../hooks/usePost";
+import { usePost, useLikedPosts, useCommentedPosts } from "../../hooks/usePost";
 import PostItem from "../organisms/PostItem";
 import SideBar from "../organisms/SideBar";
 import PostFilter from "../organisms/PostFilter";
@@ -20,9 +20,18 @@ const PostList = () => {
       tags: [],
     },
   });
+  const [listType, setListType] = useState("all"); // Loại danh sách: all, my-posts, liked, commented
 
+  // Chọn hook dựa trên listType
+  const postHooks = {
+    all: usePost,
+    "liked-posts": useLikedPosts,
+    "commented-posts": useCommentedPosts,
+  };
+  const useSelectedPostHook = postHooks[listType];
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    usePost(params);
+    useSelectedPostHook(params);
+
   const { ref, inView } = useInView();
 
   useEffect(() => {
@@ -47,6 +56,10 @@ const PostList = () => {
         tags: selectedTags,
       },
     }));
+  };
+
+  const handleListTypeChange = (value) => {
+    setListType(value);
   };
 
   return (
@@ -88,7 +101,7 @@ const PostList = () => {
               overflowY: "auto",
             }}
           >
-            <SideBar />
+            <SideBar listType={listType} onChange={handleListTypeChange} />
           </Col>
         )}
       </Row>
