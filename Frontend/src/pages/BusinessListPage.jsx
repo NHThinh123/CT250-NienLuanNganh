@@ -1,6 +1,6 @@
 import useBusiness from "../features/business/hooks/useBusiness";
 import { Col, Row } from "antd";
-import BusinessList from "../features/business/components/templates/BusinessList";
+import Businesses from "../features/business/components/templates/Businesses";
 
 const BusinessListPage = () => {
   const { businessData } = useBusiness();
@@ -8,7 +8,7 @@ const BusinessListPage = () => {
     <Row>
       <Col span={3}></Col>
       <Col span={18}>
-        <BusinessList businessData={businessData} />
+        <Businesses businessData={businessData} />
       </Col>
       <Col span={3}></Col>
     </Row>

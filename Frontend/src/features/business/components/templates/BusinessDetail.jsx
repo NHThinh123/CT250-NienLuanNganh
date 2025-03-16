@@ -21,6 +21,7 @@ import {
   DollarSign,
   Store,
   BadgeDollarSign,
+  MessageCircle,
 } from "lucide-react"; // Thêm DollarSign
 import { useState, useEffect, useRef } from "react";
 import ProfileBusinessPage from "../../../../pages/ProfileBusinessPage";
@@ -182,7 +183,7 @@ const BusinessDetail = ({
       {/* Các phần khác giữ nguyên */}
       <Row>
         <Col span={2}></Col>
-        <Col span={7}>
+        <Col span={10}>
           <div style={styles.businessAva}>
             <img
               style={styles.businessImage}
@@ -191,7 +192,7 @@ const BusinessDetail = ({
             />
           </div>
         </Col>
-        <Col span={7}>
+        <Col span={10}>
           <div style={styles.businessDetail}>
             <div style={styles.businessBreadcrumb}>
               <Breadcrumb
@@ -207,25 +208,33 @@ const BusinessDetail = ({
               <p style={styles.businessName}>{businessData.business_name}</p>
             </div>
             <div style={styles.businessRating}>
-              <Rating
-                initialRating={businessData.rating_average}
-                readonly
-                emptySymbol={
-                  <FontAwesomeIcon
-                    icon={regularStar}
-                    style={{ fontSize: 20, color: "#ccc" }}
-                  />
-                }
-                fullSymbol={
-                  <FontAwesomeIcon
-                    icon={solidStar}
-                    style={{ fontSize: 20, color: "#FFD700" }}
-                  />
-                }
-                fractions={10}
-                quiet={true}
-              />
+              <p>
+                <Rating
+                  initialRating={businessData.rating_average}
+                  readonly
+                  emptySymbol={
+                    <FontAwesomeIcon
+                      icon={regularStar}
+                      style={{ fontSize: 20, color: "#ccc" }}
+                    />
+                  }
+                  fullSymbol={
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 20, color: "#FFD700" }}
+                    />
+                  }
+                  fractions={10}
+                  quiet={true}
+                />
+              </p>
               <p style={styles.ratingText}>{businessData.rating_average}/5</p>
+            </div>
+            <div style={styles.businessTotalReviews}>
+              <p>
+                <MessageCircle size={20} style={styles.icon} />
+                {businessData.totalReviews || "N/A"} lượt đánh giá
+              </p>
             </div>
             <div style={styles.businessLocation}>
               <p>
@@ -254,7 +263,6 @@ const BusinessDetail = ({
             </div>
           </div>
         </Col>
-        <Col span={4}></Col>
         <Col span={2}></Col>
       </Row>
 
@@ -325,7 +333,7 @@ const BusinessDetail = ({
               borderColor: "#52c41a",
               borderRadius: "5px",
               height: "40px",
-              fontWeight: "bold"
+              fontWeight: "bold",
             }}
             onClick={handlePaymentClick} // Bạn cần định nghĩa hàm này trong component
           >
@@ -336,11 +344,11 @@ const BusinessDetail = ({
             onClick={handlePaymentModalClose}
             style={{
               borderRadius: "5px",
-              height: "35px"
+              height: "35px",
             }}
           >
             Đóng
-          </Button>
+          </Button>,
         ]}
         width={600}
         bodyStyle={{ padding: "20px", backgroundColor: "#f5f5f5" }}
@@ -488,14 +496,17 @@ const styles = {
   },
   businessImage: {
     width: "100%",
-    maxWidth: "500px",
-    height: "250px",
+    height: "300px",
     borderRadius: "5px",
     objectFit: "cover",
   },
   businessDetail: {
     margin: "0px",
-    width: "95%",
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center", // Căn giữa theo chiều dọc
+    height: "100%", // Đảm bảo chiều cao để căn giữa
   },
   businessBreadcrumb: {
     marginBottom: "7px",
@@ -509,8 +520,6 @@ const styles = {
   },
   businessRating: {
     display: "flex",
-    alignItems: "center",
-    marginBottom: "14px",
   },
   ratingText: {
     fontSize: "15px",
@@ -520,18 +529,19 @@ const styles = {
   businessTime: {
     fontSize: "15px",
     color: "#252525",
-    marginBottom: "14px",
+  },
+  businessTotalReviews: {
+    fontSize: "15px",
+    color: "#252525",
   },
   businessLocation: {
     fontSize: "15px",
     color: "#252525",
-    marginBottom: "14px",
     cursor: "text",
   },
   businessContactInfo: {
     fontSize: "15px",
     color: "#252525",
-    marginBottom: "14px",
     cursor: "text",
   },
   icon: {
