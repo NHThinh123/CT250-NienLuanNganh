@@ -25,7 +25,7 @@ export const MenuProvider = ({ children }) => {
     const element = menuRefs.current?.[menuId]; // Kiểm tra tồn tại
     if (element) {
       const offsetTop =
-        element.getBoundingClientRect().top + window.scrollY - 75;
+        element.getBoundingClientRect().top + window.scrollY - 118;
       window.scrollTo({ top: offsetTop, behavior: "smooth" });
     }
   };

@@ -1,13 +1,18 @@
 import { useState } from "react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import { Input, Row, Col } from "antd";
+import { Input, Row, Col, Select, Button, Checkbox } from "antd";
+import { SlidersHorizontal } from "lucide-react";
+
+const { Option } = Select;
 
 const BusinessFilter = ({
   handleSearch,
-  //   handleSortChange,
-  //   handleTagFilter,
+  handleSortChange,
+  handleStarFilter,
 }) => {
   const [searchValue, setSearchValue] = useState("");
+  const [selectedStars, setSelectedStars] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
 
   const handleInputChange = (e) => {
     setSearchValue(e.target.value);
@@ -16,70 +21,61 @@ const BusinessFilter = ({
   const handleSearchClick = () => {
     handleSearch(searchValue);
   };
-  //   const [searchValue, setSearchValue] = useState("");
-  //   const [selectedTags, setSelectedTags] = useState([]);
-  //   const [showFilters, setShowFilters] = useState(false);
 
-  //   const handleInputChange = (e) => {
-  //     setSearchValue(e.target.value);
-  //   };
+  const handleStarChange = (checkedValues) => {
+    setSelectedStars(checkedValues);
+    handleStarFilter(checkedValues); // Gửi danh sách rating được chọn lên Businesses
+  };
 
-  //   const handleSearchClick = () => {
-  //     handleSearch(searchValue);
-  //   };
-
-  //   const handleTagChange = (checkedValues) => {
-  //     setSelectedTags(checkedValues);
-  //     handleTagFilter(checkedValues);
-  //   };
-
-  //   const toggleFilters = () => {
-  //     setShowFilters(!showFilters);
-  //   };
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
 
   return (
     <BoxContainer>
       <Row>
-        <Col span={4}></Col>
-        <Col span={16}>
+        <Col span={15}>
           <Input.Search
             placeholder="Tìm kiếm quán ăn"
             value={searchValue}
             onChange={handleInputChange}
             onSearch={handleSearchClick}
             enterButton
-            // style={{ paddingRight: "10px" }}
+            style={{ paddingRight: "10px" }}
           />
         </Col>
-        <Col span={4}>
-          {/* <Select
-            defaultValue="most_likes"
-            style={{ width: 150 }}
+        <Col span={5}>
+          <Select
+            defaultValue="Sắp xếp theo..."
+            style={{ width: "100%", textAlign: "center" }}
             onChange={handleSortChange}
           >
-            <Option value="newest">Mới nhất</Option>
-            <Option value="oldest">Cũ nhất</Option>
-            <Option value="most_likes">Nhiều lượt thích</Option>
-            <Option value="most_comments">Nhiều bình luận</Option>
-          </Select> */}
+            <Option value="high_to_low_reviews">
+              Lượt đánh giá nhiều đến ít
+            </Option>
+            <Option value="low_to_high_cost">Giá thấp đến cao</Option>
+            <Option value="high_to_low_cost">Giá cao đến thấp</Option>
+          </Select>
         </Col>
-        {/* <Col span={4} style={{ paddingLeft: "8px" }}></Col> */}
+        <Col span={4} style={{ paddingLeft: "8px" }}>
+          <Button onClick={toggleFilters} block>
+            <SlidersHorizontal size={15} />
+            {showFilters ? "Ẩn bộ lọc" : "Bộ lọc"}
+          </Button>
+        </Col>
       </Row>
-      {/* {showFilters && (
+      {showFilters && (
         <Row style={{ marginTop: "16px" }}>
-          <Col span={24}>
-            <Checkbox.Group onChange={handleTagChange} value={selectedTags}>
-              <Row gutter={[8, 8]}>
-                {tagOptions.map((tag) => (
-                  <Col span={6} key={tag.value}>
-                    <Checkbox value={tag.value}>{tag.label}</Checkbox>
-                  </Col>
-                ))}
-              </Row>
+          <Col span={2}>Đánh giá:</Col>
+          <Col span={22}>
+            <Checkbox.Group onChange={handleStarChange} value={selectedStars}>
+              <Checkbox value="from_3_stars">từ 3 sao</Checkbox>
+              <Checkbox value="from_4_stars">từ 4 sao</Checkbox>
+              <Checkbox value="from_5_stars">từ 5 sao</Checkbox>
             </Checkbox.Group>
           </Col>
         </Row>
-      )} */}
+      )}
     </BoxContainer>
   );
 };
