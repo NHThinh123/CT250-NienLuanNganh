@@ -6,7 +6,11 @@ const useCreateMenu = () => {
   return useMutation({
     mutationFn: createMenuApi,
     onSuccess: () => {
-      queryClient.invalidateQueries("menus"); // Làm mới danh sách món ăn
+      // Làm mới query với key "menus"
+      queryClient.invalidateQueries({ queryKey: ["menus"] });
+    },
+    onError: (error) => {
+      console.error("Lỗi khi tạo menu:", error);
     },
   });
 };
