@@ -22,8 +22,10 @@ const BusinessList = ({
   searchKeyword,
   sortOption,
   starFilters,
+  currentPage,
+  itemsPerPage,
+  setFilteredTotalItems,
 }) => {
-  console.log("businessData in businesses", businessData);
   const navigate = useNavigate();
 
   // Hàm lọc businesses theo rating
@@ -48,6 +50,9 @@ const BusinessList = ({
     })
     .filter(filterByRating);
 
+  // Cập nhật số lượng business sau khi lọc để phân trang chính xác
+  setFilteredTotalItems(filteredBusinessData.length);
+
   // Sắp xếp danh sách businesses theo tùy chọn của người dùng
   const sortedBusinessData = [...filteredBusinessData].sort((a, b) => {
     if (sortOption === "high_to_low_reviews") {
@@ -62,6 +67,12 @@ const BusinessList = ({
     return 0;
   });
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = sortedBusinessData.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
   const formatPrice = (price) => {
     if (typeof price !== "number" || isNaN(price)) {
       return "N/A";
@@ -69,7 +80,7 @@ const BusinessList = ({
     return price.toLocaleString("vi-VN");
   };
 
-  if (sortedBusinessData.length === 0) {
+  if (paginatedData.length === 0) {
     return (
       <BoxContainer style={{ textAlign: "center", padding: "20px" }}>
         <p style={{ fontSize: "16px", color: "#888" }}>
@@ -83,9 +94,9 @@ const BusinessList = ({
     <BoxContainer>
       <Row
         gutter={[24, 24]}
-        justify={sortedBusinessData.length / 4 == 0 ? "space-between" : "start"}
+        justify={paginatedData.length / 4 == 0 ? "space-between" : "start"}
       >
-        {sortedBusinessData.map((business) => (
+        {paginatedData.map((business) => (
           <Col
             key={business._id}
             xs={24} // 1 card trên dòng khi màn hình nhỏ
