@@ -19,7 +19,8 @@ import useCreatePost from "../../hooks/useCreatePost";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 import UploadMedia from "../atoms/UploadMedia";
-
+import SearchOptionBusiness from "../atoms/SearchOptionBusiness";
+import useBusiness from "../../../business/hooks/useBusiness";
 const ModalUploadPost = ({
   isModalOpen,
   handleCancel,
@@ -35,6 +36,9 @@ const ModalUploadPost = ({
   const [isShowUploadTag, setIsShowUploadTag] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
+
+  const { businessData, isLoading } = useBusiness();
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null); // State cho quán ăn
 
   const handleShowUploadImage = () => {
     setIsShowUploadImage(true);
@@ -52,6 +56,9 @@ const ModalUploadPost = ({
     formData.append("title", values.title);
     formData.append("content", values.content);
     formData.append("tags", JSON.stringify(tags));
+    if (selectedRestaurant) {
+      formData.append("linked_business_id", selectedRestaurant._id);
+    }
     fileList.forEach((file) => {
       formData.append("media", file.originFileObj);
     });
@@ -67,6 +74,7 @@ const ModalUploadPost = ({
         setIsShowUploadLocation(false);
         setFileList([]);
         setTags([]);
+        setSelectedRestaurant(null);
         setIsModalOpen(false);
       },
       onError: () => {
@@ -153,6 +161,15 @@ const ModalUploadPost = ({
             </Form.Item>
           </Form>
         </Col>
+        {isShowUploadLocation && (
+          <Col span={24} style={{ marginBottom: "16px" }}>
+            <SearchOptionBusiness
+              onSelect={(business) => setSelectedRestaurant(business)}
+              businessData={businessData}
+              isLoading={isLoading}
+            />
+          </Col>
+        )}
         {isShowUploadTag && (
           <Col span={24}>
             <UploadTag tags={tags} setTags={setTags} />

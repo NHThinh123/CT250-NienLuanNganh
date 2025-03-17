@@ -106,7 +106,7 @@ const UploadMedia = ({ fileList, setFileList }) => {
       >
         <ImageUp size={48} strokeWidth={1.5} />
         <br />
-        <Typography.Text>Thêm ảnh hoặc video</Typography.Text>
+        <Typography.Text>Thêm ảnh hoặc video tối đa 10MB</Typography.Text>
       </Upload.Dragger>
     </>
   );

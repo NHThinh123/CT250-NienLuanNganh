@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
+
 import {
   Avatar,
   Button,
@@ -19,6 +19,8 @@ import UploadMedia from "../atoms/UploadMedia";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 import useUpdatePost from "../../hooks/useUpdatePost";
+import SearchOptionBusiness from "../atoms/SearchOptionBusiness";
+import useBusiness from "../../../business/hooks/useBusiness";
 
 const ModalUpdatePost = ({
   isModalOpen,
@@ -29,6 +31,7 @@ const ModalUpdatePost = ({
 }) => {
   const { entity } = useAuthEntity();
   const { mutate: updatePost, isPending } = useUpdatePost();
+  const { businessData, isLoading } = useBusiness();
 
   const [form] = Form.useForm();
   // Trạng thái ban đầu từ postData
@@ -41,13 +44,16 @@ const ModalUpdatePost = ({
       url: media.url,
       isExisting: true, // Đánh dấu ảnh cũ từ server
     })) || [];
+  const initialRestaurant = postData?.linked_business || null; // Lấy quán ăn liên quan từ postData
 
   const [tags, setTags] = useState(initialTags);
   const [fileList, setFileList] = useState(initialFileList);
   const [deletedMediaIds, setDeletedMediaIds] = useState([]);
+  const [selectedRestaurant, setSelectedRestaurant] =
+    useState(initialRestaurant); // State cho quán ăn
   const [isShowUploadImage, setIsShowUploadImage] = useState(true);
   const [isShowUploadTag, setIsShowUploadTag] = useState(true);
-  const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
+  const [isShowUploadLocation, setIsShowUploadLocation] = useState(true);
 
   // Khởi tạo lại trạng thái khi postData thay đổi
   useEffect(() => {
@@ -58,6 +64,7 @@ const ModalUpdatePost = ({
     setTags(initialTags);
     setFileList(initialFileList);
     setDeletedMediaIds([]);
+    setSelectedRestaurant(initialRestaurant); // Khởi tạo quán ăn từ postData
   }, [postData, form]);
 
   const handleShowUploadImage = () => setIsShowUploadImage(true);
@@ -72,6 +79,9 @@ const ModalUpdatePost = ({
     formData.append("content", values.content);
     formData.append("tags", JSON.stringify(tags));
     formData.append("deletedMediaIds", JSON.stringify(deletedMediaIds));
+    if (selectedRestaurant) {
+      formData.append("related_business_id", selectedRestaurant._id); // Thêm linked_business_id
+    }
 
     fileList.forEach((file, index) => {
       if (!file.isExisting && file.originFileObj) {
@@ -94,9 +104,10 @@ const ModalUpdatePost = ({
         setTags([]);
         setFileList([]);
         setDeletedMediaIds([]);
+        setSelectedRestaurant(null); // Reset quán ăn
         setIsShowUploadImage(true);
         setIsShowUploadTag(true);
-        setIsShowUploadLocation(false);
+        setIsShowUploadLocation(true);
 
         // Gửi dữ liệu mới lên parent
         if (onPostUpdated) {
@@ -140,9 +151,10 @@ const ModalUpdatePost = ({
         setTags(initialTags);
         setFileList(initialFileList);
         setDeletedMediaIds([]);
+        setSelectedRestaurant(initialRestaurant); // Reset về quán ăn ban đầu
         setIsShowUploadImage(true);
         setIsShowUploadTag(true);
-        setIsShowUploadLocation(false);
+        setIsShowUploadLocation(true);
         handleCancel();
       },
     });
@@ -214,6 +226,16 @@ const ModalUpdatePost = ({
             </Form.Item>
           </Form>
         </Col>
+        {isShowUploadLocation && (
+          <Col span={24} style={{ marginBottom: "16px" }}>
+            <SearchOptionBusiness
+              onSelect={(business) => setSelectedRestaurant(business)}
+              businessData={businessData}
+              isLoading={isLoading}
+              initialRestaurant={selectedRestaurant}
+            />
+          </Col>
+        )}
         {isShowUploadTag && (
           <Col span={24}>
             <UploadTag tags={tags} setTags={setTags} />

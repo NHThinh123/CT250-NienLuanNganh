@@ -83,7 +83,7 @@ const getCommentedPosts = async (req, res, next) => {
 
 const createPost = async (req, res, next) => {
   try {
-    const { id, title, content, tags } = req.body;
+    const { id, title, content, tags, linked_business_id } = req.body;
     const parsedTags = tags ? JSON.parse(tags) : [];
     //console.log(user_id, title, content, parsedTags, req.files);
     const data = await createPostService(
@@ -91,7 +91,8 @@ const createPost = async (req, res, next) => {
       title,
       content,
       parsedTags,
-      req.files
+      req.files,
+      linked_business_id
     );
     res.status(200).json(data);
   } catch (error) {
@@ -121,15 +122,9 @@ const getMyPosts = async (req, res, next) => {
 const updatePost = async (req, res, next) => {
   try {
     const { post_id } = req.params;
-    const { id, title, content, tags, deletedMediaIds } = req.body;
+    const { id, title, content, tags, deletedMediaIds, related_business_id } =
+      req.body;
     const files = req.files;
-    console.log("id", id);
-    console.log("title", title);
-    console.log("content", content);
-    console.log("tags", tags);
-    console.log("deletedMediaIds", deletedMediaIds);
-    console.log("files", files);
-    console.log("files", files);
     const parsedTags = tags ? JSON.parse(tags) : undefined;
     const parsedDeletedMediaIds = deletedMediaIds
       ? JSON.parse(deletedMediaIds)
@@ -141,6 +136,7 @@ const updatePost = async (req, res, next) => {
       tags: parsedTags,
       deletedMediaIds: parsedDeletedMediaIds,
       files,
+      related_business_id,
     });
     res.status(200).json(data);
   } catch (error) {

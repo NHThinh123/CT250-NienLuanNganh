@@ -29,6 +29,7 @@ const getListPostService = async ({
     initialMatchConditions.$or = [
       { user_id: new mongoose.Types.ObjectId(filter.id) },
       { business_id: new mongoose.Types.ObjectId(filter.id) },
+      { linked_business_id: new mongoose.Types.ObjectId(filter.id) }, // Thêm điều kiện lọc theo linked_business_id
     ];
   }
   if (search) {
@@ -61,6 +62,15 @@ const getListPostService = async ({
       },
     },
     { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "linked_business_id", // Lookup cho linked_business_id
+        foreignField: "_id",
+        as: "linked_business",
+      },
+    },
+    { $unwind: { path: "$linked_business", preserveNullAndEmptyArrays: true } },
     {
       $lookup: {
         from: "assets",
@@ -112,8 +122,10 @@ const getListPostService = async ({
       _id: "$_id",
       user_id: { $first: "$user_id" },
       business_id: { $first: "$business_id" },
+      linked_business_id: { $first: "$linked_business_id" }, // Thêm linked_business_id
       user: { $first: "$user" },
       business: { $first: "$business" },
+      linked_business: { $first: "$linked_business" }, // Thêm thông tin quán liên quan
       title: { $first: "$title" },
       content: { $first: "$content" },
       createdAt: { $first: "$createdAt" },
@@ -175,6 +187,7 @@ const getListPostService = async ({
     $project: {
       user_id: 1,
       business_id: 1,
+      linked_business_id: 1, // Thêm vào kết quả trả về
       title: 1,
       content: 1,
       edited: 1,
@@ -186,6 +199,7 @@ const getListPostService = async ({
       commentCount: 1,
       isLike: 1,
       author: 1,
+      linked_business: 1, // Thêm thông tin quán liên quan vào kết quả
     },
   });
 
@@ -285,6 +299,15 @@ const getPostByIdService = async (post_id, id) => {
     { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
     {
       $lookup: {
+        from: "businesses",
+        localField: "linked_business_id", // Lookup cho linked_business_id
+        foreignField: "_id",
+        as: "linked_business",
+      },
+    },
+    { $unwind: { path: "$linked_business", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
         from: "assets",
         localField: "_id",
         foreignField: "post_id",
@@ -362,6 +385,7 @@ const getPostByIdService = async (post_id, id) => {
       $project: {
         user_id: 1,
         business_id: 1,
+        linked_business_id: 1, // Thêm vào kết quả trả về
         title: 1,
         content: 1,
         edited: 1,
@@ -373,6 +397,7 @@ const getPostByIdService = async (post_id, id) => {
         commentCount: 1,
         isLike: 1,
         author: 1,
+        linked_business: 1, // Thêm thông tin quán liên quan
       },
     },
   ]);
@@ -395,13 +420,11 @@ const getLikedPostsService = async ({
   const objectId = new mongoose.Types.ObjectId(id);
 
   let pipeline = [
-    // Match các lượt thích của user hoặc business
     {
       $match: {
         $or: [{ user_id: objectId }, { business_id: objectId }],
       },
     },
-    // Join với bảng posts
     {
       $lookup: {
         from: "posts",
@@ -411,11 +434,9 @@ const getLikedPostsService = async ({
       },
     },
     { $unwind: "$post" },
-    // Lọc bài viết chưa bị xóa mềm
     { $match: { "post.deleted": { $ne: true } } },
   ];
 
-  // Thêm điều kiện tìm kiếm nếu có
   if (search) {
     pipeline.push({
       $match: {
@@ -427,7 +448,6 @@ const getLikedPostsService = async ({
     });
   }
 
-  // Thêm các lookup và aggregation
   pipeline.push(
     {
       $lookup: {
@@ -447,6 +467,20 @@ const getLikedPostsService = async ({
       },
     },
     { $unwind: { path: "$post.business", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "post.linked_business_id", // Lookup cho linked_business_id
+        foreignField: "_id",
+        as: "post.linked_business",
+      },
+    },
+    {
+      $unwind: {
+        path: "$post.linked_business",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
     {
       $lookup: {
         from: "assets",
@@ -473,7 +507,7 @@ const getLikedPostsService = async ({
     },
     {
       $lookup: {
-        from: "user_like_posts", // Tên collection thực tế trong DB
+        from: "user_like_posts",
         localField: "post._id",
         foreignField: "post_id",
         as: "post.likes",
@@ -487,7 +521,6 @@ const getLikedPostsService = async ({
         as: "post.comments",
       },
     },
-    // Lọc bình luận chưa bị xóa mềm
     {
       $match: {
         "post.comments.deleted": { $ne: true },
@@ -495,12 +528,11 @@ const getLikedPostsService = async ({
     }
   );
 
-  // Thêm các trường tính toán
   pipeline.push({
     $addFields: {
       "post.likeCount": { $size: "$post.likes" },
       "post.commentCount": { $size: "$post.comments" },
-      "post.isLike": 1, // Vì đây là danh sách bài đã thích
+      "post.isLike": 1,
       "post.author": {
         $cond: {
           if: { $ne: ["$post.user_id", null] },
@@ -519,23 +551,21 @@ const getLikedPostsService = async ({
     },
   });
 
-  // Sắp xếp
   let sortOptions = { "post.createdAt": -1 };
   if (sort === "oldest") sortOptions = { "post.createdAt": 1 };
   if (sort === "most_likes") sortOptions = { "post.likeCount": -1 };
   if (sort === "most_comments") sortOptions = { "post.commentCount": -1 };
   pipeline.push({ $sort: sortOptions });
 
-  // Phân trang
   const skip = (parseInt(page) - 1) * parseInt(limit);
   pipeline.push({ $skip: skip }, { $limit: parseInt(limit) });
 
-  // Dự án các trường cần thiết
   pipeline.push({
     $project: {
       "post._id": 1,
       "post.user_id": 1,
       "post.business_id": 1,
+      "post.linked_business_id": 1, // Thêm vào kết quả trả về
       "post.title": 1,
       "post.content": 1,
       "post.edited": 1,
@@ -547,12 +577,12 @@ const getLikedPostsService = async ({
       "post.commentCount": 1,
       "post.isLike": 1,
       "post.author": 1,
+      "post.linked_business": 1, // Thêm thông tin quán liên quan
     },
   });
 
   const result = await User_Like_Post.aggregate(pipeline);
 
-  // Tổng số bài viết đã thích
   const countPipeline = [
     {
       $match: {
@@ -599,20 +629,17 @@ const getCommentedPostsService = async ({
   const objectId = new mongoose.Types.ObjectId(id);
 
   let pipeline = [
-    // Match các bình luận của user hoặc business
     {
       $match: {
         $or: [{ user_id: objectId }, { business_id: objectId }],
-        deleted: { $ne: true }, // Lọc bình luận chưa bị xóa mềm
+        deleted: { $ne: true },
       },
     },
-    // Nhóm theo post_id để loại bỏ trùng lặp
     {
       $group: {
-        _id: "$post_id", // Nhóm theo post_id
+        _id: "$post_id",
       },
     },
-    // Join với bảng posts
     {
       $lookup: {
         from: "posts",
@@ -622,11 +649,9 @@ const getCommentedPostsService = async ({
       },
     },
     { $unwind: "$post" },
-    // Lọc bài viết chưa bị xóa mềm
     { $match: { "post.deleted": { $ne: true } } },
   ];
 
-  // Thêm điều kiện tìm kiếm nếu có
   if (search) {
     pipeline.push({
       $match: {
@@ -638,7 +663,6 @@ const getCommentedPostsService = async ({
     });
   }
 
-  // Thêm các lookup và aggregation
   pipeline.push(
     {
       $lookup: {
@@ -658,6 +682,20 @@ const getCommentedPostsService = async ({
       },
     },
     { $unwind: { path: "$post.business", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "businesses",
+        localField: "post.linked_business_id", // Lookup cho linked_business_id
+        foreignField: "_id",
+        as: "post.linked_business",
+      },
+    },
+    {
+      $unwind: {
+        path: "$post.linked_business",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
     {
       $lookup: {
         from: "assets",
@@ -698,7 +736,6 @@ const getCommentedPostsService = async ({
         as: "post.comments",
       },
     },
-    // Lọc bình luận chưa bị xóa mềm
     {
       $match: {
         "post.comments.deleted": { $ne: true },
@@ -706,7 +743,6 @@ const getCommentedPostsService = async ({
     }
   );
 
-  // Thêm các trường tính toán
   pipeline.push({
     $addFields: {
       "post.likeCount": { $size: "$post.likes" },
@@ -741,23 +777,21 @@ const getCommentedPostsService = async ({
     },
   });
 
-  // Sắp xếp
   let sortOptions = { "post.createdAt": -1 };
   if (sort === "oldest") sortOptions = { "post.createdAt": 1 };
   if (sort === "most_likes") sortOptions = { "post.likeCount": -1 };
   if (sort === "most_comments") sortOptions = { "post.commentCount": -1 };
   pipeline.push({ $sort: sortOptions });
 
-  // Phân trang
   const skip = (parseInt(page) - 1) * parseInt(limit);
   pipeline.push({ $skip: skip }, { $limit: parseInt(limit) });
 
-  // Dự án các trường cần thiết
   pipeline.push({
     $project: {
       "post._id": 1,
       "post.user_id": 1,
       "post.business_id": 1,
+      "post.linked_business_id": 1, // Thêm vào kết quả trả về
       "post.title": 1,
       "post.content": 1,
       "post.edited": 1,
@@ -769,20 +803,19 @@ const getCommentedPostsService = async ({
       "post.commentCount": 1,
       "post.isLike": 1,
       "post.author": 1,
+      "post.linked_business": 1, // Thêm thông tin quán liên quan
     },
   });
 
   const result = await Comment.aggregate(pipeline);
 
-  // Tổng số bài viết đã bình luận
   const countPipeline = [
     {
       $match: {
         $or: [{ user_id: objectId }, { business_id: objectId }],
-        deleted: { $ne: true }, // Lọc bình luận chưa bị xóa mềm
+        deleted: { $ne: true },
       },
     },
-    // Nhóm theo post_id để đếm số bài viết duy nhất
     {
       $group: {
         _id: "$post_id",
@@ -814,10 +847,22 @@ const getCommentedPostsService = async ({
   };
 };
 
-const createPostService = async (id, title, content, tags, files) => {
+const createPostService = async (
+  id,
+  title,
+  content,
+  tags,
+  files,
+  related_business_id
+) => {
   if (!title || !content) throw new AppError("Missing required fields", 400);
   if (!id || !mongoose.Types.ObjectId.isValid(id))
     throw new AppError("A valid ID must be provided", 400);
+  if (
+    related_business_id &&
+    !mongoose.Types.ObjectId.isValid(related_business_id)
+  )
+    throw new AppError("Invalid related business ID", 400);
 
   const objectId = new mongoose.Types.ObjectId(id);
   const user = await User.findById(objectId);
@@ -825,9 +870,18 @@ const createPostService = async (id, title, content, tags, files) => {
   if (!user && !business)
     throw new AppError("ID does not belong to any user or business", 404);
 
+  // Kiểm tra xem related_business_id có tồn tại trong Business không
+  if (related_business_id) {
+    const linkedBusiness = await Business.findById(related_business_id);
+    if (!linkedBusiness) throw new AppError("Related business not found", 404);
+  }
+
   let result = await Post.create({
     user_id: user ? objectId : null,
     business_id: business ? objectId : null,
+    linked_business_id: related_business_id
+      ? new mongoose.Types.ObjectId(related_business_id)
+      : null, // Thêm linked_business_id
     title,
     content,
     edited: false,
@@ -876,31 +930,45 @@ const updatePostService = async (post_id, id, updateData) => {
       404
     );
 
-  const { title, content, tags, deletedMediaIds, files } = updateData;
+  const { title, content, tags, deletedMediaIds, files, related_business_id } =
+    updateData;
 
-  // Cập nhật title, content và đánh dấu edited nếu có thay đổi
+  // Kiểm tra related_business_id nếu được cung cấp
+  if (
+    related_business_id &&
+    !mongoose.Types.ObjectId.isValid(related_business_id)
+  )
+    throw new AppError("Invalid related business ID", 400);
+  if (related_business_id) {
+    const linkedBusiness = await Business.findById(related_business_id);
+    if (!linkedBusiness) throw new AppError("Related business not found", 404);
+  }
+
+  // Cập nhật các trường
   const updateFields = {};
   if (title) updateFields.title = title;
   if (content) updateFields.content = content;
+  if (related_business_id !== undefined)
+    updateFields.linked_business_id = related_business_id
+      ? new mongoose.Types.ObjectId(related_business_id)
+      : null;
 
-  // Kiểm tra xem có thay đổi nào không để đánh dấu edited
   const hasChanges =
-    Object.keys(updateFields).length > 0 || // Thay đổi title hoặc content
-    (tags !== undefined && (tags.length > 0 || post.tags?.length > 0)) || // Thay đổi tags
-    (deletedMediaIds && deletedMediaIds.length > 0) || // Xóa media
-    (files && files.length > 0); // Thêm media
+    Object.keys(updateFields).length > 0 ||
+    (tags !== undefined && (tags.length > 0 || post.tags?.length > 0)) ||
+    (deletedMediaIds && deletedMediaIds.length > 0) ||
+    (files && files.length > 0);
 
   if (hasChanges) {
-    updateFields.edited = true; // Đánh dấu đã chỉnh sửa
+    updateFields.edited = true;
     const updatedPost = await Post.findOneAndUpdate(
       { _id: post_id },
       { $set: updateFields },
-      { new: true, runValidators: true } // runValidators để kiểm tra required
+      { new: true, runValidators: true }
     );
     if (!updatedPost) throw new AppError("Failed to update post", 500);
   }
 
-  // Xóa media cũ nếu có deletedMediaIds
   if (deletedMediaIds && deletedMediaIds.length > 0) {
     await Asset.deleteMany({
       post_id: post_id,
@@ -910,7 +978,6 @@ const updatePostService = async (post_id, id, updateData) => {
     });
   }
 
-  // Thêm media mới nếu có files
   if (files && files.length > 0) {
     const mediaDocs = files.map((file) => {
       let type = file.mimetype.startsWith("image/")
@@ -924,7 +991,6 @@ const updatePostService = async (post_id, id, updateData) => {
     await Asset.insertMany(mediaDocs);
   }
 
-  // Cập nhật tags nếu được cung cấp
   if (tags !== undefined) {
     await Post_Tag.deleteMany({ post_id: post_id });
     if (tags.length > 0) {

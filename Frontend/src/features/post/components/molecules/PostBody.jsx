@@ -1,4 +1,6 @@
 import { Col, Row, Tag, Typography } from "antd";
+import PostLinkedBusiness from "./PostLinkedBusiness";
+import { Link } from "react-router-dom";
 
 const PostBody = ({ postData }) => {
   return (
@@ -26,6 +28,17 @@ const PostBody = ({ postData }) => {
       <Row>
         <Col span={24}>{postData?.content}</Col>
       </Row>
+      {postData?.linked_business_id && (
+        <div>
+          <Typography.Text italic type="secondary">
+            {" "}
+            Thông tin quán ăn:
+          </Typography.Text>
+          <Link to={`/businesses/${postData.linked_business_id}`}>
+            <PostLinkedBusiness linked_business={postData?.linked_business} />
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

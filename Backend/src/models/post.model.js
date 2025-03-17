@@ -11,6 +11,10 @@ const postSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Business",
     },
+    linked_business_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+    },
     title: { type: String, required: true },
     content: { type: String, required: true },
     edited: { type: Boolean, default: false }, // Thêm trường edited
