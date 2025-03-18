@@ -1,5 +1,5 @@
-import { Outlet, useNavigate } from "react-router-dom";
-import { Layout, Button, Space, Avatar, Dropdown, Spin, message } from "antd"; // Thêm message
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Layout, Button, Space, Avatar, Dropdown, Spin, message } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useContext, useState } from "react";
 import { AuthContext } from "./contexts/auth.context";
@@ -8,13 +8,15 @@ import NavBar from "./components/templates/NavBar";
 import logo from "../src/assets/logo/logo.png";
 import Footer from "./components/templates/Footer";
 import ScrollToTop from "./components/atoms/ScrollToTop";
-import "antd/dist/reset.css";
 import ScrollToTopButton from "./components/atoms/ScrollToTopButton";
+import Sidebar from "./components/templates/SideBar"; // Đảm bảo import đúng
+import "antd/dist/reset.css";
 
-const { Header, Content } = Layout;
+const { Header, Content, Sider } = Layout;
 
 function App() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { auth, setAuth } = useContext(AuthContext);
   const { business, setBusiness } = useContext(BusinessContext);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -25,14 +27,14 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-    ? business.business?.avatar
-    : null;
+      ? business.business?.avatar
+      : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-    ? business.business?.business_name
-    : "";
+      ? business.business?.business_name
+      : "";
 
   const handleLogout = () => {
     setIsLoggingOut(true);
@@ -79,6 +81,10 @@ function App() {
     },
   ];
 
+  const isAdminPage = location.pathname === "/admin";
+  const isAdminTablePage = location.pathname === "/admintable";
+  const isAdminAddPage = location.pathname === "/adminadd";
+
   return (
     <Layout style={{ margin: 0, position: "relative" }}>
       {isLoggingOut && (
@@ -105,7 +111,7 @@ function App() {
         style={{
           position: "fixed",
           top: 0,
-          left: 0,
+
           width: "100%",
           zIndex: 1000,
           backgroundColor: "#fff",
@@ -133,24 +139,18 @@ function App() {
           </div>
 
           {/* NavBar */}
-          <div style={{ flexGrow: 1, padding: "0 20px" }}>
-            <NavBar />
-          </div>
-
+          {!isAdminPage && !isAdminTablePage && !isAdminAddPage && (
+            <div style={{ flexGrow: 1, padding: "0 20px" }}>
+              <NavBar />
+            </div>
+          )}
           {/* Đăng nhập/Đăng ký hoặc Avatar */}
           <div style={{ flexShrink: 0 }}>
             <Space>
               {isUserLoggedIn || isBusinessLoggedIn ? (
-                <Dropdown
-                  menu={{ items: menuItems }}
-                  placement="bottomRight"
-                  arrow
-                >
+                <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow>
                   <Space style={{ cursor: "pointer" }}>
-                    <Avatar
-                      src={avatarSrc}
-                      icon={!avatarSrc && <UserOutlined />}
-                    />
+                    <Avatar src={avatarSrc} icon={!avatarSrc && <UserOutlined />} />
                     <span>{displayName}</span>
                   </Space>
                 </Dropdown>
@@ -167,14 +167,34 @@ function App() {
         </div>
       </Header>
 
-      {/* Nội dung chính */}
-      <Content style={{ paddingTop: "64px" }}>
-        <ScrollToTop />
-        <ScrollToTopButton />
-        <Outlet />
-      </Content>
+      {(isAdminPage || isAdminTablePage || isAdminAddPage) && (
+        <Sider
+          width={150}
+          style={{
+            position: "fixed",
+            top: 64,
+            left: 0,
+            height: "calc(100vh - 64px)",
+            background: "#fff",
+            zIndex: 1000,
+            overflow: "auto",
+          }}
+        >
+          <Sidebar />
+        </Sider>
+      )}
 
-      <Footer />
+      {/* Nội dung chính */}
+      <Layout style={{ marginLeft: (isAdminPage || isAdminTablePage || isAdminAddPage) ? 150 : 0, minHeight: "100vh" }}>
+        <Content style={{ paddingTop: "64px" }}>
+          <ScrollToTop />
+          <ScrollToTopButton />
+          <Outlet />
+        </Content>
+        {!isAdminPage && !isAdminTablePage && !isAdminAddPage && (
+          <Footer />
+        )}
+      </Layout>
     </Layout>
   );
 }

@@ -5,7 +5,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./styles/global.css";
 import App from "./App.jsx";
 import HomePage from "./pages/HomePage.jsx";
-//import UserPage from "./pages/UserPage.jsx";
 import PostPage from "./pages/PostPage.jsx";
 import PostCreatePage from "./pages/PostCreatePage.jsx";
 import PostDetailPage from "./pages/PostDetailPage.jsx";
@@ -30,6 +29,10 @@ import { ConfigProvider, App as AntdApp } from "antd";
 import ResetBusinessPasswordPage from "./pages/ResetBusinessPasswordPage.jsx";
 import MyPostList from "./features/post/components/templates/MyPostList.jsx";
 import ProtectedRoute from "./components/molecules/ProtectedRoute.jsx";
+import ProtectedRouteAdmin from "./components/molecules/ProtectedRouteAdmin.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
+import AdminTablePage from "./pages/AdminTablePage.jsx";
+import AdminAddPage from "./pages/AdminAddPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +104,30 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/admin",
+        element: (
+          <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
+            <AdminPage />
+          </ProtectedRouteAdmin>
+        ),
+      },
+      {
+        path: "/admintable",
+        element: (
+          <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
+            <AdminTablePage />
+          </ProtectedRouteAdmin>
+        ),
+      },
+      {
+        path: "/adminadd",
+        element: (
+          <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
+            <AdminAddPage />
+          </ProtectedRouteAdmin>
+        ),
+      },
     ],
   },
   {
@@ -135,6 +162,8 @@ const router = createBrowserRouter([
     path: "/subscription/plans/:businessId",
     element: <SubscriptionPlansPage />,
   },
+
+
 ]);
 
 createRoot(document.getElementById("root")).render(

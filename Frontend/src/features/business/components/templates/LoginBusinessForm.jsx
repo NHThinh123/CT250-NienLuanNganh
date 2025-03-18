@@ -12,7 +12,7 @@ const LoginForm = () => {
         setIsLoading(true);
         loginMutation.mutate(values, {
             onSettled: () => {
-                setIsLoading(false); // Tắt loading sau khi hoàn tất login
+                setIsLoading(false);
             },
         });
     };
@@ -54,9 +54,17 @@ const LoginForm = () => {
                     </p>
 
                     <Form name="login-form" layout="vertical" initialValues={{ remember: true }} onFinish={onFinish}>
-                        <Form.Item label="Email" name="email" rules={[{ required: true, message: "Hãy nhập email" }]}>
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                            rules={[
+                                { required: true, message: "Hãy nhập email" },
+                                { type: "email", message: "Email không hợp lệ" }
+                            ]}
+                        >
                             <Input size="large" placeholder="Yumzy@gmail.com" />
                         </Form.Item>
+
 
                         <Form.Item label="Mật Khẩu" name="password" rules={[{ required: true, message: "Hãy nhập mật khẩu" }]}>
                             <Input.Password size="large" placeholder="********" />

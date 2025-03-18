@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
-  const { mutate: loginMutation, isLoading } = useLogin();
+  const { mutate: loginMutation, } = useLogin();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -71,7 +71,9 @@ const LoginForm = () => {
             <Form.Item
               label="Email"
               name="email"
-              rules={[{ required: true, message: "Hãy nhập email" }]}
+              rules={[{ required: true, message: "Hãy nhập email" },
+              { type: "email", message: "Email không hợp lệ" }
+              ]}
             >
               <Input
                 size="large"

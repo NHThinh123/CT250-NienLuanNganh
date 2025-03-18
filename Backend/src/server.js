@@ -19,6 +19,7 @@ const user_like_postRoutes = require("./routes/user_like_post.route");
 const user_like_commentRoutes = require("./routes/user_like_comment.route");
 const commentRoutes = require("./routes/comment.route");
 const errorHandler = require("./middleware/errorHandler");
+const adminRoutes = require("./routes/admin.route");
 
 const app = express();
 const port = process.env.PORT || 8888;
@@ -42,6 +43,7 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/user_like_post", user_like_postRoutes);
 app.use("/api/user_like_comment", user_like_commentRoutes);
 app.use("/api/post_tag", post_tagRoutes);
+app.use("/api/admin", adminRoutes)
 
 // Middleware xử lý lỗi
 // app.use(errorHandler);

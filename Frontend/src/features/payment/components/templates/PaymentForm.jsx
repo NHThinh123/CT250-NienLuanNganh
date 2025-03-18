@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import axios from "../../../../services/axios.customize";
 import { Button, Form, Typography, Card, Spin, Alert, Modal, Col } from "antd";
 import "../../../../styles/PaymentForm.css"; // CSS tùy chỉnh
 import { CheckCircleOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -22,7 +23,15 @@ const PaymentForm = ({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [successModalVisible, setSuccessModalVisible] = useState(false);
+    const [paymentCompleted, setPaymentCompleted] = useState(false);
+    const navigate = useNavigate();
 
+    // Log trạng thái successModalVisible để debug
+    useEffect(() => {
+        console.log("successModalVisible:", successModalVisible);
+    }, [successModalVisible]);
+
+    // Hàm xử lý thanh toán
     const handleSubmit = async () => {
         setLoading(true);
         setError(null);
@@ -41,6 +50,7 @@ const PaymentForm = ({
             });
 
             if (paymentMethodError) {
+                console.error("Lỗi từ Stripe:", paymentMethodError);
                 setError(paymentMethodError.message);
                 setLoading(false);
                 return;
@@ -58,31 +68,51 @@ const PaymentForm = ({
                 businessName,
             });
 
+            console.log("Phản hồi từ API:", responseData);
+
             if (!responseData || !responseData.business) {
                 throw new Error("Dữ liệu doanh nghiệp không hợp lệ từ server.");
             }
 
             onPaymentSuccess({ business: responseData.business });
             setSuccessModalVisible(true); // Hiển thị modal thành công
+            setPaymentCompleted(true);
             setLoading(false);
         } catch (err) {
+            console.error("Lỗi trong handleSubmit:", err);
             setError(err.message || "Đã xảy ra lỗi trong quá trình thanh toán.");
             setLoading(false);
         }
     };
 
-    // Hàm giả lập để kiểm tra thông báo thành công (dùng cho debug)
+    // Hàm giả lập để kiểm tra thông báo thành công
     const handleMockSuccess = () => {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
-            setSuccessModalVisible(true); // Hiển thị modal thành công sau 2 giây
+            setSuccessModalVisible(true);
+            setPaymentCompleted(true);
         }, 2000);
     };
 
-    const handleModalOk = () => {
-        setSuccessModalVisible(false);
-    };
+    // Tạm thời đóng Modal thủ công để kiểm tra
+    // const handleModalClose = () => {
+    //     setSuccessModalVisible(false);
+    //     navigate(`/business/${businessId}`); // Điều hướng sau khi đóng Modal
+    // };
+
+    // Tự động đóng Modal và điều hướng sau 2 giây (tạm thời comment để debug)
+    /*
+    useEffect(() => {
+        if (successModalVisible) {
+            const timer = setTimeout(() => {
+                setSuccessModalVisible(false);
+                navigate(`/business/${businessId}`);
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [successModalVisible, businessId, navigate]);
+    */
 
     return (
         <Col xs={0} md={12} style={{ textAlign: "center" }}>
@@ -102,10 +132,9 @@ const PaymentForm = ({
                     </Title>
 
                     <Form form={form} onFinish={handleSubmit} layout="vertical">
-                        {/* Thông tin thanh toán */}
                         <div className="payment-details">
                             <Text strong>Số tiền: </Text>
-                            <Text>${amount}</Text>
+                            <Text>{amount}vnd</Text>
                         </div>
                         <div className="payment-details">
                             <Text strong>Gói: </Text>
@@ -120,7 +149,6 @@ const PaymentForm = ({
                             <Text>{businessName}</Text>
                         </div>
 
-                        {/* Trường thông tin thẻ */}
                         <Form.Item
                             label="Số thẻ"
                             rules={[{ required: true, message: "Vui lòng nhập số thẻ!" }]}
@@ -138,6 +166,7 @@ const PaymentForm = ({
                                     },
                                 }}
                                 className="stripe-input"
+                                disabled={paymentCompleted}
                             />
                         </Form.Item>
 
@@ -159,6 +188,7 @@ const PaymentForm = ({
                                         },
                                     }}
                                     className="stripe-input"
+                                    disabled={paymentCompleted}
                                 />
                             </Form.Item>
 
@@ -179,46 +209,29 @@ const PaymentForm = ({
                                         },
                                     }}
                                     className="stripe-input"
+                                    disabled={paymentCompleted}
                                 />
                             </Form.Item>
                         </div>
 
-                        {/* Hiển thị lỗi */}
                         {error && <Alert message={error} type="error" showIcon style={{ marginBottom: "20px" }} />}
 
-                        {/* Nút thanh toán */}
                         <Button
                             type="primary"
                             htmlType="submit"
                             loading={loading}
-                            disabled={!stripe || loading}
+                            disabled={!stripe || loading || paymentCompleted}
                             block
                             size="large"
                             style={{
                                 borderRadius: "8px",
                                 height: "35px",
                                 fontSize: "16px",
-                                background: loading ? "#d9d9d9" : "#52c41a",
+                                background: loading || paymentCompleted ? "#d9d9d9" : "#52c41a",
                                 border: "none",
                             }}
                         >
                             {loading ? <Spin /> : "Thanh toán"}
-                        </Button>
-
-                        {/* Nút giả lập để kiểm tra thông báo thành công */}
-                        <Button
-                            type="default"
-                            onClick={handleMockSuccess}
-                            block
-                            size="large"
-                            style={{
-                                marginTop: "10px",
-                                borderRadius: "8px",
-                                height: "35px",
-                                fontSize: "16px",
-                            }}
-                        >
-                            Kiểm tra thông báo thành công
                         </Button>
                     </Form>
                 </Card>
@@ -226,25 +239,32 @@ const PaymentForm = ({
                 {/* Modal thông báo thành công */}
                 <Modal
                     visible={successModalVisible}
-                    onOk={handleModalOk}
-                    onCancel={handleModalOk}
-                    footer={[
-                        <Button key="ok" type="primary" onClick={handleModalOk}>
-                            OK
-                        </Button>,
-                    ]}
+                    // footer={[
+                    //     <Button key="ok" type="primary" onClick={handleModalClose}>
+                    //         OK
+                    //     </Button>,
+                    // ]}
                     centered
+                    width={400}
+                    style={{ padding: "20px" }}
                 >
                     <div style={{ textAlign: "center", padding: "20px" }}>
-                        <CheckCircleOutlined style={{ fontSize: "40px", color: "#52c41a" }} />
-                        <Title level={4} style={{ marginTop: "16px" }}>
+                        <CheckCircleOutlined style={{ fontSize: "50px", color: "#52c41a", marginBottom: "16px" }} />
+                        <Title level={4} style={{ marginTop: "16px", color: "#333" }}>
                             Thanh toán thành công!
                         </Title>
-                        <Text>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.</Text>
+                        <Text style={{ display: "block", marginBottom: "8px" }}>
+                            Số tiền: <strong>{amount}vnd</strong>
+                        </Text>
+                        <Text style={{ display: "block", marginBottom: "8px" }}>
+                            Gói: <strong>{planType}</strong>
+                        </Text>
+                        <Text style={{ display: "block", color: "#888" }}>
+                            Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!
+                        </Text>
                     </div>
                 </Modal>
 
-                {/* Lớp phủ loading toàn màn hình */}
                 {loading && (
                     <div className="loading-overlay">
                         <Spin size="large" tip="Đang xử lý thanh toán..." />

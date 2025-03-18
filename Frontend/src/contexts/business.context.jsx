@@ -13,9 +13,9 @@ export const BusinessContext = createContext({
     open_hours: "",
     close_hours: "",
   },
-  setBusiness: () => {},
+  setBusiness: () => { },
   loading: true,
-  setLoading: () => {},
+  setLoading: () => { },
 });
 
 // Provider quản lý trạng thái Business
@@ -23,10 +23,6 @@ export const BusinessWrapper = ({ children }) => {
   const [business, setBusiness] = useState(() => {
     try {
       const storedBusiness = localStorage.getItem("authBusiness");
-      console.log(
-        "Dữ liệu từ localStorage trong BusinessWrapper:",
-        localStorage.getItem("authBusiness")
-      );
       const parsedBusiness = storedBusiness ? JSON.parse(storedBusiness) : null;
       return parsedBusiness && parsedBusiness.isAuthenticated
         ? parsedBusiness

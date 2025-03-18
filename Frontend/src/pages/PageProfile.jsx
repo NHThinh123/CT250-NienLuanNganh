@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../contexts/auth.context";
-import { Card, Button, message } from "antd";
+import { Card, message } from "antd";
 import AvatarUpload from "../features/auth/components/templates/AvatarUpload";
 import ProfileForm from "../features/auth/components/templates/ProfileForm";
 import ProfileInfo from "../features/auth/components/templates/ProfileInfo";
@@ -9,7 +9,7 @@ import { useUpdateProfile } from "../features/auth/hooks/useProfile";
 const ProfilePage = () => {
     const { auth, setAuth } = useContext(AuthContext);
     console.log(auth);
-    const { mutate: updateProfile, isLoading } = useUpdateProfile();
+    const { mutate: updateProfile } = useUpdateProfile();
     const [isEditing, setIsEditing] = useState(false);
 
     if (!auth.isAuthenticated) {

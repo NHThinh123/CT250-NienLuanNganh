@@ -6,9 +6,11 @@ import {
   Modal,
   Card,
   Typography,
-  Tag,
   Space,
-} from "antd"; // Thêm Card, Typography, Tag, Space
+  Drawer,
+  Divider,
+  message,
+} from "antd";
 import Rating from "react-rating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
@@ -18,10 +20,11 @@ import {
   CircleDollarSign,
   Clock,
   MapPinHouse,
-  DollarSign,
   Store,
   BadgeDollarSign,
-} from "lucide-react"; // Thêm DollarSign
+  AlignJustify,
+  Check,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import ProfileBusinessPage from "../../../../pages/ProfileBusinessPage";
 import { Map as ReactMapGL, Marker } from "react-map-gl";
@@ -52,6 +55,7 @@ const BusinessDetail = ({
   const mapRef = useRef(null);
   const directionsRef = useRef(null);
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const formatPrice = (price) => {
     if (typeof price !== "number" || isNaN(price)) {
@@ -59,7 +63,17 @@ const BusinessDetail = ({
     }
     return price.toLocaleString("vi-VN");
   };
-
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
+  const containerStyle = {
+    position: "relative",
+    height: 50,
+    overflow: "hidden",
+  };
   const formatDate = (date) => {
     if (!date) return "Chưa có thông tin";
     return new Date(date).toLocaleDateString("vi-VN", {
@@ -69,14 +83,15 @@ const BusinessDetail = ({
     });
   };
 
-  const getPaymentStatus = () => {
-    if (!businessData.nextPaymentDueDate)
-      return { text: "Chưa kích hoạt", color: "orange" };
+
+  // Hàm tính số ngày còn lại đến hạn thanh toán
+  const getDaysUntilDueDate = () => {
+    if (!businessData.nextPaymentDueDate) return Infinity;
     const today = new Date();
     const dueDate = new Date(businessData.nextPaymentDueDate);
-    return today > dueDate
-      ? { text: "Quá hạn", color: "red" }
-      : { text: "Đã thanh toán", color: "green" };
+    const timeDiff = dueDate - today;
+    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    return daysDiff;
   };
 
   if (isLoading) {
@@ -103,16 +118,25 @@ const BusinessDetail = ({
   };
 
   const handlePaymentClick = () => {
-    navigate(`/subscription/plans/${businessData._id}`, {
-      state: {
-        businessId: businessData._id,
-        email: businessData.email,
-        businessName: businessData.business_name,
-        fromBusinessDetail: true,
-      },
-    });
-    setIsPaymentModalOpen(false);
+    const daysUntilDue = getDaysUntilDueDate();
+
+    if (daysUntilDue <= 3) {
+      // Nếu còn 3 ngày trở lại, cho phép thanh toán
+      navigate(`/subscription/plans/${businessData._id}`, {
+        state: {
+          businessId: businessData._id,
+          email: businessData.email,
+          businessName: businessData.business_name,
+          fromBusinessDetail: true,
+        },
+      });
+      setIsPaymentModalOpen(false);
+    } else {
+      // Nếu còn hơn 3 ngày, hiển thị thông báo
+      message.warning("Chưa đến hạn thanh toán!");
+    }
   };
+
 
   const coordinates = businessData.address?.coordinates || [0, 0];
   const longitude = Number(coordinates[0]);
@@ -134,6 +158,12 @@ const BusinessDetail = ({
       });
       return;
     }
+
+    mapRef.current.flyTo({
+      center: [longitude, latitude],
+      zoom: 14,
+      duration: 0,
+    });
 
     const directions = new MapboxDirections({
       accessToken: mapboxToken,
@@ -166,20 +196,76 @@ const BusinessDetail = ({
     <div style={styles.businessPage}>
       {canEdit && (
         <div style={styles.editButtonContainer}>
-          <Button
-            type="primary"
-            onClick={handleEdit}
-            style={{ marginBottom: "10px" }}
-          >
-            Chỉnh sửa thông tin
-          </Button>
-          <Button type="primary" onClick={handlePaymentStatus}>
-            Trạng thái thanh toán
-          </Button>
+          <div style={containerStyle}>
+            <Button
+              type="text"
+              onClick={showDrawer}
+              style={{
+                height: "30px",
+                background: "#ffffff",
+              }}
+            >
+              <AlignJustify style={{ color: "#000000" }} />
+            </Button>
+            <Drawer
+              title={
+                <Title level={4} style={{ margin: 0, color: "#1a1a1a" }}>
+                  Tùy Chọn
+                </Title>
+              }
+              placement="right"
+              onClose={onClose}
+              open={open}
+              width={300}
+              closable={false}
+              style={{
+                borderRadius: "10px 0 0 10px",
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                border: "none",
+              }}
+            >
+              <Space direction="vertical" style={{ width: "100%" }}>
+                <Button
+                  type="text"
+                  onClick={handleEdit}
+                  block
+                  style={{
+                    height: "40px",
+                    borderRadius: "8px",
+                    border: "none",
+                    fontWeight: "500",
+                    transition: "all 0.3s",
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    paddingLeft: "10px",
+                    textAlign: "left",
+                  }}
+                >
+                  Chỉnh sửa thông tin
+                </Button>
+                <Button
+                  type="text"
+                  onClick={handlePaymentStatus}
+                  block
+                  style={{
+                    height: "40px",
+                    borderRadius: "8px",
+                    border: "none",
+                    fontWeight: "500",
+                    transition: "all 0.3s",
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    paddingLeft: "10px",
+                    textAlign: "left",
+                  }}
+                >
+                  Trạng thái thanh toán
+                </Button>
+              </Space>
+            </Drawer>
+          </div>
         </div>
       )}
-
-      {/* Các phần khác giữ nguyên */}
       <Row>
         <Col span={2}></Col>
         <Col span={7}>
@@ -306,11 +392,9 @@ const BusinessDetail = ({
           onClose={handleModalClose}
         />
       </Modal>
-
-      {/* Modal trạng thái thanh toán hiện đại */}
       <Modal
         title={
-          <Title level={4} style={{ margin: 0, color: "#52c41a" }}>
+          <Title level={4} style={{ color: "#000" }}>
             Trạng thái thanh toán
           </Title>
         }
@@ -324,10 +408,10 @@ const BusinessDetail = ({
               backgroundColor: "#52c41a",
               borderColor: "#52c41a",
               borderRadius: "5px",
-              height: "40px",
-              fontWeight: "bold"
+              height: "35px",
+              fontWeight: "bold",
             }}
-            onClick={handlePaymentClick} // Bạn cần định nghĩa hàm này trong component
+            onClick={handlePaymentClick}
           >
             Thanh Toán
           </Button>,
@@ -336,20 +420,42 @@ const BusinessDetail = ({
             onClick={handlePaymentModalClose}
             style={{
               borderRadius: "5px",
-              height: "35px"
+              height: "35px",
             }}
           >
             Đóng
-          </Button>
+          </Button>,
         ]}
         width={600}
-        bodyStyle={{ padding: "20px", backgroundColor: "#f5f5f5" }}
       >
+        <div>
+          <Divider orientation="left" orientationMargin="0">
+            <span style={{ color: "#000" }}>Ưu Đãi</span>
+          </Divider>
+          <ul
+            style={{ paddingLeft: "20px", marginBottom: "20px", listStyle: "none" }}
+          >
+            <li style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
+              <Check color="#52c41a" strokeWidth={1.75} style={{ marginRight: "8px" }} />
+              Quảng bá không giới hạn – Hiển thị nhà hàng/quán ăn của bạn trên nền tảng đánh giá ẩm thực hàng đầu.
+            </li>
+            <li style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
+              <Check color="#52c41a" strokeWidth={1.75} style={{ marginRight: "8px" }} />
+              Tiếp cận khách hàng tiềm năng – Kết nối với thực khách đang tìm kiếm địa điểm ăn uống chất lượng.
+            </li>
+            <li style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
+              <Check color="#52c41a" strokeWidth={1.75} style={{ marginRight: "8px" }} />
+              Tối ưu hóa đánh giá & thương hiệu – Thu hút đánh giá tích cực, nâng cao uy tín và độ tin cậy.
+            </li>
+            <li style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
+              <Check color="#52c41a" strokeWidth={1.75} style={{ marginRight: "8px" }} />
+              Chiến dịch khuyến mãi & ưu đãi độc quyền – Hỗ trợ các chương trình giảm giá, voucher để thu hút khách hàng mới.
+            </li>
+          </ul>
+        </div>
         <Card
           style={{
             borderRadius: "10px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-            background: "linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%)",
           }}
         >
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -476,7 +582,7 @@ const styles = {
   editButtonContainer: {
     position: "absolute",
     top: "20px",
-    right: "30px",
+    right: "120px",
     zIndex: 10,
     display: "flex",
     flexDirection: "column",
