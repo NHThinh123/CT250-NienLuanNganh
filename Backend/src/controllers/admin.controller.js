@@ -25,7 +25,7 @@ exports.createUser = async (req, res) => {
         // Kiểm tra email đã tồn tại
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: "Email đã tồn tại" });
+            return res.status(409).json({ message: "Email đã tồn tại" });
         }
 
         // Hash mật khẩu

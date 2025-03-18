@@ -14,6 +14,10 @@ const getAllUsers = async () => {
 
 const createUser = async (data) => {
     const response = await instance.post(`${API_URL}/create/users`, data);
+    // Kiểm tra phản hồi từ axioscustomize
+    if (response?.message === "Email đã tồn tại") {
+        throw new Error(response.message);
+    }
     return response;
 };
 
@@ -29,6 +33,9 @@ const getAllBusinesses = async () => {
 
 const createBusiness = async (data) => {
     const response = await instance.post(`${API_URL}/create/businesses`, data);
+    if (response?.message === "Email đã tồn tại") {
+        throw new Error(response.message);
+    }
     return response;
 };
 // Cập nhật user

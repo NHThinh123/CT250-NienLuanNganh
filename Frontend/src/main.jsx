@@ -118,6 +118,8 @@ const router = createBrowserRouter([
       {
         path: "/terms-of-use",
         element: <TermsOfUsePage />,
+      },
+      {
         path: "/admin",
         element: (
           <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">

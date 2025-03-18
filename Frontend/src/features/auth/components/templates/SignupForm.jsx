@@ -109,7 +109,7 @@ const SignupForm = () => {
                         <Form.Item
                             label="Xác nhận mật khẩu"
                             name="confirmPassword"
-                            dependencies={["password"]} // Liên kết với trường password
+                            dependencies={["password"]}
                             rules={[
                                 { required: true, message: "Hãy xác nhận mật khẩu" },
                                 ({ getFieldValue }) => ({

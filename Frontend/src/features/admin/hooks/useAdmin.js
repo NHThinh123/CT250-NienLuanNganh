@@ -9,6 +9,7 @@ import {
     updateBusiness,
     deleteBusiness,
 } from "../services/adminApi";
+import { message } from "antd";
 
 export const useAdmin = () => {
     const queryClient = useQueryClient();
@@ -22,14 +23,21 @@ export const useAdmin = () => {
         queryFn: getAllUsers,
         retry: false,
     });
-
+    // Mutation để tạo user
     const createUserMutation = useMutation({
         mutationFn: (data) => createUser(data),
         onSuccess: () => {
             queryClient.invalidateQueries(["users"]);
+            message.success("Tạo tài khoản User thành công!");
+        },
+        onError: (error) => {
+            if (error.message === "Email đã tồn tại") {
+                message.error("Email đã tồn tại, vui lòng sử dụng email khác!");
+            } else {
+                message.error(`Failed to create user: ${error.message}`);
+            }
         },
     });
-
     const updateUserMutation = useMutation({
         mutationFn: ({ id, data }) => updateUser({ id, data }),
         onSuccess: () => {
@@ -58,6 +66,14 @@ export const useAdmin = () => {
         mutationFn: (data) => createBusiness(data),
         onSuccess: () => {
             queryClient.invalidateQueries(["businesses"]);
+            message.success("Business created successfully!");
+        },
+        onError: (error) => {
+            if (error.message === "Email đã tồn tại") {
+                message.error("Email đã tồn tại, vui lòng sử dụng email khác!");
+            } else {
+                message.error(`Failed to create business: ${error.message}`);
+            }
         },
     });
 

@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { Form, Input, Select, Button } from "antd";
+import React from 'react';
+import { Form, Input, Select, Button, TimePicker } from 'antd';
 
 const { Option } = Select;
 
-const CreateBusinessForm = ({ onCreateBusiness }) => {
-    const [form] = Form.useForm();
-
+const CreateBusinessForm = ({ onCreateBusiness, loading, form }) => { // Nhận form từ prop
     const onFinish = (values) => {
         onCreateBusiness({
             business_name: values.business_name,
@@ -19,7 +17,7 @@ const CreateBusinessForm = ({ onCreateBusiness }) => {
             verified: values.verified,
             status: values.status,
         });
-        form.resetFields();
+        // Không reset form ở đây, để logic reset trong onSuccess
     };
 
     return (
@@ -28,77 +26,82 @@ const CreateBusinessForm = ({ onCreateBusiness }) => {
             name="createBusiness"
             onFinish={onFinish}
             layout="vertical"
-            style={{ maxWidth: 600, margin: "20px 0" }}
+            style={{ maxWidth: 600, margin: '20px 0' }}
         >
             <Form.Item
                 name="business_name"
-                label="Business Name"
-                rules={[{ required: true, message: "Please input the name!" }]}
+                label="Tên Doanh Nghiệp Ẩm Thực"
+                rules={[{ required: true, message: 'Hãy Nhập Tên Doanh Nghiệp Ẩm thực!' }]}
             >
-                <Input />
+                <Input style={{ width: "600px" }} />
             </Form.Item>
             <Form.Item
-                name="email"
                 label="Email"
-                rules={[{ required: true, message: "Please input the email!" }]}
+                name="email"
+                rules={[
+                    { required: true, message: "Hãy nhập email" },
+                    {
+                        pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: "Email không hợp lệ",
+                    },
+                ]}
             >
-                <Input />
+                <Input size="large" placeholder="example@gmail.com" />
             </Form.Item>
             <Form.Item
+                label="Mật Khẩu"
                 name="password"
-                label="Password"
-                rules={[{ required: true, message: "Please input the password!" }]}
+                rules={[
+                    { required: true, message: "Hãy nhập mật khẩu" },
+                    { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" },
+                    {
+                        pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$#!%*?&]{8,}$/,
+                        message: "Mật khẩu phải có chữ Hoa, số, ký tự đặc biệt",
+                    },
+                ]}
             >
-                <Input.Password />
+                <Input.Password size="large" placeholder="Yumzy123@" />
             </Form.Item>
-            <Form.Item
-                name="open_hours"
-                label="Open Hours"
-                rules={[{ required: true, message: "Please input open hours!" }]}
-            >
-                <Input />
+            <Form.Item label="Giờ mở cửa" name="openHours" rules={[{ required: true, message: "Vui lòng chọn giờ mở cửa!" }]}>
+                <TimePicker size="large" format="HH:mm" style={{ width: "100%", borderRadius: "8px" }} placeholder="Chọn giờ" />
             </Form.Item>
-            <Form.Item
-                name="close_hours"
-                label="Close Hours"
-                rules={[{ required: true, message: "Please input close hours!" }]}
-            >
-                <Input />
+            <Form.Item label="Giờ đóng cửa" name="closeHours" rules={[{ required: true, message: "Vui lòng chọn giờ đóng cửa!" }]}>
+                <TimePicker size="large" format="HH:mm" style={{ width: "100%", borderRadius: "8px" }} placeholder="Chọn giờ" />
             </Form.Item>
             <Form.Item
                 name="coordinates"
-                label="Coordinates (Longitude, Latitude)"
-                rules={[{ required: true, message: "Please input coordinates!" }]}
+                label="Vị Trí"
+                rules={[{ required: true, message: 'Hãy Nhập Vị Trí!' }]}
             >
                 <Input placeholder="e.g., 106.6297, 10.8231" />
             </Form.Item>
             <Form.Item
                 name="location"
-                label="Location"
-                rules={[{ required: true, message: "Please input location!" }]}
+                label="Địa Chỉ"
+                rules={[{ required: true, message: 'Hãy Nhập Địa Chỉ!' }]}
             >
                 <Input />
             </Form.Item>
             <Form.Item
                 name="contact_info"
-                label="Contact Info"
-                rules={[{ required: true, message: "Please input contact info!" }]}
+                label="Thông Tin Liên Hệ"
+                rules={[{ required: true, message: 'Hãy Nhập Thông Tin Liên Hệ!' }]}
             >
                 <Input />
             </Form.Item>
-            <Form.Item name="verified" label="Verified" valuePropName="checked">
+            <Form.Item name="verified" label="Xác Thực" valuePropName="checked">
                 <Input type="checkbox" />
             </Form.Item>
-            <Form.Item name="status" label="Status" initialValue="pending">
+            <Form.Item name="status" label="Trạng Thái" initialValue="pending">
                 <Select>
                     <Option value="pending">Pending</Option>
                     <Option value="active">Active</Option>
                     <Option value="suspended">Suspended</Option>
                 </Select>
             </Form.Item>
-            <Form.Item>
-                <Button type="primary" htmlType="submit">
-                    Create Business
+            <Form.Item style={{ textAlign: "center" }}>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                    Tạo Doanh Nghiệp
                 </Button>
             </Form.Item>
         </Form>
