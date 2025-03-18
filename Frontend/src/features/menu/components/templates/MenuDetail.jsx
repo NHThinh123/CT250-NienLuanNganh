@@ -70,7 +70,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               </div>
             </Col>
             <Col span={9}>
-              <div style={{ position: "sticky", top: 63.8, zIndex: 10 }}>
+              <div style={{ position: "sticky", top: 63.8, zIndex: 1000 }}>
                 <DishSearch onSearch={handleSearch} />
               </div>
               <MenuDetailList

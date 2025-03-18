@@ -2,6 +2,7 @@ import { useState } from "react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import { Input, Row, Col, Select, Button, Checkbox } from "antd";
 import { SlidersHorizontal } from "lucide-react";
+import BusinessPagination from "../molecules/BusinessPagination";
 
 const { Option } = Select;
 
@@ -9,6 +10,9 @@ const BusinessFilter = ({
   handleSearch,
   handleSortChange,
   handleStarFilter,
+  onPageChange,
+  totalItems,
+  itemsPerPage,
 }) => {
   const [searchValue, setSearchValue] = useState("");
   const [selectedStars, setSelectedStars] = useState([]);
@@ -34,7 +38,7 @@ const BusinessFilter = ({
   return (
     <BoxContainer>
       <Row>
-        <Col span={15}>
+        <Col span={12}>
           <Input.Search
             placeholder="Tìm kiếm quán ăn"
             value={searchValue}
@@ -57,11 +61,21 @@ const BusinessFilter = ({
             <Option value="high_to_low_cost">Giá cao đến thấp</Option>
           </Select>
         </Col>
-        <Col span={4} style={{ paddingLeft: "8px" }}>
+        <Col span={3} style={{ paddingLeft: "8px" }}>
           <Button onClick={toggleFilters} block>
             <SlidersHorizontal size={15} />
             {showFilters ? "Ẩn bộ lọc" : "Bộ lọc"}
           </Button>
+        </Col>
+        <Col
+          span={4}
+          style={{ display: "grid", width: "100%", placeContent: "center" }}
+        >
+          <BusinessPagination
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={onPageChange}
+          />
         </Col>
       </Row>
       {showFilters && (
