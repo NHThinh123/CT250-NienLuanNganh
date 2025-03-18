@@ -118,6 +118,8 @@ const router = createBrowserRouter([
       {
         path: "/terms-of-use",
         element: <TermsOfUsePage />,
+      },
+      {
         path: "/admin",
         element: (
           <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
@@ -175,8 +177,6 @@ const router = createBrowserRouter([
     path: "/subscription/plans/:businessId",
     element: <SubscriptionPlansPage />,
   },
-
-
 ]);
 
 createRoot(document.getElementById("root")).render(

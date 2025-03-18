@@ -920,10 +920,24 @@ const updatePostService = async (post_id, id, updateData) => {
     throw new AppError("Invalid user or business ID", 400);
 
   const objectId = new mongoose.Types.ObjectId(id);
-  const post = await Post.findOne({
-    _id: post_id,
-    $or: [{ user_id: objectId }, { business_id: objectId }],
-  });
+
+  // Kiểm tra vai trò của người dùng
+  const user = await User.findById(objectId);
+  const isAdmin = user && user.role === "admin";
+
+  // Tìm bài viết
+  let post;
+  if (isAdmin) {
+    // Admin có thể sửa bất kỳ bài viết nào
+    post = await Post.findById(post_id);
+  } else {
+    // Người dùng thường chỉ sửa bài viết của họ
+    post = await Post.findOne({
+      _id: post_id,
+      $or: [{ user_id: objectId }, { business_id: objectId }],
+    });
+  }
+
   if (!post)
     throw new AppError(
       "Post not found or you don't have permission to update",
@@ -1015,10 +1029,24 @@ const deletePostService = async (post_id, id) => {
     throw new AppError("Invalid user or business ID", 400);
 
   const objectId = new mongoose.Types.ObjectId(id);
-  const post = await Post.findOne({
-    _id: post_id,
-    $or: [{ user_id: objectId }, { business_id: objectId }],
-  });
+
+  // Kiểm tra vai trò của người dùng
+  const user = await User.findById(objectId);
+  const isAdmin = user && user.role === "admin";
+
+  // Tìm bài viết
+  let post;
+  if (isAdmin) {
+    // Admin có thể xóa bất kỳ bài viết nào
+    post = await Post.findById(post_id);
+  } else {
+    // Người dùng thường chỉ xóa bài viết của họ
+    post = await Post.findOne({
+      _id: post_id,
+      $or: [{ user_id: objectId }, { business_id: objectId }],
+    });
+  }
+
   if (!post)
     throw new AppError(
       "Post not found or you don't have permission to delete",
