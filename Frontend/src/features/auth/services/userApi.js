@@ -23,7 +23,6 @@ const updateUser = (id, data) => {
 };
 //api lấy id người dùng
 const getUserProfile = (id) => {
-  console.log(id);
   const URL_API = `/api/user/id/${id}`;
   return axios.get(URL_API);
 };

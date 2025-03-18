@@ -1,4 +1,3 @@
-
 import { useMutation } from "@tanstack/react-query";
 import { useContext } from "react";
 import { BusinessContext } from "../../../contexts/business.context";
@@ -15,79 +14,89 @@ const useBusinessLogin = () => {
   return useMutation({
     mutationFn: (credentials) => loginBusinessApi(credentials),
     onSuccess: (data) => {
-      console.log("✅ API trả về dữ liệu:", data);
 
+
+      // Kiểm tra xem data có phải là lỗi không
+      if (data.status !== "Loginsuccessful") {
+        const errorMessage = data.message || "Đăng nhập thất bại";
+        switch (errorMessage) {
+          case "Tài khoản không tồn tại":
+            message.error("Email không tồn tại!");
+            break;
+          case "Mật khẩu không chính xác":
+            message.error("Mật khẩu không chính xác!");
+            break;
+          case "Email chưa được xác minh. Vui lòng kiểm tra hộp thư của bạn.":
+            message.error("Email chưa được xác minh. Vui lòng kiểm tra hộp thư của bạn!");
+            break;
+          default:
+            message.error(errorMessage);
+            break;
+        }
+        return;
+      }
+
+      // Logic chỉ chạy khi đăng nhập thành công
       const businessData = {
         id: data.business.id,
         email: data.business.email,
         business_name: data.business.business_name,
-        avatar:
-          data.business.avatar ||
-          "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg",
+        avatar: data.business.avatar || "https://...",
         contact_info: data.business.contact_info,
         location: data.business.location,
         open_hours: data.business.open_hours,
         close_hours: data.business.close_hours,
         status: data.business.status,
-        verified: data.business.verified, // Thêm trường verified
+        verified: data.business.verified,
       };
-      console.log("Dữ liệu business trước khi set:", {
-        isAuthenticated: true,
-        business: businessData,
-      });
 
-      // Lưu thông tin vào BusinessContext và localStorage
       setBusiness({ isAuthenticated: true, business: businessData });
       setAuth({ isAuthenticated: false, user: {} });
-      localStorage.setItem(
-        "authBusiness",
-        JSON.stringify({ isAuthenticated: true, business: businessData })
-      );
+      localStorage.setItem("authBusiness", JSON.stringify({ isAuthenticated: true, business: businessData }));
       localStorage.removeItem("authUser");
 
-      console.log(
-        "💾 Dữ liệu sau khi lưu localStorage:",
-        JSON.parse(localStorage.getItem("authBusiness"))
-      );
-
-      // Kiểm tra verified trước, sau đó kiểm tra status
       if (businessData.verified === false) {
         message.info("Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để xác minh!");
-        navigate("/login"); // Hoặc có thể điều hướng đến trang khác nếu cần
+        //navigate("/login");
       } else if (businessData.status === "pending") {
-        message.info("Tài khoản của bạn chưa được kích hoạt. Vui lòng chọn gói dịch vụ để tiếp tục.");
+        message.info("Tài khoản chưa được kích hoạt. Vui lòng chọn gói dịch vụ để tiếp tục.");
         navigate(`/subscription/plans/${businessData.id}`, {
-          state: {
-            email: businessData.email,
-            businessName: businessData.business_name,
-          },
+          state: { email: businessData.email, businessName: businessData.business_name },
         });
       } else if (businessData.status === "suspended") {
-        message.info("Tài khoản của bạn đang bị tạm khóa. Vui lòng thanh toán để kích hoạt lại.");
+        message.info("Tài khoản đang bị tạm khóa. Vui lòng thanh toán để kích hoạt lại.");
         navigate(`/subscription/plans/${businessData.id}`, {
-          state: {
-            email: businessData.email,
-            businessName: businessData.business_name,
-          },
+          state: { email: businessData.email, businessName: businessData.business_name },
         });
       } else {
         message.success("Đăng nhập thành công!");
-        setTimeout(() => {
-          navigate("/");
-        }, 500);
+        setTimeout(() => navigate("/"), 500);
       }
     },
     onError: (error) => {
-      // Xử lý các trường hợp lỗi cụ thể
-      const errorMessage = error.response?.data?.message;
-      if (errorMessage === "Email does not exist") {
-        message.error("Email không tồn tại!");
-      } else if (errorMessage === "Incorrect password") {
-        message.error("Mật khẩu không chính xác!");
-      } else {
-        message.error(errorMessage || "Đăng nhập thất bại. Vui lòng thử lại!");
+      console.error("Lỗi đăng nhập chi tiết:", error);
+      console.error("Phản hồi từ API:", error.response?.data);
+
+      let errorMessage = "Có lỗi xảy ra khi đăng nhập. Vui lòng kiểm tra thông tin và thử lại!";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+        switch (errorMessage) {
+          case "Tài khoản không tồn tại":
+            message.error("Email không tồn tại!");
+            break;
+          case "Mật khẩu không chính xác":
+            message.error("Mật khẩu không chính xác!");
+            break;
+          case "Email chưa được xác minh. Vui lòng kiểm tra hộp thư của bạn.":
+            message.error("Email chưa được xác minh. Vui lòng kiểm tra hộp thư của bạn!");
+            break;
+          default:
+            message.error(errorMessage);
+            break;
+        }
+      } else if (error.message) {
+        message.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng!");
       }
-      console.error("Login error:", errorMessage);
     },
   });
 };

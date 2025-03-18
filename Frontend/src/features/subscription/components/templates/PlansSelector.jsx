@@ -8,9 +8,8 @@ const PlansSelector = ({ selectedPlan, onPlanChange, onUpgrade }) => {
     const handleUpgrade = async () => {
         setLoading(true);
 
-        // Giả lập quá trình xử lý mất 2 giây trước khi hoàn thành
         setTimeout(async () => {
-            await onUpgrade(); // Gọi hàm onUpgrade
+            await onUpgrade();
             setLoading(false);
         }, 2000);
     };
@@ -40,8 +39,8 @@ const PlansSelector = ({ selectedPlan, onPlanChange, onUpgrade }) => {
                 <Col xs={24} sm={12}>
                     <SubscriptionPlanCard
                         title="Gói tháng"
-                        price="$50"
-                        period="USD/tháng"
+                        price="200.000"
+                        period="vnd/tháng"
                         isSelected={selectedPlan === "monthly"}
                         onSelect={() => onPlanChange("monthly")}
                     />
@@ -49,9 +48,9 @@ const PlansSelector = ({ selectedPlan, onPlanChange, onUpgrade }) => {
                 <Col xs={24} sm={12}>
                     <SubscriptionPlanCard
                         title="Gói năm"
-                        price="$500"
-                        period="USD/năm"
-                        saveAmount="Tiết kiệm $100"
+                        price="2.000.000"
+                        period="vnd/năm"
+                        saveAmount="Tiết kiệm 400.000 vnd"
                         isSelected={selectedPlan === "yearly"}
                         onSelect={() => onPlanChange("yearly")}
                     />

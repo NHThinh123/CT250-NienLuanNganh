@@ -8,15 +8,16 @@ const SignupForm = () => {
     const { mutate: signupMutation } = useSignup();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
     const onFinish = (values) => {
-        setLoading(true); // Hiển thị loading toàn màn hình
+        setLoading(true);
         signupMutation(
             {
                 email: values.email,
                 password: values.password,
                 name: values.name,
                 dateOfBirth: values.dateOfBirth.format("YYYY-MM-DD"),
-                role: values.role,
+                role: "user", // Đặt role mặc định là "user"
             },
             {
                 onSettled: () => setLoading(false), // Tắt loading khi hoàn tất
@@ -105,8 +106,36 @@ const SignupForm = () => {
                             <Input.Password size="large" placeholder="Yumzy123@" />
                         </Form.Item>
 
-                        <Form.Item label="Ngày sinh" name="dateOfBirth" rules={[{ required: true, message: "Hãy nhập ngày sinh" }]}>
-                            <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày sinh" style={{ width: "100%" }} disabledDate={disabledDate} />
+                        <Form.Item
+                            label="Xác nhận mật khẩu"
+                            name="confirmPassword"
+                            dependencies={["password"]} // Liên kết với trường password
+                            rules={[
+                                { required: true, message: "Hãy xác nhận mật khẩu" },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue("password") === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error("Mật khẩu xác nhận không khớp!"));
+                                    },
+                                }),
+                            ]}
+                        >
+                            <Input.Password size="large" placeholder="Nhập lại mật khẩu" />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Ngày sinh"
+                            name="dateOfBirth"
+                            rules={[{ required: true, message: "Hãy nhập ngày sinh" }]}
+                        >
+                            <DatePicker
+                                format="YYYY-MM-DD"
+                                placeholder="Chọn ngày sinh"
+                                style={{ width: "100%" }}
+                                disabledDate={disabledDate}
+                            />
                         </Form.Item>
 
                         <Form.Item>
@@ -114,7 +143,12 @@ const SignupForm = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" block size="large" loading={loading}
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                block
+                                size="large"
+                                loading={loading}
                                 style={{ height: "35px" }}
                             >
                                 {loading ? "Đang đăng ký..." : "Đăng Ký"}
@@ -131,10 +165,16 @@ const SignupForm = () => {
                         </Button>
 
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Bạn có tài khoản? <a href="/login" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đăng Nhập</a>
+                            Bạn có tài khoản?{" "}
+                            <a href="/login" style={{ color: "#1a73e8", fontWeight: "bold" }}>
+                                Đăng Nhập
+                            </a>
                         </p>
                         <p style={{ textAlign: "center", marginTop: "10px" }}>
-                            Bạn là chủ doanh nghiệp ẩm thực? <a href="/signupBusiness" style={{ color: "#1a73e8", fontWeight: "bold" }}>Đăng Ký Business</a>
+                            Bạn là chủ doanh nghiệp ẩm thực?{" "}
+                            <a href="/signupBusiness" style={{ color: "#1a73e8", fontWeight: "bold" }}>
+                                Đăng Ký Business
+                            </a>
                         </p>
                     </Form>
                 </Card>

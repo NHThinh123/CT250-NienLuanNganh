@@ -165,7 +165,7 @@ const signup = async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Người dùng đã tồn tại" });
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -249,8 +249,8 @@ const signin = async (req, res) => {
     // Tạo JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET, // Chuỗi bí mật để mã hóa token
-      { expiresIn: "1h" } // Thời gian hết hạn của token
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
     );
 
     return res.status(200).json({
@@ -263,7 +263,8 @@ const signin = async (req, res) => {
         avatar: user.avatar,
         dateOfBirth: user.dateOfBirth,
         role: user.role,
-        token: token // Trả về token cho client
+        token: token,
+        createdAt: user.createdAt
       }
     });
   } catch (err) {

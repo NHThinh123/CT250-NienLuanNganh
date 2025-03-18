@@ -20,7 +20,7 @@ const SubscriptionPlansPage = () => {
     };
 
     const handleUpgrade = () => {
-        const amount = selectedPlan === "monthly" ? 50 : 500;
+        const amount = selectedPlan === "monthly" ? 200000 : 2000000;
         const planType = selectedPlan;
         navigate(`/payment/activation/${businessId}`, {
             state: { amount, planType, email, businessName, businessId, fromBusinessDetail },

@@ -5,7 +5,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./styles/global.css";
 import App from "./App.jsx";
 import HomePage from "./pages/HomePage.jsx";
-//import UserPage from "./pages/UserPage.jsx";
 import PostPage from "./pages/PostPage.jsx";
 import PostCreatePage from "./pages/PostCreatePage.jsx";
 import PostDetailPage from "./pages/PostDetailPage.jsx";
@@ -33,6 +32,10 @@ import ProtectedRoute from "./components/molecules/ProtectedRoute.jsx";
 import FAQPage from "./pages/FAQPage.jsx";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
 import TermsOfUsePage from "./pages/TermsOfUsePage.jsx";
+import ProtectedRouteAdmin from "./components/molecules/ProtectedRouteAdmin.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
+import AdminTablePage from "./pages/AdminTablePage.jsx";
+import AdminAddPage from "./pages/AdminAddPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -115,6 +118,28 @@ const router = createBrowserRouter([
       {
         path: "/terms-of-use",
         element: <TermsOfUsePage />,
+        path: "/admin",
+        element: (
+          <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
+            <AdminPage />
+          </ProtectedRouteAdmin>
+        ),
+      },
+      {
+        path: "/admintable",
+        element: (
+          <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
+            <AdminTablePage />
+          </ProtectedRouteAdmin>
+        ),
+      },
+      {
+        path: "/adminadd",
+        element: (
+          <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
+            <AdminAddPage />
+          </ProtectedRouteAdmin>
+        ),
       },
     ],
   },
@@ -150,6 +175,8 @@ const router = createBrowserRouter([
     path: "/subscription/plans/:businessId",
     element: <SubscriptionPlansPage />,
   },
+
+
 ]);
 
 createRoot(document.getElementById("root")).render(

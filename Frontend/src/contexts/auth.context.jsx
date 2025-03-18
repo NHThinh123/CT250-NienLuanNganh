@@ -10,7 +10,6 @@ export const AuthContext = createContext({
         name: "",
         avatar: "",
         dateOfBirth: "",
-
     },
     setAuth: () => { },
     loading: true,
@@ -22,17 +21,18 @@ export const AuthWrapper = ({ children }) => {
     const [auth, setAuth] = useState(() => {
         try {
             const storedUser = localStorage.getItem("authUser");
+            const storedToken = localStorage.getItem("access_token");
             const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-            return parsedUser
+            return storedToken && parsedUser
                 ? { isAuthenticated: true, user: parsedUser }
                 : { isAuthenticated: false, user: {} };
         } catch (error) {
             console.error("Lỗi khi parse localStorage:", error);
-            localStorage.removeItem("authUser"); // Xóa dữ liệu lỗi để tránh lỗi lần sau
+            localStorage.removeItem("authUser");
+            localStorage.removeItem("access_token");
             return { isAuthenticated: false, user: {} };
         }
     });
-
 
     const [loading, setLoading] = useState(false);
 
@@ -40,8 +40,10 @@ export const AuthWrapper = ({ children }) => {
     useEffect(() => {
         if (auth.isAuthenticated) {
             localStorage.setItem("authUser", JSON.stringify(auth.user));
+            localStorage.setItem("access_token", auth.user.token); // Sử dụng key "access_token"
         } else {
             localStorage.removeItem("authUser");
+            localStorage.removeItem("access_token");
         }
     }, [auth]);
 

@@ -18,6 +18,7 @@ const {
   sendBusinessResetPasswordEmail,
 } = require("../services/email.service");
 const crypto = require("crypto");
+const { create } = require("../models/userVerification.model");
 
 const getBusiness = async (req, res, next) => {
   try {
@@ -248,7 +249,7 @@ const processActivationPayment = async (req, res) => {
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100),
+      amount: Math.round(amount / 2500),
       currency: "usd",
       payment_method: paymentMethodId,
       confirm: true,
@@ -335,8 +336,8 @@ const processMonthlyPayment = async (req, res) => {
 
     // Tạo thanh toán qua Stripe
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100,
-      currency: "usd", // Đồng bộ với processActivationPayment (đổi từ "vnd" sang "usd")
+      amount: Math.round(amount),
+      currency: "vnd", // Đồng bộ với processActivationPayment (đổi từ "vnd" sang "usd")
       payment_method: paymentMethodId,
       confirm: true,
       automatic_payment_methods: {
@@ -396,7 +397,10 @@ const loginBusiness = async (req, res, next) => {
     // Tìm business theo email
     const business = await Business.findOne({ email });
     if (!business) {
-      return res.status(404).json({ message: "Tài khoản không tồn tại" });
+      return res.status(404).json({
+        status: "NOT_FOUND",
+        message: "Tài khoản không tồn tại"
+      });
     }
     if (!business.verified) {
       return res.status(403).json({
@@ -408,7 +412,10 @@ const loginBusiness = async (req, res, next) => {
     // Kiểm tra mật khẩu
     const isMatch = await bcrypt.compare(password, business.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Mật khẩu không chính xác" });
+      return res.status(400).json({
+        status: "PASSWORDINCORRECT",
+        message: "Mật khẩu không chính xác"
+      });
     }
 
     // Tạo token
@@ -432,11 +439,17 @@ const loginBusiness = async (req, res, next) => {
         open_hours: business.open_hours,
         close_hours: business.close_hours,
         status: business.status,
+        createdAt: business.createdAt,
+        lastPaymentDate: business.lastPaymentDate,
+        nextPaymentDueDate: business.nextPaymentDueDate,
       },
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({
+      status: "SERVER_ERROR",
+      message: "Internal Server Error"
+    });
   }
 };
 

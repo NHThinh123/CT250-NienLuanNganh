@@ -175,8 +175,7 @@ const SignupBusinessForm = () => {
         formData.append("close_hours", dayjs(values.closeHours).format("HH:mm"));
         formData.append("password", values.password);
 
-        // Log dữ liệu gửi lên để kiểm tra
-        console.log({
+        console.log("Dữ liệu gửi lên:", {
             business_name: values.businessName,
             email: values.email,
             location: values.location,
@@ -189,9 +188,30 @@ const SignupBusinessForm = () => {
 
         register(formData, {
             onSuccess: (data) => {
-                const { business } = data;
-                if (business && business.id) {
-                    navigate(`/subscription/plans/${business.id}`, {
+                console.log("Phản hồi từ API:", data);
+
+                // Kiểm tra nếu API trả về thông điệp "Email đã tồn tại!"
+                if (data.message && data.message.toLowerCase().includes("email đã tồn tại")) {
+                    message.error("Email đã tồn tại! Vui lòng sử dụng email khác.");
+                    return; // Dừng xử lý tiếp
+                }
+
+                // Xử lý logic tìm businessId
+                let businessId;
+                if (data.business && data.business.id) {
+                    businessId = data.business.id;
+                } else if (data.id) {
+                    businessId = data.id;
+                } else if (data.data && data.data.id) {
+                    businessId = data.data.id;
+                } else if (data.business && data.business._id) {
+                    businessId = data.business._id;
+                } else {
+                    businessId = null;
+                }
+
+                if (businessId) {
+                    navigate(`/subscription/plans/${businessId}`, {
                         state: { email: values.email, businessName: values.businessName },
                     });
                 } else {
@@ -201,7 +221,12 @@ const SignupBusinessForm = () => {
             },
             onError: (error) => {
                 console.error("Đăng ký thất bại:", error);
-                message.error("Đăng ký thất bại: " + (error.response?.data?.message || "Lỗi không xác định"));
+                const errorMessage = error.response?.data?.message || "Lỗi không xác định";
+                if (errorMessage.toLowerCase().includes("email đã tồn tại")) {
+                    message.error("Email đã tồn tại! Vui lòng sử dụng email khác.");
+                } else {
+                    message.error("Đăng ký thất bại: " + errorMessage);
+                }
             },
         });
     };
@@ -258,7 +283,7 @@ const SignupBusinessForm = () => {
 
                     <Row gutter={16}>
                         <Col xs={24} sm={8}>
-                            <Form.Item label="Tỉnh/Thành phố" name="province" rules={[{ required: true, message: "Vui lòng chọn tỉnh/thành phố!" }]}>
+                            <Form.Item label="Tỉnh/Thành phố" name="province" rules={[{ required: false, message: "Vui lòng chọn tỉnh/thành phố!" }]}>
                                 <Select
                                     size="large"
                                     placeholder="Chọn tỉnh/thành phố"
@@ -278,7 +303,7 @@ const SignupBusinessForm = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={8}>
-                            <Form.Item label="Quận/Huyện" name="district" rules={[{ required: true, message: "Vui lòng chọn quận/huyện!" }]}>
+                            <Form.Item label="Quận/Huyện" name="district" rules={[{ required: false, message: "Vui lòng chọn quận/huyện!" }]}>
                                 <Select
                                     size="large"
                                     placeholder="Chọn quận/huyện"
@@ -298,7 +323,7 @@ const SignupBusinessForm = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={8}>
-                            <Form.Item label="Phường/Xã" name="ward" rules={[{ required: true, message: "Vui lòng chọn phường/xã!" }]}>
+                            <Form.Item label="Phường/Xã" name="ward" rules={[{ required: false, message: "Vui lòng chọn phường/xã!" }]}>
                                 <Select
                                     size="large"
                                     placeholder="Chọn phường/xã"
@@ -345,7 +370,7 @@ const SignupBusinessForm = () => {
                                         color="red"
                                     />
                                 )}
-                                <NavigationControl style={{ top: 10, right: 10 }} />
+                                <NavigationControl style={{ top: 10, right: "10px" }} />
                             </ReactMapGL>
                         </div>
                     </Form.Item>
