@@ -20,10 +20,12 @@ const removeAccents = (str) => {
 const BusinessList = ({
   businessData,
   searchKeyword,
+  typeSortOption,
   sortOption,
   starFilters,
   currentPage,
   itemsPerPage,
+  priceRange,
   setFilteredTotalItems,
 }) => {
   const navigate = useNavigate();
@@ -33,9 +35,11 @@ const BusinessList = ({
     if (starFilters.length === 0) return true; // Nếu không chọn bộ lọc, hiển thị tất cả
     const rating = business.rating_average || 0;
     return (
-      (starFilters.includes("from_3_stars") && rating >= 3) ||
-      (starFilters.includes("from_4_stars") && rating >= 4) ||
-      (starFilters.includes("from_5_stars") && rating >= 5)
+      (starFilters.includes("0_to_1_star") && rating >= 0 && rating <= 1) ||
+      (starFilters.includes("1_to_2_star") && rating > 1 && rating <= 2) ||
+      (starFilters.includes("2_to_3_star") && rating > 2 && rating <= 3) ||
+      (starFilters.includes("3_to_4_star") && rating > 3 && rating <= 4) ||
+      (starFilters.includes("4_to_5_star") && rating > 4 && rating <= 5)
     );
   };
 
@@ -48,23 +52,39 @@ const BusinessList = ({
       const keyword = removeAccents(searchKeyword || "").toLowerCase();
       return businessName.includes(keyword);
     })
-    .filter(filterByRating);
+    .filter(filterByRating)
+    .filter((business) => {
+      return (
+        business.dish_lowest_cost >= priceRange[0] &&
+        business.dish_highest_cost <= priceRange[1]
+      );
+    });
 
   // Cập nhật số lượng business sau khi lọc để phân trang chính xác
   setFilteredTotalItems(filteredBusinessData.length);
 
   // Sắp xếp danh sách businesses theo tùy chọn của người dùng
   const sortedBusinessData = [...filteredBusinessData].sort((a, b) => {
-    if (sortOption === "high_to_low_reviews") {
-      return (b.totalReviews || 0) - (a.totalReviews || 0);
+    if (typeSortOption === "cost") {
+      if (sortOption === "low_to_high") {
+        return (a.dish_lowest_cost || 0) - (b.dish_lowest_cost || 0);
+      } else if (sortOption === "high_to_low") {
+        return (b.dish_highest_cost || 0) - (a.dish_highest_cost || 0);
+      }
+    } else if (typeSortOption === "star") {
+      if (sortOption === "low_to_high") {
+        return (a.rating_average || 0) - (b.rating_average || 0);
+      } else if (sortOption === "high_to_low") {
+        return (b.rating_average || 0) - (a.rating_average || 0);
+      }
+    } else if (typeSortOption === "reviews") {
+      if (sortOption === "low_to_high") {
+        return (a.totalReviews || 0) - (b.totalReviews || 0);
+      } else if (sortOption === "high_to_low") {
+        return (b.totalReviews || 0) - (a.totalReviews || 0);
+      }
     }
-    if (sortOption === "low_to_high_cost") {
-      return (a.dish_lowest_cost || 0) - (b.dish_lowest_cost || 0);
-    }
-    if (sortOption === "high_to_low_cost") {
-      return (b.dish_highest_cost || 0) - (a.dish_highest_cost || 0);
-    }
-    return 0;
+    return 0; // Nếu không chọn gì thì giữ nguyên thứ tự
   });
 
   const startIndex = (currentPage - 1) * itemsPerPage;

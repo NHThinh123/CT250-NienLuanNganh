@@ -97,6 +97,11 @@ const updateDish = async (req, res) => {
     const { id } = req.params;
     const dataUpdate = req.body;
     const imagePath = req.file?.path || "";
+
+    // Lấy thông tin món ăn cũ trước khi cập nhật
+    const oldDish = await getDishByIdService(id);
+    const dish_price_old = oldDish.dish_price;
+
     const updatedDish = await updateDishService(id, dataUpdate, imagePath);
 
     const menu = await Menu.findById(updatedDish.menu_id);
@@ -107,6 +112,7 @@ const updateDish = async (req, res) => {
     const dish_lowest_cost = business.dish_lowest_cost;
 
     if (
+      dish_price_old === dish_highest_cost ||
       dish_price_updated < dish_lowest_cost ||
       dish_price_updated > dish_highest_cost
     ) {

@@ -8,6 +8,7 @@ const {
   loginBusiness,
   updateRatingAverage,
   updateDishCostBusiness,
+  updateTotalReviews,
   processActivationPayment,
   processMonthlyPayment,
   requestBusinessPasswordReset,
@@ -23,12 +24,12 @@ const { verifyBusinessEmail } = require("../controllers/user.verifiEmail");
 router.get("/", getBusiness);
 //Xác thực tài khoản
 router.get("/verify/:businessId/:uniqueString", verifyBusinessEmail);
-router.get('/verified', (req, res) => {
+router.get("/verified", (req, res) => {
   try {
-    res.sendFile(path.join(__dirname, '../views/verification.html'));
+    res.sendFile(path.join(__dirname, "../views/verification.html"));
   } catch (error) {
-    console.error('Error sending verification page:', error);
-    res.status(500).send('Internal Server Error');
+    console.error("Error sending verification page:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 //Gửi yêu cầu đặt lại mật khẩu
@@ -50,5 +51,6 @@ router.post("/payment/monthly/:businessId", processMonthlyPayment);
 router.post("/loginBusiness", loginBusiness);
 router.put("/updateRatingAverage/:id", updateRatingAverage);
 router.put("/updateDishCost/:id", updateDishCostBusiness);
+router.put("/updateTotalReviews/:id", updateTotalReviews);
 
 module.exports = router;

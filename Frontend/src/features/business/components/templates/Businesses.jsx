@@ -4,8 +4,10 @@ import BusinessList from "./BusinessList";
 
 const Businesses = ({ businessData }) => {
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [sortOption, setSortOption] = useState("");
+  const [typeSortOption, setTypeSortOption] = useState("");
+  const [sortOption, setSortOption] = useState("high_to_low");
   const [starFilters, setStarFilters] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 100000000000]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredTotalItems, setFilteredTotalItems] = useState(0);
   const ITEMS_PER_PAGE = 8;
@@ -14,8 +16,16 @@ const Businesses = ({ businessData }) => {
     setSearchKeyword(keyword);
   };
 
+  const handleTypeSort = (option) => {
+    setTypeSortOption(option);
+  };
+
   const handleSortChange = (option) => {
     setSortOption(option);
+  };
+
+  const handlePriceRangeChange = (range) => {
+    setPriceRange(range);
   };
 
   const handleStarFilter = (stars) => {
@@ -32,8 +42,11 @@ const Businesses = ({ businessData }) => {
         <BusinessFilter
           handleSearch={handleSearch}
           handleSortChange={handleSortChange}
+          handleTypeSort={handleTypeSort}
           handleStarFilter={handleStarFilter}
           onPageChange={handlePageChange}
+          handlePriceRangeChange={handlePriceRangeChange}
+          businessData={businessData}
           totalItems={filteredTotalItems}
           itemsPerPage={ITEMS_PER_PAGE}
         />
@@ -41,8 +54,10 @@ const Businesses = ({ businessData }) => {
       <BusinessList
         businessData={businessData}
         searchKeyword={searchKeyword}
+        typeSortOption={typeSortOption}
         sortOption={sortOption}
         starFilters={starFilters}
+        priceRange={priceRange}
         currentPage={currentPage}
         itemsPerPage={ITEMS_PER_PAGE}
         setFilteredTotalItems={setFilteredTotalItems}

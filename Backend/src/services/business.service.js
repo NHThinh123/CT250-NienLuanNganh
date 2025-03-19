@@ -122,7 +122,7 @@ const updateDishCostBusinessService = async (businessId) => {
   }
 };
 
-const updateTotalReviews = async (businessId) => {
+const updateTotalReviewsService = async (businessId) => {
   try {
     const totalReviews = await Review.countDocuments({
       business_id: businessId,
@@ -140,5 +140,5 @@ module.exports = {
   updateBusinessService,
   updateRatingAverageService,
   updateDishCostBusinessService,
-  updateTotalReviews,
+  updateTotalReviewsService,
 };
