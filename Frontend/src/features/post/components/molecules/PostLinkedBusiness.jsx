@@ -26,7 +26,7 @@ const PostLinkedBusiness = ({ linked_business }) => {
         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         margin: 16,
       }}
-      title={<Text strong>{linked_business.business_name}</Text>}
+      title={<Text strong>Quán ăn: {linked_business.business_name}</Text>}
     >
       <Row>
         <Col span={6}>

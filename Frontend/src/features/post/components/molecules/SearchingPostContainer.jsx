@@ -11,7 +11,10 @@ const SearchingPostContainer = ({ listType, onChange }) => {
 
   return (
     <BoxContainer>
-      <Typography.Title level={4} style={{ marginTop: "16px" }}>
+      <Typography.Title
+        level={4}
+        style={{ marginTop: "8px", marginLeft: "8px" }}
+      >
         Phân loại
       </Typography.Title>
       <div>

@@ -190,7 +190,7 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
           <img
             src={
               record?.media?.[0]?.url ||
-              "https://inkythuatso.com/uploads/thumbnails/800/2023/03/9-anh-dai-dien-trang-inkythuatso-03-15-27-03.jpg"
+              "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg"
             }
             alt={text || "Ảnh bài viết"}
             style={{

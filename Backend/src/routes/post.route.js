@@ -8,6 +8,8 @@ const {
   getMyPosts,
   getLikedPosts,
   getCommentedPosts,
+  getPostFrequency,
+  getPostSummary,
 } = require("../controllers/post.controller");
 const uploadPost = require("../middleware/uploadPost");
 
@@ -22,5 +24,7 @@ router.get("/detail/:id", getPostById);
 router.post("/create", uploadPost.array("media", 5), createPost);
 router.patch("/:post_id", uploadPost.array("media", 5), updatePost);
 router.delete("/:post_id", deletePost);
+router.get("/frequency", getPostFrequency);
+router.get("/summary", getPostSummary);
 
 module.exports = router;

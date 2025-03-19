@@ -57,6 +57,16 @@ const getCommentedPostsApi = ({ pageParam = 1, queryKey }) => {
   const URL_API = `/api/posts/commented-posts`;
   return axios.get(URL_API, { params: { ...params, page: pageParam } });
 };
+
+const getPostFrequencyApi = (id, timeRange = "7days") => {
+  const URL_API = `/api/posts/frequency`;
+  return axios.get(URL_API, { params: { id: id, timeRange } });
+};
+
+const getPostSummaryApi = (id, timeRange = "7days") => {
+  const URL_API = `/api/posts/summary`;
+  return axios.get(URL_API, { params: { id: id, timeRange } });
+};
 export {
   getPostApi,
   createPostApi,
@@ -68,4 +78,6 @@ export {
   getMyPostsApi,
   getLikedPostsApi,
   getCommentedPostsApi,
+  getPostFrequencyApi,
+  getPostSummaryApi,
 };

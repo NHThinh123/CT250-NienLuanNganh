@@ -36,6 +36,7 @@ import ProtectedRouteAdmin from "./components/molecules/ProtectedRouteAdmin.jsx"
 import AdminPage from "./pages/AdminPage.jsx";
 import AdminTablePage from "./pages/AdminTablePage.jsx";
 import AdminAddPage from "./pages/AdminAddPage.jsx";
+import PostOverviewPage from "./pages/PostOverviewPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -65,11 +66,20 @@ const router = createBrowserRouter([
           },
           {
             path: "my-posts",
-            element: (
-              <ProtectedRoute redirectPath="/login">
-                <MyPostList />
-              </ProtectedRoute>
-            ),
+            children: [
+              {
+                index: true,
+                element: (
+                  <ProtectedRoute redirectPath="/login">
+                    <MyPostList />
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path: "overview",
+                element: <PostOverviewPage />,
+              },
+            ],
           },
           {
             path: ":id",

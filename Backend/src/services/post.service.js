@@ -1060,6 +1060,241 @@ const deletePostService = async (post_id, id) => {
   return { message: "Post deleted successfully", postId: post_id };
 };
 
+const getPostFrequencyService = async (id, timeRange = "7days") => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError("Invalid user or business ID", 400);
+  }
+
+  const objectId = new mongoose.Types.ObjectId(id);
+  let startDate;
+
+  // Xác định khoảng thời gian dựa trên timeRange
+  const now = new Date();
+  switch (timeRange.toLowerCase()) {
+    case "7days":
+      startDate = new Date(now.setDate(now.getDate() - 7)); // 7 ngày qua
+      break;
+    case "28days":
+      startDate = new Date(now.setDate(now.getDate() - 28)); // 28 ngày qua
+      break;
+    case "all":
+      startDate = null; // Không giới hạn thời gian bắt đầu
+      break;
+    default:
+      throw new AppError(
+        "Invalid timeRange. Use '7days', '28days', or 'all'",
+        400
+      );
+  }
+
+  // Sử dụng native MongoDB driver
+  const db = mongoose.connection.db;
+  let pipeline = [
+    {
+      $match: {
+        $or: [{ user_id: objectId }, { business_id: objectId }],
+      },
+    },
+  ];
+
+  // Thêm điều kiện thời gian nếu không phải "all"
+  if (startDate) {
+    pipeline[0].$match.createdAt = { $gte: startDate };
+  }
+
+  // Debug: Log toàn bộ dữ liệu thô trước khi nhóm
+  const rawData = await db.collection("posts").aggregate(pipeline).toArray();
+  console.log(
+    "Raw Data (native):",
+    rawData.map((post) => ({
+      _id: post._id,
+      user_id: post.user_id,
+      business_id: post.business_id,
+      deleted: post.deleted,
+      createdAt: post.createdAt,
+      deletedAt: post.deletedAt,
+    }))
+  );
+
+  // Logic nhóm dữ liệu theo timeRange
+  if (timeRange === "7days") {
+    pipeline.push(
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } }
+    );
+
+    const frequency = await db
+      .collection("posts")
+      .aggregate(pipeline)
+      .toArray();
+
+    const result = Array(7).fill(0);
+    const today = new Date();
+    const dates = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() - (6 - i));
+      return d.toISOString().split("T")[0];
+    });
+
+    frequency.forEach((item) => {
+      const index = dates.indexOf(item._id);
+      if (index !== -1) result[index] = item.count;
+    });
+    return result;
+  } else if (timeRange === "28days") {
+    pipeline.push(
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } }
+    );
+
+    const frequency = await db
+      .collection("posts")
+      .aggregate(pipeline)
+      .toArray();
+
+    const result = Array(28).fill(0);
+    const today = new Date();
+    const dates = Array.from({ length: 28 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() - (27 - i));
+      return d.toISOString().split("T")[0];
+    });
+
+    frequency.forEach((item) => {
+      const index = dates.indexOf(item._id);
+      if (index !== -1) result[index] = item.count;
+    });
+    return result;
+  } else if (timeRange === "all") {
+    pipeline.push(
+      {
+        $group: {
+          _id: { $year: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } }
+    );
+
+    const frequency = await db
+      .collection("posts")
+      .aggregate(pipeline)
+      .toArray();
+
+    const minYear = frequency.length > 0 ? frequency[0]._id : now.getFullYear();
+    const maxYear =
+      frequency.length > 0
+        ? frequency[frequency.length - 1]._id
+        : now.getFullYear();
+    const yearRange = maxYear - minYear + 1;
+    const result = Array(yearRange).fill(0);
+    frequency.forEach((item) => {
+      result[item._id - minYear] = item.count;
+    });
+    return {
+      years: Array.from({ length: yearRange }, (_, i) => minYear + i),
+      counts: result,
+    };
+  }
+};
+const getPostSummaryService = async (id, timeRange = "7days") => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError("Invalid user or business ID", 400);
+  }
+
+  const objectId = new mongoose.Types.ObjectId(id);
+  let startDate;
+
+  // Xác định khoảng thời gian dựa trên timeRange
+  const now = new Date();
+  switch (timeRange.toLowerCase()) {
+    case "7days":
+      startDate = new Date(now.setDate(now.getDate() - 7)); // 7 ngày qua
+      break;
+    case "28days":
+      startDate = new Date(now.setDate(now.getDate() - 28)); // 28 ngày qua
+      break;
+    case "all":
+      startDate = null; // Không giới hạn thời gian bắt đầu
+      break;
+    default:
+      throw new AppError(
+        "Invalid timeRange. Use '7days', '28days', or 'all'",
+        400
+      );
+  }
+
+  // Điều kiện cơ bản, bao gồm cả bài đã xóa mềm
+  let matchCondition = {
+    $or: [{ user_id: objectId }, { business_id: objectId }],
+    // Không thêm điều kiện deleted để lấy cả bài đã xóa mềm
+  };
+
+  // Thêm điều kiện thời gian nếu không phải "all"
+  if (startDate) {
+    matchCondition.createdAt = { $gte: startDate };
+  }
+
+  // Tổng số bài viết, bao gồm cả đã xóa mềm
+  const totalPosts = await Post.countDocumentsWithDeleted(matchCondition);
+
+  // Tổng số lượt thích, bao gồm cả bài đã xóa mềm
+  const totalLikes = await User_Like_Post.aggregate([
+    {
+      $lookup: {
+        from: "posts",
+        localField: "post_id",
+        foreignField: "_id",
+        as: "post",
+      },
+    },
+    { $unwind: "$post" },
+    {
+      $match: {
+        $or: [{ "post.user_id": objectId }, { "post.business_id": objectId }],
+        ...(startDate ? { "post.createdAt": { $gte: startDate } } : {}),
+      },
+    },
+    { $group: { _id: null, total: { $sum: 1 } } },
+  ]);
+
+  // Tổng số bình luận, bao gồm cả bài đã xóa mềm
+  const totalComments = await Comment.aggregate([
+    {
+      $lookup: {
+        from: "posts",
+        localField: "post_id",
+        foreignField: "_id",
+        as: "post",
+      },
+    },
+    { $unwind: "$post" },
+    {
+      $match: {
+        $or: [{ "post.user_id": objectId }, { "post.business_id": objectId }],
+        ...(startDate ? { "post.createdAt": { $gte: startDate } } : {}),
+      },
+    },
+    { $group: { _id: null, total: { $sum: 1 } } },
+  ]);
+
+  return {
+    totalPosts,
+    totalLikes: totalLikes[0]?.total || 0,
+    totalComments: totalComments[0]?.total || 0,
+  };
+};
+
 module.exports = {
   getListPostService,
   getPostByIdService,
@@ -1069,4 +1304,6 @@ module.exports = {
   getMyPostsService,
   getLikedPostsService,
   getCommentedPostsService,
+  getPostFrequencyService,
+  getPostSummaryService,
 };

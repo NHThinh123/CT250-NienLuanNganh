@@ -1,8 +1,10 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
   getPostApi,
   getLikedPostsApi,
   getCommentedPostsApi,
+  getPostFrequencyApi,
+  getPostSummaryApi,
 } from "../services/postApi";
 
 // Hook cho danh sách bài viết chung
@@ -43,5 +45,25 @@ const useCommentedPosts = (params) => {
     },
   });
 };
+const usePostFrequency = (id, timeRange = "7days") => {
+  return useQuery({
+    queryKey: ["post-frequency", id, timeRange],
+    queryFn: () => getPostFrequencyApi(id, timeRange),
+    enabled: !!id,
+  });
+};
 
-export { usePost, useLikedPosts, useCommentedPosts };
+const usePostSummary = (id, timeRange = "7days") => {
+  return useQuery({
+    queryKey: ["post-summary", id, timeRange],
+    queryFn: () => getPostSummaryApi(id, timeRange),
+    enabled: !!id,
+  });
+};
+export {
+  usePost,
+  useLikedPosts,
+  useCommentedPosts,
+  usePostFrequency,
+  usePostSummary,
+};

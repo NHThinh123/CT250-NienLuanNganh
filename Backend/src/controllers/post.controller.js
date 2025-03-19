@@ -7,6 +7,8 @@ const {
   getMyPostsService,
   getLikedPostsService,
   getCommentedPostsService,
+  getPostFrequencyService,
+  getPostSummaryService,
 } = require("../services/post.service");
 
 const getListPost = async (req, res, next) => {
@@ -153,6 +155,25 @@ const deletePost = async (req, res, next) => {
     next(error);
   }
 };
+const getPostFrequency = async (req, res, next) => {
+  try {
+    const { id, timeRange } = req.query;
+    const data = await getPostFrequencyService(id, timeRange);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getPostSummary = async (req, res, next) => {
+  try {
+    const { id, timeRange } = req.query;
+    const data = await getPostSummaryService(id, timeRange);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   getListPost,
@@ -163,4 +184,6 @@ module.exports = {
   getMyPosts,
   getLikedPosts,
   getCommentedPosts,
+  getPostFrequency,
+  getPostSummary,
 };
