@@ -1,6 +1,6 @@
 const {
   updateRatingAverageService,
-  updateTotalReviews,
+  updateTotalReviewsService,
 } = require("../services/business.service");
 const {
   getListReviewService,
@@ -53,7 +53,7 @@ const createReview = async (req, res, next) => {
       business_id_review
     );
     await updateRatingAverageService(business_id); //Cập nhật lại rating_average khi tạo một review
-    await updateTotalReviews(business_id); //Cập nhật lại số lượng review của business khi tạo một review
+    await updateTotalReviewsService(business_id); //Cập nhật lại số lượng review của business khi tạo một review
 
     res.status(201).json(newReview);
   } catch (error) {

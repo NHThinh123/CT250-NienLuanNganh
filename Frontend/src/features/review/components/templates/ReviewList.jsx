@@ -1,4 +1,4 @@
-import { Avatar, List, Rate, Typography } from "antd";
+import { Avatar, List, Rate, Typography, Row, Col } from "antd";
 import { formatTime } from "../../../../constants/formatTime";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 
@@ -23,33 +23,38 @@ const ReviewList = ({ reviewData }) => {
           dataSource={reviewData}
           renderItem={(review) => (
             <List.Item>
-              <div style={{ display: "flex" }}>
-                <Avatar
-                  src={
-                    !review.user_id && review.business_id_review
-                      ? review.business_id_review.avatar
-                      : review.user_id.avatar
-                  }
-                ></Avatar>
-                <div style={{ marginLeft: 8 }}>
-                  <p style={{ fontWeight: "bold", margin: 0 }}>
-                    {!review.user_id && review.business_id_review
-                      ? review.business_id_review.business_name
-                      : review.user_id.name}
-                  </p>
-                  <Rate
-                    value={review.review_rating}
-                    disabled
-                    style={{ fontSize: 15 }}
+              <Row>
+                <Col span={3}>
+                  {/* <div style={{ display: "flex" }}> */}
+                  <Avatar
+                    src={
+                      !review.user_id && review.business_id_review
+                        ? review.business_id_review.avatar
+                        : review.user_id.avatar
+                    }
+                    size={35}
                   />
-                </div>
-              </div>
-              <Typography.Text
-                style={{ marginLeft: 40, color: "#6D6F71", fontSize: 14 }}
-              >
-                {formatTime(review.createdAt)}
-              </Typography.Text>
-              <p style={{ marginLeft: 40 }}>{review.review_contents}</p>
+                </Col>
+                <Col span={21}>
+                  <div>
+                    <p style={{ fontWeight: "bold", margin: 0 }}>
+                      {!review.user_id && review.business_id_review
+                        ? review.business_id_review.business_name
+                        : review.user_id.name}
+                    </p>
+                    <Rate
+                      value={review.review_rating}
+                      disabled
+                      style={{ fontSize: 15 }}
+                    />
+                  </div>
+                  {/* </div> */}
+                  <Typography.Text style={{ color: "#6D6F71", fontSize: 14 }}>
+                    {formatTime(review.createdAt)}
+                  </Typography.Text>
+                  <p>{review.review_contents}</p>
+                </Col>
+              </Row>
             </List.Item>
           )}
         />

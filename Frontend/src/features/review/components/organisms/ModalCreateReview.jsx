@@ -1,4 +1,14 @@
-import { Col, Form, Input, message, Modal, Rate, Row, Typography } from "antd";
+import {
+  Avatar,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Rate,
+  Row,
+  Typography,
+} from "antd";
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import useCreateReview from "../../../review/hooks/useCreateReview";
 import { AuthContext } from "../../../../contexts/auth.context";
@@ -92,15 +102,15 @@ const ModalCreateReview = ({
         <Col span={24}>
           <Form form={form} onFinish={onFinish}>
             <div style={{ display: "flex", marginBottom: 10 }}>
-              <img
-                style={{ width: "50px", height: "50px", borderRadius: "50%" }}
+              <Avatar
                 src={
                   user_id && !business_id
                     ? auth?.user.avatar
                     : business?.business.avatar
                 }
                 alt="Ảnh"
-              ></img>
+                size={60}
+              />
               <p
                 style={{
                   margin: "0px 0px 0px 10px",

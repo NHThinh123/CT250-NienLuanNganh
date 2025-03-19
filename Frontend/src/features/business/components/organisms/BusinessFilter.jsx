@@ -1,22 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
-import { Input, Row, Col, Select, Button, Checkbox } from "antd";
-import { SlidersHorizontal } from "lucide-react";
+import { Input, Row, Col, Select, Button, Checkbox, Slider } from "antd";
+import { ArrowRight, SlidersHorizontal } from "lucide-react";
 import BusinessPagination from "../molecules/BusinessPagination";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 
 const { Option } = Select;
 
 const BusinessFilter = ({
   handleSearch,
   handleSortChange,
+  handleTypeSort,
   handleStarFilter,
   onPageChange,
   totalItems,
   itemsPerPage,
+  businessData,
+  handlePriceRangeChange,
 }) => {
   const [searchValue, setSearchValue] = useState("");
   const [selectedStars, setSelectedStars] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 100]); // Giá trị mặc định
+  const [selectedPriceRange, setSelectedPriceRange] = useState([0, 100]);
+
+  useEffect(() => {
+    if (businessData.length > 0) {
+      const minPrice = Math.min(...businessData.map((b) => b.dish_lowest_cost));
+      const maxPrice = Math.max(
+        ...businessData.map((b) => b.dish_highest_cost)
+      );
+
+      setPriceRange([minPrice, maxPrice]);
+      setSelectedPriceRange([minPrice, maxPrice]);
+    }
+  }, [businessData]); // Chạy lại khi businesses thay đổi
+
+  const handlePriceChange = (value) => {
+    setSelectedPriceRange(value);
+    handlePriceRangeChange(value);
+  };
+
+  const formatPrice = (price) => {
+    if (typeof price !== "number" || isNaN(price)) {
+      return "N/A";
+    }
+    return price.toLocaleString("vi-VN");
+  };
 
   const handleInputChange = (e) => {
     setSearchValue(e.target.value);
@@ -38,30 +69,58 @@ const BusinessFilter = ({
   return (
     <BoxContainer>
       <Row>
-        <Col span={12}>
+        <Col span={11}>
           <Input.Search
             placeholder="Tìm kiếm quán ăn"
             value={searchValue}
             onChange={handleInputChange}
             onSearch={handleSearchClick}
             enterButton
-            style={{ paddingRight: "10px" }}
+            style={{ paddingRight: "22px" }}
           />
         </Col>
-        <Col span={5}>
+        <Col span={3}>
           <Select
-            defaultValue="Sắp xếp theo..."
+            defaultValue="Sắp xếp"
             style={{ width: "100%", textAlign: "center" }}
-            onChange={handleSortChange}
+            onChange={handleTypeSort}
           >
-            <Option value="high_to_low_reviews">
-              Lượt đánh giá nhiều đến ít
-            </Option>
-            <Option value="low_to_high_cost">Giá thấp đến cao</Option>
-            <Option value="high_to_low_cost">Giá cao đến thấp</Option>
+            <Option value="cost">Giá</Option>
+            <Option value="star">Sao</Option>
+            <Option value="reviews">Lượt đánh giá</Option>
           </Select>
         </Col>
-        <Col span={3} style={{ paddingLeft: "8px" }}>
+        <Col span={3} style={{ paddingLeft: "4px" }}>
+          <Select
+            defaultValue="high_to_low"
+            onChange={handleSortChange}
+            style={{ width: "100%" }}
+          >
+            <Option value="high_to_low">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                Cao{" "}
+                <ArrowRight
+                  size={16}
+                  strokeWidth={1.75}
+                  style={{ margin: "0px 3px" }}
+                />{" "}
+                Thấp
+              </div>
+            </Option>
+            <Option value="low_to_high">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                Thấp{" "}
+                <ArrowRight
+                  size={16}
+                  strokeWidth={1.75}
+                  style={{ margin: "0px 3px" }}
+                />{" "}
+                Cao
+              </div>
+            </Option>
+          </Select>
+        </Col>
+        <Col span={3} style={{ paddingLeft: "22px" }}>
           <Button onClick={toggleFilters} block>
             <SlidersHorizontal size={15} />
             {showFilters ? "Ẩn bộ lọc" : "Bộ lọc"}
@@ -79,16 +138,146 @@ const BusinessFilter = ({
         </Col>
       </Row>
       {showFilters && (
-        <Row style={{ marginTop: "16px" }}>
-          <Col span={2}>Đánh giá:</Col>
-          <Col span={22}>
-            <Checkbox.Group onChange={handleStarChange} value={selectedStars}>
-              <Checkbox value="from_3_stars">từ 3 sao</Checkbox>
-              <Checkbox value="from_4_stars">từ 4 sao</Checkbox>
-              <Checkbox value="from_5_stars">từ 5 sao</Checkbox>
-            </Checkbox.Group>
-          </Col>
-        </Row>
+        <div>
+          <Row style={{ marginTop: "16px" }}>
+            <Col span={1}></Col>
+            <Col span={2}>Sao:</Col>
+            <Col span={21}>
+              <Checkbox.Group
+                onChange={handleStarChange}
+                value={selectedStars}
+                style={{ gap: 30 }}
+              >
+                <Checkbox value="0_to_1_star">
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ marginRight: 3, marginTop: 2 }}>0</span>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                    <ArrowRight
+                      size={15}
+                      strokeWidth={1.75}
+                      style={{ margin: "0px 2px" }}
+                    />
+                    <div style={{ marginRight: 3, marginTop: 2 }}>1</div>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                  </div>
+                </Checkbox>
+                <Checkbox value="1_to_2_star">
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ marginRight: 3, marginTop: 2 }}>1</span>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                    <ArrowRight
+                      size={15}
+                      strokeWidth={1.75}
+                      style={{ margin: "0px 2px" }}
+                    />
+                    <div style={{ marginRight: 3, marginTop: 2 }}>2</div>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                  </div>
+                </Checkbox>
+                <Checkbox value="2_to_3_star">
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ marginRight: 3, marginTop: 2 }}>2</span>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                    <ArrowRight
+                      size={15}
+                      strokeWidth={1.75}
+                      style={{ margin: "0px 2px" }}
+                    />
+                    <div style={{ marginRight: 3, marginTop: 2 }}>3</div>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                  </div>
+                </Checkbox>
+                <Checkbox value="3_to_4_star">
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ marginRight: 3, marginTop: 2 }}>3</span>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                    <ArrowRight
+                      size={15}
+                      strokeWidth={1.75}
+                      style={{ margin: "0px 2px" }}
+                    />
+                    <div style={{ marginRight: 3, marginTop: 2 }}>4</div>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                  </div>
+                </Checkbox>
+                <Checkbox value="4_to_5_star">
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ marginRight: 3, marginTop: 2 }}>4</span>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                    <ArrowRight
+                      size={15}
+                      strokeWidth={1.75}
+                      style={{ margin: "0px 2px" }}
+                    />
+                    <div style={{ marginRight: 3, marginTop: 2 }}>5</div>
+                    <FontAwesomeIcon
+                      icon={solidStar}
+                      style={{ fontSize: 13, color: "#FFD700" }}
+                    />
+                  </div>
+                </Checkbox>
+              </Checkbox.Group>
+            </Col>
+          </Row>
+          <Row style={{ marginTop: "16px" }}>
+            <Col span={1}></Col>
+            <Col span={2} style={{ display: "flex", alignItems: "center" }}>
+              Giá:
+            </Col>
+            <Col span={14}>
+              <Slider
+                range={{ draggableTrack: true }}
+                defaultValue={priceRange}
+                min={priceRange[0]}
+                max={priceRange[1]}
+                step={1000}
+                tooltip={{
+                  formatter: (value) => formatPrice(value), // Định dạng giá hiển thị khi trượt
+                }}
+                onChange={handlePriceChange}
+              />
+            </Col>
+            <Col
+              span={4}
+              style={{ display: "flex", alignItems: "center", marginLeft: 15 }}
+            >
+              {formatPrice(selectedPriceRange[0])}đ{" "}
+              <ArrowRight
+                size={15}
+                strokeWidth={1.75}
+                style={{ margin: "0px 10px" }}
+              />{" "}
+              {formatPrice(selectedPriceRange[1])}đ
+            </Col>
+          </Row>
+        </div>
       )}
     </BoxContainer>
   );

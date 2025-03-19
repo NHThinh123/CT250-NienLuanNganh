@@ -3,6 +3,7 @@ const {
   getBusinessByIdService,
   updateBusinessService,
   updateRatingAverageService,
+  updateTotalReviewsService,
   updateDishCostBusinessService,
 } = require("../services/business.service");
 const AppError = require("../utils/AppError");
@@ -399,7 +400,7 @@ const loginBusiness = async (req, res, next) => {
     if (!business) {
       return res.status(404).json({
         status: "NOT_FOUND",
-        message: "Tài khoản không tồn tại"
+        message: "Tài khoản không tồn tại",
       });
     }
     if (!business.verified) {
@@ -414,7 +415,7 @@ const loginBusiness = async (req, res, next) => {
     if (!isMatch) {
       return res.status(400).json({
         status: "PASSWORDINCORRECT",
-        message: "Mật khẩu không chính xác"
+        message: "Mật khẩu không chính xác",
       });
     }
 
@@ -448,7 +449,7 @@ const loginBusiness = async (req, res, next) => {
     console.error("Login error:", error);
     res.status(500).json({
       status: "SERVER_ERROR",
-      message: "Internal Server Error"
+      message: "Internal Server Error",
     });
   }
 };
@@ -472,6 +473,17 @@ const updateDishCostBusiness = async (req, res, next) => {
     next(error);
   }
 };
+
+const updateTotalReviews = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updatedBusiness = await updateTotalReviewsService(id);
+    res.status(200).json(updatedBusiness);
+  } catch (error) {
+    next(error);
+  }
+};
+
 //Gửi yêu cầu đặt lại mật khẩu
 const requestBusinessPasswordReset = async (req, res) => {
   console.log("Request body received:", req.body);
@@ -533,11 +545,9 @@ const resetBusinessPassword = async (req, res) => {
     );
 
     if (!updatedBusiness) {
-      return res
-        .status(400)
-        .json({
-          message: "Không tìm thấy người dùng, đặt lại mật khẩu thất bại!",
-        });
+      return res.status(400).json({
+        message: "Không tìm thấy người dùng, đặt lại mật khẩu thất bại!",
+      });
     }
 
     // Xóa token đặt lại mật khẩu sau khi sử dụng
@@ -587,6 +597,7 @@ module.exports = {
   loginBusiness,
   updateRatingAverage,
   updateDishCostBusiness,
+  updateTotalReviews,
   processActivationPayment,
   processMonthlyPayment,
   requestBusinessPasswordReset,
