@@ -3,7 +3,6 @@ require("./services/paymentScheduler");
 
 const express = require("express");
 const cors = require("cors");
-const { WebSocketServer } = require("ws");
 const configViewEngine = require("./config/viewEngine");
 const connection = require("./config/database");
 
@@ -18,8 +17,9 @@ const reviewRoutes = require("./routes/review.route");
 const user_like_postRoutes = require("./routes/user_like_post.route");
 const user_like_commentRoutes = require("./routes/user_like_comment.route");
 const commentRoutes = require("./routes/comment.route");
-const errorHandler = require("./middleware/errorHandler");
 const adminRoutes = require("./routes/admin.route");
+const initializeWebSocket = require("./websocket/websocket");
+
 
 const app = express();
 const port = process.env.PORT || 8888;
@@ -45,6 +45,7 @@ app.use("/api/user_like_comment", user_like_commentRoutes);
 app.use("/api/post_tag", post_tagRoutes);
 app.use("/api/admin", adminRoutes)
 
+
 // Middleware xử lý lỗi
 // app.use(errorHandler);
 
@@ -54,42 +55,13 @@ const server = app.listen(port, () => {
 });
 
 // Khởi tạo WebSocket Server
-const wss = new WebSocketServer({ server });
+const { notifyClients, notifyUserStats, notifyBusinessStats, notifyPaymentStats } = initializeWebSocket(server);
 
-// Danh sách các client kết nối
-const clients = new Map();
-
-wss.on("connection", (ws) => {
-
-  ws.on("message", (message) => {
-    const data = JSON.parse(message);
-    if (data.businessId) {
-      clients.set(ws, data.businessId); // Lưu ID của business mà client theo dõi
-    }
-  });
-
-  ws.on("close", () => {
-    clients.delete(ws);
-  });
-});
-
-// Hàm gửi thông báo tới các client theo dõi businessId
-const notifyClients = (businessId) => {
-  clients.forEach((trackedId, client) => {
-    if (trackedId === businessId && client.readyState === client.OPEN) {
-      client.send(
-        JSON.stringify({
-          event: "businessUpdated",
-          businessId,
-        })
-      );
-    }
-  });
-};
-
-// Xuất hàm notifyClients để sử dụng trong các route
+// Xuất các hàm để sử dụng trong các route
 app.set("notifyClients", notifyClients);
-
+app.set("notifyUserStats", notifyUserStats);
+app.set("notifyBusinessStats", notifyBusinessStats);
+app.set("notifyPaymentStats", notifyPaymentStats);
 // Kết nối database và khởi động server
 (async () => {
   try {

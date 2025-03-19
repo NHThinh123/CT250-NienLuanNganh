@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const Business = require("../models/business.model");
 const bcrypt = require("bcryptjs");
+const Payment = require("../models/payment.model");
 
 // Lấy danh sách tất cả users
 exports.getAllUsers = async (req, res) => {
@@ -188,5 +189,16 @@ exports.deleteBusiness = async (req, res) => {
         res.status(200).json({ message: "Xóa business thành công" });
     } catch (error) {
         res.status(500).json({ message: "Lỗi server", error });
+    }
+};
+//Lấy tổng doanh thu
+exports.TotalPayment = async (req, res) => {
+    try {
+        const totalRevenue = await Payment.aggregate([
+            { $group: { _id: null, total: { $sum: "$amount" } } }
+        ]);
+        res.json({ totalRevenue: totalRevenue[0]?.total || 0 });
+    } catch (error) {
+        res.status(500).json({ message: "Error calculating revenue", error });
     }
 };

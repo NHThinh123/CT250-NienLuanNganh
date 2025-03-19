@@ -8,6 +8,7 @@ import {
     createBusiness,
     updateBusiness,
     deleteBusiness,
+    getTotalRevenue,
 } from "../services/adminApi";
 import { message } from "antd";
 
@@ -90,7 +91,16 @@ export const useAdmin = () => {
             queryClient.invalidateQueries(["businesses"]);
         },
     });
-
+    // Query cho tổng doanh thu
+    const {
+        data: revenueData,
+        isLoading: isRevenueLoading,
+        error: revenueError,
+    } = useQuery({
+        queryKey: ["totalRevenue"],
+        queryFn: getTotalRevenue,
+        retry: false,
+    });
     return {
         users: users || [],
         isUsersLoading,
@@ -110,5 +120,8 @@ export const useAdmin = () => {
         updateBusinessLoading: updateBusinessMutation.isLoading,
         deleteBusiness: deleteBusinessMutation.mutate,
         deleteBusinessLoading: deleteBusinessMutation.isLoading,
+        totalRevenue: revenueData?.totalRevenue || 0,
+        isRevenueLoading,
+        revenueError,
     };
 };

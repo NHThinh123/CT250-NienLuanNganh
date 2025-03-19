@@ -1,10 +1,9 @@
 import React from "react";
-import { Row, Col, Card } from "antd";
 import { useAdmin } from "../features/admin/hooks/useAdmin";
 import DashboardSummary from "../features/admin/components/templates/DashboardSummary";
-import Charts from "../features/admin/components/templates/Charts";
-import CreateUserForm from "../features/admin/components/templates/CreateUserForm";
-import CreateBusinessForm from "../features/admin/components/templates/CreateBusinessForm";
+import { Charts } from "../features/admin/components/templates/Charts";
+
+
 
 const AdminPage = () => {
     const {
@@ -14,6 +13,9 @@ const AdminPage = () => {
         isBusinessesLoading,
         businesses,
         businessesError,
+        totalRevenue,
+        isRevenueLoading,
+        revenueError,
     } = useAdmin();
     // Xử lý giá trị hiển thị cho Statistic
     const userCount = isUsersLoading
@@ -26,7 +28,11 @@ const AdminPage = () => {
         : businessesError
             ? "Error"
             : businesses.length;
-
+    const revenue = isRevenueLoading
+        ? "Loading..."
+        : revenueError
+            ? "Error"
+            : `${totalRevenue.toLocaleString()}`;
 
 
     if (isUsersLoading || isBusinessesLoading) {
@@ -38,6 +44,7 @@ const AdminPage = () => {
             <DashboardSummary
                 userCount={userCount}
                 businessCount={businessCount}
+                totalRevenue={revenue}
             />
             <Charts />
 

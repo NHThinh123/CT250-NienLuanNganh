@@ -18,6 +18,7 @@ const router = express.Router();
 const upload = require("../middleware/uploadAvatar");
 const path = require("path");
 const { verifyBusinessEmail } = require("../controllers/user.verifiEmail");
+const Business = require("../models/business.model");
 
 // router.post("/", createBusiness);
 router.get("/", getBusiness);
@@ -41,6 +42,16 @@ router.get("/reset-password/:token", (req, res) => {
 router.post("/reset-password/:token", resetBusinessPassword);
 //Lấy email
 router.get("/get-email/:token", getBusinessEmail);
+router.post("/", async (req, res) => {
+  try {
+    const newUser = await Business.create(req.body);
+    // Gửi thông báo qua WebSocket khi user mới được tạo
+    req.app.get("notifyBusinessrStats")();
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating user", error });
+  }
+});
 
 router.get("/id/:id", getBusinessById);
 router.put("/id/:id", upload.single("avatar"), updateBusiness);

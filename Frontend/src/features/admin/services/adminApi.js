@@ -83,5 +83,17 @@ const deleteBusiness = async (id) => {
         throw error;
     }
 };
+const getTotalRevenue = async () => {
+    try {
+        const response = await instance.get(`${API_URL}/total-revenue`);
 
-export { getAllUsers, createUser, getAllBusinesses, createBusiness, updateUser, deleteUser, updateBusiness, deleteBusiness };
+        const data = response || { totalRevenue: 0 };
+        return data;
+    } catch (error) {
+        console.error("Error fetching total revenue:", error.message);
+        const fallbackData = { totalRevenue: 0 };
+        console.log("Returning fallback data due to error:", fallbackData);
+        return fallbackData;
+    }
+};
+export { getAllUsers, createUser, getAllBusinesses, createBusiness, updateUser, deleteUser, updateBusiness, deleteBusiness, getTotalRevenue };

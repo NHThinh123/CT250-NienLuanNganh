@@ -4,6 +4,7 @@ const path = require('path');
 const { signup, signin, getUserById, getListUser, updateUser, uploadAvatar, requestPasswordReset, resetPassword, getEmail } = require("../controllers/user.controller");
 const { verifyEmail } = require("../controllers/user.verifiEmail");
 const upload = require("../middleware/uploadAvatar");
+const User = require("../models/user.model");
 
 //Đăng kí
 router.post("/signup", upload.single('avatar'), signup);
@@ -37,5 +38,15 @@ router.get("/reset-password/:token", (req, res) => {
 router.post("/reset-password/:token", resetPassword);
 //Lấy email
 router.get("/get-email/:token", getEmail);
+router.post("/", async (req, res) => {
+  try {
+    const newUser = await User.create(req.body);
+    // Gửi thông báo qua WebSocket khi user mới được tạo
+    req.app.get("notifyUserStats")();
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating user", error });
+  }
+});
 
 module.exports = router;

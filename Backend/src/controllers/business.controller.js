@@ -1,7 +1,6 @@
 const {
   getBusinessService,
   getBusinessByIdService,
-  updateBusinessService,
   updateRatingAverageService,
   updateDishCostBusinessService,
 } = require("../services/business.service");
@@ -267,7 +266,7 @@ const processActivationPayment = async (req, res) => {
       business.lastPaymentDate = new Date();
       business.nextPaymentDueDate = new Date(
         business.lastPaymentDate.getTime() +
-          (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
+        (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
       );
       if (isActivation) {
         business.activationPayment = true;
@@ -350,7 +349,7 @@ const processMonthlyPayment = async (req, res) => {
       business.lastPaymentDate = new Date();
       business.nextPaymentDueDate = new Date(
         business.lastPaymentDate.getTime() +
-          (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
+        (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
       );
       business.status = "active";
       business.reminderSent = false; // Đặt lại reminderSent
