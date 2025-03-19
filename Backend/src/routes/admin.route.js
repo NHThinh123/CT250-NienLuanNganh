@@ -9,7 +9,8 @@ const {
     createBusiness,
     updateBusiness,
     deleteBusiness,
-    TotalPayment
+    TotalPayment,
+    getAllInvoice
 } = require("../controllers/admin.controller");
 const { protect, adminOnly } = require("../middleware/admin");
 
@@ -26,5 +27,6 @@ router.put("/businesses/:id", protect, adminOnly, updateBusiness);
 router.delete("/businesses/:id", protect, adminOnly, deleteBusiness);
 //Lấy tổng doanh thu
 router.get("/total-revenue", protect, adminOnly, TotalPayment);
+router.get("/invoices", protect, adminOnly, getAllInvoice);
 
 module.exports = router;

@@ -96,4 +96,13 @@ const getTotalRevenue = async () => {
         return fallbackData;
     }
 };
-export { getAllUsers, createUser, getAllBusinesses, createBusiness, updateUser, deleteUser, updateBusiness, deleteBusiness, getTotalRevenue };
+const getAllInvoices = async () => {
+    try {
+        const response = await instance.get(`${API_URL}/invoices`);
+        return response;
+    } catch (error) {
+        console.error("Error fetching invoices:", error.message);
+        throw error;
+    }
+};
+export { getAllUsers, createUser, getAllBusinesses, createBusiness, updateUser, deleteUser, updateBusiness, deleteBusiness, getTotalRevenue, getAllInvoices };

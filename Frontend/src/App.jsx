@@ -84,6 +84,7 @@ function App() {
   const isAdminPage = location.pathname === "/admin";
   const isAdminTablePage = location.pathname === "/admintable";
   const isAdminAddPage = location.pathname === "/adminadd";
+  const isAdminBillingPage = location.pathname === "/adminbilling";
 
   return (
     <Layout style={{ margin: 0, position: "relative" }}>
@@ -139,7 +140,7 @@ function App() {
           </div>
 
           {/* NavBar */}
-          {!isAdminPage && !isAdminTablePage && !isAdminAddPage && (
+          {!isAdminPage && !isAdminTablePage && !isAdminAddPage && !isAdminBillingPage && (
             <div style={{ flexGrow: 1, padding: "0 20px" }}>
               <NavBar />
             </div>
@@ -167,7 +168,7 @@ function App() {
         </div>
       </Header>
 
-      {(isAdminPage || isAdminTablePage || isAdminAddPage) && (
+      {(isAdminPage || isAdminTablePage || isAdminAddPage || isAdminBillingPage) && (
         <Sider
           width={150}
           style={{
@@ -185,13 +186,13 @@ function App() {
       )}
 
       {/* Nội dung chính */}
-      <Layout style={{ marginLeft: (isAdminPage || isAdminTablePage || isAdminAddPage) ? 150 : 0, minHeight: "100vh" }}>
+      <Layout style={{ marginLeft: (isAdminPage || isAdminTablePage || isAdminAddPage || isAdminBillingPage) ? 150 : 0, minHeight: "100vh" }}>
         <Content style={{ paddingTop: "64px" }}>
           <ScrollToTop />
           <ScrollToTopButton />
           <Outlet />
         </Content>
-        {!isAdminPage && !isAdminTablePage && !isAdminAddPage && (
+        {!isAdminPage && !isAdminTablePage && !isAdminAddPage && !isAdminBillingPage && (
           <Footer />
         )}
       </Layout>

@@ -202,3 +202,15 @@ exports.TotalPayment = async (req, res) => {
         res.status(500).json({ message: "Error calculating revenue", error });
     }
 };
+exports.getAllInvoice = async (req, res) => {
+    try {
+        const payments = await Payment.find()
+            .populate("businessId", "business_name email")
+            .sort({ paymentDate: -1 })
+            .limit(100);
+        res.status(200).json(payments);
+    } catch (error) {
+        console.error("Error fetching payments from DB:", error);
+        res.status(500).json({ error: "Failed to fetch payments from DB" });
+    }
+};

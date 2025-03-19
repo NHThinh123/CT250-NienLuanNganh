@@ -19,6 +19,10 @@ const PaymentSchema = new mongoose.Schema(
             type: Date,
             default: Date.now,
         },
+        paymentId: { type: String, required: true, unique: true },
+        customerId: { type: String, required: true },
+        customerEmail: { type: String },
+        invoicePdf: { type: String },
     },
     { timestamps: true }
 );

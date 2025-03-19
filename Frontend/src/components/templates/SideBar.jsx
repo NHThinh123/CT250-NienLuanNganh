@@ -1,6 +1,6 @@
 import React from "react";
 import { Layout, Menu } from "antd";
-import { List, SquarePlus } from "lucide-react";
+import { List, Receipt, SquarePlus } from "lucide-react";
 import {
     DashboardOutlined,
 } from "@ant-design/icons";
@@ -31,6 +31,12 @@ const Sidebar = () => {
             icon: <SquarePlus size={16} />,
             label: "Thêm mới",
             onClick: () => navigate("/adminadd"),
+        },
+        {
+            key: "/adminbilling",
+            icon: <Receipt size={16} />,
+            label: "Hóa Đơn",
+            onClick: () => navigate("/adminbilling"),
         },
 
     ];

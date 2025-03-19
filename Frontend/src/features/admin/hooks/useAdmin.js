@@ -9,6 +9,7 @@ import {
     updateBusiness,
     deleteBusiness,
     getTotalRevenue,
+    getAllInvoices,
 } from "../services/adminApi";
 import { message } from "antd";
 
@@ -101,6 +102,18 @@ export const useAdmin = () => {
         queryFn: getTotalRevenue,
         retry: false,
     });
+    const {
+        data: invoicesData,
+        isLoading: isInvoicesLoading,
+        error: invoicesError,
+    } = useQuery({
+        queryKey: ["invoices"],
+        queryFn: getAllInvoices,
+        retry: false,
+        onError: (error) => {
+            message.error(`Failed to fetch invoices: ${error.message}`);
+        },
+    });
     return {
         users: users || [],
         isUsersLoading,
@@ -123,5 +136,8 @@ export const useAdmin = () => {
         totalRevenue: revenueData?.totalRevenue || 0,
         isRevenueLoading,
         revenueError,
+        invoices: invoicesData || [],
+        isInvoicesLoading,
+        invoicesError,
     };
 };

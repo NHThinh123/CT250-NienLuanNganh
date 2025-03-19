@@ -36,6 +36,7 @@ import ProtectedRouteAdmin from "./components/molecules/ProtectedRouteAdmin.jsx"
 import AdminPage from "./pages/AdminPage.jsx";
 import AdminTablePage from "./pages/AdminTablePage.jsx";
 import AdminAddPage from "./pages/AdminAddPage.jsx";
+import AdminBillingPage from "./pages/AdminBillingPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -140,6 +141,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
             <AdminAddPage />
+          </ProtectedRouteAdmin>
+        ),
+      },
+      {
+        path: "/adminbilling",
+        element: (
+          <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
+            <AdminBillingPage />
           </ProtectedRouteAdmin>
         ),
       },
