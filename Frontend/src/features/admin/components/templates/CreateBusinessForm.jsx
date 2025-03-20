@@ -17,7 +17,7 @@ const CreateBusinessForm = ({ onCreateBusiness, loading, form }) => { // Nhận 
             verified: values.verified,
             status: values.status,
         });
-        // Không reset form ở đây, để logic reset trong onSuccess
+
     };
 
     return (
@@ -62,10 +62,10 @@ const CreateBusinessForm = ({ onCreateBusiness, loading, form }) => { // Nhận 
             >
                 <Input.Password size="large" placeholder="Yumzy123@" />
             </Form.Item>
-            <Form.Item label="Giờ mở cửa" name="openHours" rules={[{ required: true, message: "Vui lòng chọn giờ mở cửa!" }]}>
+            <Form.Item label="Giờ mở cửa" name="open_hours" rules={[{ required: true, message: "Vui lòng chọn giờ mở cửa!" }]}>
                 <TimePicker size="large" format="HH:mm" style={{ width: "100%", borderRadius: "8px" }} placeholder="Chọn giờ" />
             </Form.Item>
-            <Form.Item label="Giờ đóng cửa" name="closeHours" rules={[{ required: true, message: "Vui lòng chọn giờ đóng cửa!" }]}>
+            <Form.Item label="Giờ đóng cửa" name="close_hours" rules={[{ required: true, message: "Vui lòng chọn giờ đóng cửa!" }]}>
                 <TimePicker size="large" format="HH:mm" style={{ width: "100%", borderRadius: "8px" }} placeholder="Chọn giờ" />
             </Form.Item>
             <Form.Item
