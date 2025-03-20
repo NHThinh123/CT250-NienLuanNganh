@@ -32,6 +32,7 @@ const PaymentForm = ({
     }, [successModalVisible]);
 
     // Hàm xử lý thanh toán
+    // Hàm xử lý thanh toán
     const handleSubmit = async () => {
         setLoading(true);
         setError(null);
@@ -51,7 +52,7 @@ const PaymentForm = ({
 
             if (paymentMethodError) {
                 console.error("Lỗi từ Stripe:", paymentMethodError);
-                setError(paymentMethodError.message);
+                setError(paymentMethodError.message || "Lỗi khi tạo phương thức thanh toán.");
                 setLoading(false);
                 return;
             }
@@ -60,7 +61,7 @@ const PaymentForm = ({
                 ? `/api/businesss/payment/monthly/${businessId}`
                 : `/api/businesss/payment/activation/${businessId}`;
 
-            const responseData = await axios.post(apiUrl, {
+            const response = await axios.post(apiUrl, {
                 paymentMethodId: paymentMethod.id,
                 amount,
                 planType,
@@ -68,33 +69,33 @@ const PaymentForm = ({
                 businessName,
             });
 
-            console.log("Phản hồi từ API:", responseData);
+            console.log("Phản hồi từ backend:", response); // Log để kiểm tra dữ liệu
 
-            if (!responseData || !responseData.business) {
-                throw new Error("Dữ liệu doanh nghiệp không hợp lệ từ server.");
+            if (!response || !response.business) {
+                throw new Error(response?.message || "Dữ liệu doanh nghiệp không hợp lệ từ server.");
             }
 
-            onPaymentSuccess({ business: responseData.business });
-            setSuccessModalVisible(true); // Hiển thị modal thành công
+            onPaymentSuccess({ business: response.business }); // Sử dụng response.business
+            setSuccessModalVisible(true);
             setPaymentCompleted(true);
             setLoading(false);
         } catch (err) {
             console.error("Lỗi trong handleSubmit:", err);
-            setError(err.message || "Đã xảy ra lỗi trong quá trình thanh toán.");
+            console.log("err.response:", err.response);
+
+            let errorMessage = "Đã xảy ra lỗi trong quá trình thanh toán.";
+            if (err.response && err.response.message) { // Sử dụng err.response.message
+                errorMessage = err.response.message;
+            } else if (err.request) {
+                errorMessage = "Không thể kết nối đến server. Vui lòng kiểm tra mạng.";
+            } else {
+                errorMessage = err.message || "Lỗi không xác định.";
+            }
+
+            setError(errorMessage);
             setLoading(false);
         }
     };
-
-    // Hàm giả lập để kiểm tra thông báo thành công
-    const handleMockSuccess = () => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-            setSuccessModalVisible(true);
-            setPaymentCompleted(true);
-        }, 2000);
-    };
-
     // Tạm thời đóng Modal thủ công để kiểm tra
     // const handleModalClose = () => {
     //     setSuccessModalVisible(false);

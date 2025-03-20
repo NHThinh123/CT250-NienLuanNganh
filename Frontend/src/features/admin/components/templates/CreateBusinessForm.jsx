@@ -92,7 +92,7 @@ const CreateBusinessForm = ({ onCreateBusiness, loading, form }) => {
                 <Input />
             </Form.Item>
             <Form.Item name="verified" label="Xác Thực" valuePropName="checked">
-                <Input type="checkbox" />
+                <Input type="checkbox" style={{ textAlign: "left" }} />
             </Form.Item>
             <Form.Item name="status" label="Trạng Thái" initialValue="pending">
                 <Select>

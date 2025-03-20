@@ -283,7 +283,7 @@ const processActivationPayment = async (req, res) => {
       const invoice = await stripe.invoices.create({
         customer: customer.id,
         collection_method: "send_invoice",
-        due_date: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // Hạn thanh toán sau 7 ngày
+        due_date: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
         metadata: { paymentIntentId: paymentIntent.id },
       });
 
@@ -291,7 +291,7 @@ const processActivationPayment = async (req, res) => {
       await stripe.invoiceItems.create({
         customer: customer.id,
         invoice: invoice.id,
-        amount: paymentIntent.amount, // Số tiền từ PaymentIntent (cent)
+        amount: paymentIntent.amount,
         currency: paymentIntent.currency,
         description: `Thanh toán phí kích hoạt (${planType === "yearly" ? "Gói năm" : "Gói tháng"}) cho ${business.business_name}`,
       });
@@ -314,15 +314,15 @@ const processActivationPayment = async (req, res) => {
       business.reminderSent = false;
       await business.save();
 
-      // Lưu thông tin thanh toán và hóa đơn vào bảng Payment
+      // Lưu thông tin thanh toán và hóa đơn
       const payment = new Payment({
         businessId: business._id,
         businessName: business.business_name,
-        amount: amount, // Số tiền gốc (VND)
+        amount: amount,
         paymentId: paymentIntent.id,
         customerId: customer.id,
         customerEmail: customer.email,
-        invoicePdf: finalizedInvoice.invoice_pdf, // Link PDF của hóa đơn
+        invoicePdf: finalizedInvoice.invoice_pdf,
       });
       await payment.save();
 
@@ -344,14 +344,50 @@ const processActivationPayment = async (req, res) => {
         },
       });
     } else {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Thanh toán chưa hoàn tất.",
         status: paymentIntent.status,
       });
     }
   } catch (error) {
     console.error("Error in processActivationPayment:", error.message, error.stack);
-    res.status(500).json({ message: error.message || "Lỗi server nội bộ." });
+
+    // Xử lý lỗi cụ thể từ Stripe
+    let errorMessage = "Đã xảy ra lỗi trong quá trình thanh toán.";
+    let statusCode = 500;
+
+    if (error.type === "StripeCardError" || error.code) {
+      statusCode = 400; // Lỗi từ phía người dùng
+      switch (error.code) {
+        case "card_declined":
+          if (error.decline_code === "insufficient_funds") {
+            errorMessage = "Thẻ không đủ số dư để thực hiện thanh toán.";
+          } else if (error.decline_code === "lost_card") {
+            errorMessage = "Thẻ đã bị báo mất.";
+          } else if (error.decline_code === "stolen_card") {
+            errorMessage = "Thẻ bị nghi ngờ là thẻ bị đánh cắp.";
+          } else {
+            errorMessage = "Thẻ của bạn bị từ chối.";
+          }
+          break;
+        case "incorrect_cvc":
+          errorMessage = "Mã CVC không đúng.";
+          break;
+        case "expired_card":
+          errorMessage = "Thẻ của bạn đã hết hạn.";
+          break;
+        case "invalid_card_number":
+          errorMessage = "Số thẻ không hợp lệ.";
+          break;
+        case "processing_error":
+          errorMessage = "Lỗi xử lý từ ngân hàng. Vui lòng thử lại sau.";
+          break;
+        default:
+          errorMessage = error.message || "Lỗi không xác định từ Stripe.";
+      }
+    }
+
+    res.status(statusCode).json({ message: errorMessage });
   }
 };
 // Xử lý thanh toán phí duy trì
@@ -464,11 +500,50 @@ const processMonthlyPayment = async (req, res) => {
         },
       });
     } else {
-      res.status(400).json({ message: "Thanh toán thất bại" });
+      res.status(400).json({
+        message: "Thanh toán chưa hoàn tất.",
+        status: paymentIntent.status,
+      });
     }
   } catch (error) {
     console.error("Error in processMonthlyPayment:", error.message, error.stack);
-    res.status(500).json({ message: error.message || "Lỗi server nội bộ." });
+
+    // Xử lý lỗi cụ thể từ Stripe
+    let errorMessage = "Đã xảy ra lỗi trong quá trình thanh toán.";
+    let statusCode = 500;
+
+    if (error.type === "StripeCardError" || error.code) {
+      statusCode = 400; // Lỗi từ phía người dùng
+      switch (error.code) {
+        case "card_declined":
+          if (error.decline_code === "insufficient_funds") {
+            errorMessage = "Thẻ không đủ số dư để thực hiện thanh toán.";
+          } else if (error.decline_code === "lost_card") {
+            errorMessage = "Thẻ đã bị báo mất.";
+          } else if (error.decline_code === "stolen_card") {
+            errorMessage = "Thẻ bị nghi ngờ là thẻ bị đánh cắp.";
+          } else {
+            errorMessage = "Thẻ của bạn bị từ chối.";
+          }
+          break;
+        case "incorrect_cvc":
+          errorMessage = "Mã CVC không đúng.";
+          break;
+        case "expired_card":
+          errorMessage = "Thẻ của bạn đã hết hạn.";
+          break;
+        case "invalid_card_number":
+          errorMessage = "Số thẻ không hợp lệ.";
+          break;
+        case "processing_error":
+          errorMessage = "Lỗi xử lý từ ngân hàng. Vui lòng thử lại sau.";
+          break;
+        default:
+          errorMessage = error.message || "Lỗi không xác định từ Stripe.";
+      }
+    }
+
+    res.status(statusCode).json({ message: errorMessage });
   }
 };
 //Đăng nhập
