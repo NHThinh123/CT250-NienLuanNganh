@@ -175,16 +175,6 @@ const SignupBusinessForm = () => {
         formData.append("close_hours", dayjs(values.closeHours).format("HH:mm"));
         formData.append("password", values.password);
 
-        console.log("Dữ liệu gửi lên:", {
-            business_name: values.businessName,
-            email: values.email,
-            location: values.location,
-            address: { type: "Point", coordinates: mapAddress.coordinates },
-            contact_info: values.contactInfo,
-            open_hours: dayjs(values.openHours).format("HH:mm"),
-            close_hours: dayjs(values.closeHours).format("HH:mm"),
-            password: values.password,
-        });
 
         register(formData, {
             onSuccess: (data) => {
