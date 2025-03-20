@@ -36,10 +36,10 @@ const BusinessList = ({
     const rating = business.rating_average || 0;
     return (
       (starFilters.includes("0_to_1_star") && rating >= 0 && rating <= 1) ||
-      (starFilters.includes("1_to_2_star") && rating > 1 && rating <= 2) ||
-      (starFilters.includes("2_to_3_star") && rating > 2 && rating <= 3) ||
-      (starFilters.includes("3_to_4_star") && rating > 3 && rating <= 4) ||
-      (starFilters.includes("4_to_5_star") && rating > 4 && rating <= 5)
+      (starFilters.includes("1_to_2_star") && rating >= 1 && rating <= 2) ||
+      (starFilters.includes("2_to_3_star") && rating >= 2 && rating <= 3) ||
+      (starFilters.includes("3_to_4_star") && rating >= 3 && rating <= 4) ||
+      (starFilters.includes("4_to_5_star") && rating >= 4 && rating <= 5)
     );
   };
 
@@ -138,7 +138,7 @@ const BusinessList = ({
                     borderTopRightRadius: "8px",
                   }}
                   alt="business avatar"
-                  src={business.avatar || "N/A"}
+                  src={business.avatar || "Ảnh"}
                 />
               }
               onClick={() => navigate(`/businesses/${business._id}`)}
@@ -198,7 +198,7 @@ const BusinessList = ({
                   gap: 5,
                 }}
               >
-                {business.rating_average || "N/A"}
+                {business.rating_average || "0"}
                 <Rating
                   initialRating={business.rating_average}
                   readonly
@@ -217,7 +217,7 @@ const BusinessList = ({
                   fractions={10}
                   quiet={true}
                 />
-                ({business.totalReviews || "N/A"})
+                ({business.totalReviews || "0"})
               </p>
               <p
                 style={{

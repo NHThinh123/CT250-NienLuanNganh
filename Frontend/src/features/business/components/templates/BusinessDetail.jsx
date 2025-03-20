@@ -10,6 +10,7 @@ import {
   Drawer,
   Divider,
   message,
+  Avatar,
 } from "antd";
 import Rating from "react-rating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -84,7 +85,6 @@ const BusinessDetail = ({
     });
   };
 
-
   // Hàm tính số ngày còn lại đến hạn thanh toán
   const getDaysUntilDueDate = () => {
     if (!businessData.nextPaymentDueDate) return Infinity;
@@ -137,7 +137,6 @@ const BusinessDetail = ({
       message.warning("Chưa đến hạn thanh toán!");
     }
   };
-
 
   const coordinates = businessData.address?.coordinates || [0, 0];
   const longitude = Number(coordinates[0]);
@@ -268,17 +267,17 @@ const BusinessDetail = ({
         </div>
       )}
       <Row>
-        <Col span={2}></Col>
-        <Col span={10}>
+        <Col span={3}></Col>
+        <Col span={9}>
           <div style={styles.businessAva}>
-            <img
+            <Avatar
               style={styles.businessImage}
               src={businessData.avatar}
               alt="Ảnh"
             />
           </div>
         </Col>
-        <Col span={10}>
+        <Col span={9}>
           <div style={styles.businessDetail}>
             <div style={styles.businessBreadcrumb}>
               <Breadcrumb
@@ -319,7 +318,7 @@ const BusinessDetail = ({
             <div style={styles.businessTotalReviews}>
               <p>
                 <MessageCircle size={20} style={styles.icon} />
-                {businessData.totalReviews || "N/A"} lượt đánh giá
+                {businessData.totalReviews || "0"} lượt đánh giá
               </p>
             </div>
             <div style={styles.businessLocation}>
@@ -349,7 +348,7 @@ const BusinessDetail = ({
             </div>
           </div>
         </Col>
-        <Col span={2}></Col>
+        <Col span={3}></Col>
       </Row>
 
       <Row style={{ marginTop: "20px" }}>
@@ -441,23 +440,71 @@ const BusinessDetail = ({
             <span style={{ color: "#000" }}>Ưu Đãi</span>
           </Divider>
           <ul
-            style={{ paddingLeft: "20px", marginBottom: "20px", listStyle: "none" }}
+            style={{
+              paddingLeft: "20px",
+              marginBottom: "20px",
+              listStyle: "none",
+            }}
           >
-            <li style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
-              <Check color="#52c41a" strokeWidth={1.75} style={{ marginRight: "8px" }} />
-              Quảng bá không giới hạn – Hiển thị nhà hàng/quán ăn của bạn trên nền tảng đánh giá ẩm thực hàng đầu.
+            <li
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "8px",
+              }}
+            >
+              <Check
+                color="#52c41a"
+                strokeWidth={1.75}
+                style={{ marginRight: "8px" }}
+              />
+              Quảng bá không giới hạn – Hiển thị nhà hàng/quán ăn của bạn trên
+              nền tảng đánh giá ẩm thực hàng đầu.
             </li>
-            <li style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
-              <Check color="#52c41a" strokeWidth={1.75} style={{ marginRight: "8px" }} />
-              Tiếp cận khách hàng tiềm năng – Kết nối với thực khách đang tìm kiếm địa điểm ăn uống chất lượng.
+            <li
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "8px",
+              }}
+            >
+              <Check
+                color="#52c41a"
+                strokeWidth={1.75}
+                style={{ marginRight: "8px" }}
+              />
+              Tiếp cận khách hàng tiềm năng – Kết nối với thực khách đang tìm
+              kiếm địa điểm ăn uống chất lượng.
             </li>
-            <li style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
-              <Check color="#52c41a" strokeWidth={1.75} style={{ marginRight: "8px" }} />
-              Tối ưu hóa đánh giá & thương hiệu – Thu hút đánh giá tích cực, nâng cao uy tín và độ tin cậy.
+            <li
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "8px",
+              }}
+            >
+              <Check
+                color="#52c41a"
+                strokeWidth={1.75}
+                style={{ marginRight: "8px" }}
+              />
+              Tối ưu hóa đánh giá & thương hiệu – Thu hút đánh giá tích cực,
+              nâng cao uy tín và độ tin cậy.
             </li>
-            <li style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
-              <Check color="#52c41a" strokeWidth={1.75} style={{ marginRight: "8px" }} />
-              Chiến dịch khuyến mãi & ưu đãi độc quyền – Hỗ trợ các chương trình giảm giá, voucher để thu hút khách hàng mới.
+            <li
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "8px",
+              }}
+            >
+              <Check
+                color="#52c41a"
+                strokeWidth={1.75}
+                style={{ marginRight: "8px" }}
+              />
+              Chiến dịch khuyến mãi & ưu đãi độc quyền – Hỗ trợ các chương trình
+              giảm giá, voucher để thu hút khách hàng mới.
             </li>
           </ul>
         </div>
