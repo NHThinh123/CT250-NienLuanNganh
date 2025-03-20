@@ -150,97 +150,62 @@ const BusinessFilter = ({
               >
                 <Checkbox value="0_to_1_star">
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{ marginRight: 3, marginTop: 2 }}>0</span>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
-                    <ArrowRight
-                      size={15}
-                      strokeWidth={1.75}
-                      style={{ margin: "0px 2px" }}
-                    />
-                    <div style={{ marginRight: 3, marginTop: 2 }}>1</div>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
+                    <span style={{ margin: 5 }}>0</span> -
+                    <span style={{ margin: 5 }}>1</span>
+                    <span>
+                      <FontAwesomeIcon
+                        icon={solidStar}
+                        style={{ fontSize: 13, color: "#FFD700" }}
+                      />
+                    </span>
                   </div>
                 </Checkbox>
                 <Checkbox value="1_to_2_star">
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{ marginRight: 3, marginTop: 2 }}>1</span>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
-                    <ArrowRight
-                      size={15}
-                      strokeWidth={1.75}
-                      style={{ margin: "0px 2px" }}
-                    />
-                    <div style={{ marginRight: 3, marginTop: 2 }}>2</div>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
+                    <span style={{ margin: 5 }}>1</span> -
+                    <span style={{ margin: 5 }}>2</span>
+                    <span>
+                      <FontAwesomeIcon
+                        icon={solidStar}
+                        style={{ fontSize: 13, color: "#FFD700" }}
+                      />
+                    </span>
                   </div>
                 </Checkbox>
                 <Checkbox value="2_to_3_star">
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{ marginRight: 3, marginTop: 2 }}>2</span>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
-                    <ArrowRight
-                      size={15}
-                      strokeWidth={1.75}
-                      style={{ margin: "0px 2px" }}
-                    />
-                    <div style={{ marginRight: 3, marginTop: 2 }}>3</div>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
+                    <span style={{ margin: 5 }}>2</span> -
+                    <span style={{ margin: 5 }}>3</span>
+                    <span>
+                      <FontAwesomeIcon
+                        icon={solidStar}
+                        style={{ fontSize: 13, color: "#FFD700" }}
+                      />
+                    </span>
                   </div>
                 </Checkbox>
                 <Checkbox value="3_to_4_star">
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{ marginRight: 3, marginTop: 2 }}>3</span>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
-                    <ArrowRight
-                      size={15}
-                      strokeWidth={1.75}
-                      style={{ margin: "0px 2px" }}
-                    />
-                    <div style={{ marginRight: 3, marginTop: 2 }}>4</div>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
+                    <span style={{ margin: 5 }}>3</span> -
+                    <span style={{ margin: 5 }}>4</span>
+                    <span>
+                      <FontAwesomeIcon
+                        icon={solidStar}
+                        style={{ fontSize: 13, color: "#FFD700" }}
+                      />
+                    </span>
                   </div>
                 </Checkbox>
                 <Checkbox value="4_to_5_star">
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{ marginRight: 3, marginTop: 2 }}>4</span>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
-                    <ArrowRight
-                      size={15}
-                      strokeWidth={1.75}
-                      style={{ margin: "0px 2px" }}
-                    />
-                    <div style={{ marginRight: 3, marginTop: 2 }}>5</div>
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 13, color: "#FFD700" }}
-                    />
+                    <span style={{ margin: 5 }}>4</span> -
+                    <span style={{ margin: 5 }}>5</span>
+                    <span>
+                      <FontAwesomeIcon
+                        icon={solidStar}
+                        style={{ fontSize: 13, color: "#FFD700" }}
+                      />
+                    </span>
                   </div>
                 </Checkbox>
               </Checkbox.Group>
