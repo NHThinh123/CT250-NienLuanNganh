@@ -30,7 +30,8 @@ const ReviewList = ({ reviewData }) => {
                     src={
                       !review.user_id && review.business_id_review
                         ? review.business_id_review.avatar
-                        : review.user_id.avatar
+                        : review.user_id.avatar ||
+                          "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
                     }
                     size={35}
                   />
