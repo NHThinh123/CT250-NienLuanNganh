@@ -14,6 +14,10 @@ const getAllUsers = async () => {
 
 const createUser = async (data) => {
     const response = await instance.post(`${API_URL}/create/users`, data);
+    // Kiểm tra phản hồi từ axioscustomize
+    if (response?.message === "Email đã tồn tại") {
+        throw new Error(response.message);
+    }
     return response;
 };
 
@@ -29,6 +33,9 @@ const getAllBusinesses = async () => {
 
 const createBusiness = async (data) => {
     const response = await instance.post(`${API_URL}/create/businesses`, data);
+    if (response?.message === "Email đã tồn tại") {
+        throw new Error(response.message);
+    }
     return response;
 };
 // Cập nhật user
@@ -76,5 +83,26 @@ const deleteBusiness = async (id) => {
         throw error;
     }
 };
+const getTotalRevenue = async () => {
+    try {
+        const response = await instance.get(`${API_URL}/total-revenue`);
 
-export { getAllUsers, createUser, getAllBusinesses, createBusiness, updateUser, deleteUser, updateBusiness, deleteBusiness };
+        const data = response || { totalRevenue: 0 };
+        return data;
+    } catch (error) {
+        console.error("Error fetching total revenue:", error.message);
+        const fallbackData = { totalRevenue: 0 };
+        console.log("Returning fallback data due to error:", fallbackData);
+        return fallbackData;
+    }
+};
+const getAllInvoices = async () => {
+    try {
+        const response = await instance.get(`${API_URL}/invoices`);
+        return response;
+    } catch (error) {
+        console.error("Error fetching invoices:", error.message);
+        throw error;
+    }
+};
+export { getAllUsers, createUser, getAllBusinesses, createBusiness, updateUser, deleteUser, updateBusiness, deleteBusiness, getTotalRevenue, getAllInvoices };

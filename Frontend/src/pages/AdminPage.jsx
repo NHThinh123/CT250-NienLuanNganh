@@ -1,7 +1,9 @@
+import React from "react";
 import { useAdmin } from "../features/admin/hooks/useAdmin";
 import DashboardSummary from "../features/admin/components/templates/DashboardSummary";
-import Charts from "../features/admin/components/templates/Charts";
-import { usePost } from "../features/post/hooks/usePost";
+import { Charts } from "../features/admin/components/templates/Charts";
+
+
 
 const AdminPage = () => {
   const {
@@ -11,20 +13,27 @@ const AdminPage = () => {
     isBusinessesLoading,
     businesses,
     businessesError,
+    totalRevenue,
+    isRevenueLoading,
+    revenueError,
   } = useAdmin();
-  const { data: postData } = usePost();
-  const postCount = postData?.pages[0].pagination?.totalPosts;
   // Xử lý giá trị hiển thị cho Statistic
   const userCount = isUsersLoading
     ? "Loading..."
     : usersError
-    ? "Error"
-    : users.length;
+      ? "Error"
+      : users.length;
   const businessCount = isBusinessesLoading
     ? "Loading..."
     : businessesError
-    ? "Error"
-    : businesses.length;
+      ? "Error"
+      : businesses.length;
+  const revenue = isRevenueLoading
+    ? "Loading..."
+    : revenueError
+      ? "Error"
+      : `${totalRevenue.toLocaleString()}`;
+
 
   if (isUsersLoading || isBusinessesLoading) {
     return <div>Loading...</div>;
@@ -35,9 +44,11 @@ const AdminPage = () => {
       <DashboardSummary
         userCount={userCount}
         businessCount={businessCount}
-        postCount={postCount}
+        totalRevenue={revenue}
       />
       <Charts />
+
+
     </div>
   );
 };

@@ -168,6 +168,7 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
             contact_info: values.contact_info,
             location: values.location,
             address: {
+                type: "Point",
                 coordinates: coordinates,
             },
             open_hours: values.open_hours,

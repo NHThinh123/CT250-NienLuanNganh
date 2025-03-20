@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const Business = require("../models/business.model");
 const bcrypt = require("bcryptjs");
+const Payment = require("../models/payment.model");
 
 // Lấy danh sách tất cả users
 exports.getAllUsers = async (req, res) => {
@@ -25,7 +26,7 @@ exports.createUser = async (req, res) => {
         // Kiểm tra email đã tồn tại
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: "Email đã tồn tại" });
+            return res.status(409).json({ message: "Email đã tồn tại" });
         }
 
         // Hash mật khẩu
@@ -188,5 +189,28 @@ exports.deleteBusiness = async (req, res) => {
         res.status(200).json({ message: "Xóa business thành công" });
     } catch (error) {
         res.status(500).json({ message: "Lỗi server", error });
+    }
+};
+//Lấy tổng doanh thu
+exports.TotalPayment = async (req, res) => {
+    try {
+        const totalRevenue = await Payment.aggregate([
+            { $group: { _id: null, total: { $sum: "$amount" } } }
+        ]);
+        res.json({ totalRevenue: totalRevenue[0]?.total || 0 });
+    } catch (error) {
+        res.status(500).json({ message: "Error calculating revenue", error });
+    }
+};
+exports.getAllInvoice = async (req, res) => {
+    try {
+        const payments = await Payment.find()
+            .populate("businessId", "business_name email")
+            .sort({ paymentDate: -1 })
+            .limit(100);
+        res.status(200).json(payments);
+    } catch (error) {
+        console.error("Error fetching payments from DB:", error);
+        res.status(500).json({ error: "Failed to fetch payments from DB" });
     }
 };

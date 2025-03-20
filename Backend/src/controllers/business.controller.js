@@ -1,7 +1,6 @@
 const {
   getBusinessService,
   getBusinessByIdService,
-  updateBusinessService,
   updateRatingAverageService,
   updateTotalReviewsService,
   updateDishCostBusinessService,
@@ -236,6 +235,7 @@ const processActivationPayment = async (req, res) => {
   const { paymentMethodId, amount, planType } = req.body;
 
   try {
+    // Kiểm tra đầu vào
     if (!amount || isNaN(amount) || amount <= 0) {
       return res.status(400).json({ message: "Số tiền không hợp lệ." });
     }
@@ -249,8 +249,9 @@ const processActivationPayment = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy tài khoản" });
     }
 
+    // Tạo PaymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount / 2500),
+      amount: Math.round(amount / 250), // Số tiền tính bằng cent (USD)
       currency: "usd",
       payment_method: paymentMethodId,
       confirm: true,
@@ -261,14 +262,51 @@ const processActivationPayment = async (req, res) => {
     });
 
     if (paymentIntent.status === "succeeded") {
-      const isActivation =
-        business.status === "suspended" || !business.activationPayment;
+      // Tạo hoặc lấy khách hàng trong Stripe
+      let customer;
+      const existingCustomers = await stripe.customers.list({
+        email: business.email,
+        limit: 1,
+      });
+
+      if (existingCustomers.data.length > 0) {
+        customer = existingCustomers.data[0];
+      } else {
+        customer = await stripe.customers.create({
+          email: business.email,
+          name: business.business_name,
+          metadata: { businessId: business._id.toString() },
+        });
+      }
+
+      // Tạo hóa đơn trong Stripe
+      const invoice = await stripe.invoices.create({
+        customer: customer.id,
+        collection_method: "send_invoice",
+        due_date: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // Hạn thanh toán sau 7 ngày
+        metadata: { paymentIntentId: paymentIntent.id },
+      });
+
+      // Thêm mục vào hóa đơn
+      await stripe.invoiceItems.create({
+        customer: customer.id,
+        invoice: invoice.id,
+        amount: paymentIntent.amount, // Số tiền từ PaymentIntent (cent)
+        currency: paymentIntent.currency,
+        description: `Thanh toán phí kích hoạt (${planType === "yearly" ? "Gói năm" : "Gói tháng"}) cho ${business.business_name}`,
+      });
+
+      // Hoàn thiện hóa đơn
+      const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
+
+      // Cập nhật trạng thái Business
+      const isActivation = business.status === "suspended" || !business.activationPayment;
 
       business.status = "active";
       business.lastPaymentDate = new Date();
       business.nextPaymentDueDate = new Date(
         business.lastPaymentDate.getTime() +
-          (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
+        (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
       );
       if (isActivation) {
         business.activationPayment = true;
@@ -276,11 +314,15 @@ const processActivationPayment = async (req, res) => {
       business.reminderSent = false;
       await business.save();
 
+      // Lưu thông tin thanh toán và hóa đơn vào bảng Payment
       const payment = new Payment({
         businessId: business._id,
         businessName: business.business_name,
-        amount: amount,
-        type: isActivation ? "activation" : "renewal",
+        amount: amount, // Số tiền gốc (VND)
+        paymentId: paymentIntent.id,
+        customerId: customer.id,
+        customerEmail: customer.email,
+        invoicePdf: finalizedInvoice.invoice_pdf, // Link PDF của hóa đơn
       });
       await payment.save();
 
@@ -290,6 +332,8 @@ const processActivationPayment = async (req, res) => {
           : "Thanh toán thành công! Gói đã được gia hạn.",
         amount: amount,
         paymentId: payment._id,
+        invoiceId: finalizedInvoice.id,
+        invoicePdf: finalizedInvoice.invoice_pdf,
         business: {
           id: business._id,
           business_name: business.business_name,
@@ -306,11 +350,7 @@ const processActivationPayment = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(
-      "Error in processActivationPayment:",
-      error.message,
-      error.stack
-    );
+    console.error("Error in processActivationPayment:", error.message, error.stack);
     res.status(500).json({ message: error.message || "Lỗi server nội bộ." });
   }
 };
@@ -337,8 +377,8 @@ const processMonthlyPayment = async (req, res) => {
 
     // Tạo thanh toán qua Stripe
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount),
-      currency: "vnd", // Đồng bộ với processActivationPayment (đổi từ "vnd" sang "usd")
+      amount: Math.round(amount / 250), // Số tiền tính bằng cent (USD)
+      currency: "usd",
       payment_method: paymentMethodId,
       confirm: true,
       automatic_payment_methods: {
@@ -348,19 +388,62 @@ const processMonthlyPayment = async (req, res) => {
     });
 
     if (paymentIntent.status === "succeeded") {
+      // Tạo hoặc lấy khách hàng trong Stripe
+      let customer;
+      const existingCustomers = await stripe.customers.list({
+        email: business.email,
+        limit: 1,
+      });
+
+      if (existingCustomers.data.length > 0) {
+        customer = existingCustomers.data[0];
+      } else {
+        customer = await stripe.customers.create({
+          email: business.email,
+          name: business.business_name,
+          metadata: { businessId: business._id.toString() },
+        });
+      }
+
+      // Tạo hóa đơn trong Stripe
+      const invoice = await stripe.invoices.create({
+        customer: customer.id,
+        collection_method: "send_invoice",
+        due_date: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // Hạn thanh toán sau 7 ngày
+        metadata: { paymentIntentId: paymentIntent.id },
+      });
+
+      // Thêm mục vào hóa đơn
+      await stripe.invoiceItems.create({
+        customer: customer.id,
+        invoice: invoice.id,
+        amount: paymentIntent.amount, // Số tiền từ PaymentIntent (cent)
+        currency: paymentIntent.currency,
+        description: `Thanh toán phí duy trì (${planType === "yearly" ? "Gói năm" : "Gói tháng"}) cho ${business.business_name}`,
+      });
+
+      // Hoàn thiện hóa đơn
+      const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
+
+      // Cập nhật trạng thái Business
       business.lastPaymentDate = new Date();
       business.nextPaymentDueDate = new Date(
         business.lastPaymentDate.getTime() +
-          (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
+        (planType === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
       );
       business.status = "active";
       business.reminderSent = false; // Đặt lại reminderSent
       await business.save();
 
+      // Lưu thông tin thanh toán và hóa đơn vào bảng Payment
       const payment = new Payment({
         businessId: business._id,
         businessName: business.business_name,
-        amount: amount,
+        amount: amount, // Số tiền gốc (VND)
+        paymentId: paymentIntent.id,
+        customerId: customer.id,
+        customerEmail: customer.email,
+        invoicePdf: finalizedInvoice.invoice_pdf, // Link PDF của hóa đơn
         type: "renewal",
       });
       await payment.save();
@@ -369,6 +452,8 @@ const processMonthlyPayment = async (req, res) => {
         message: "Thanh toán phí duy trì thành công!",
         amount: amount,
         paymentId: payment._id,
+        invoiceId: finalizedInvoice.id,
+        invoicePdf: finalizedInvoice.invoice_pdf,
         business: {
           id: business._id,
           business_name: business.business_name,
@@ -382,11 +467,7 @@ const processMonthlyPayment = async (req, res) => {
       res.status(400).json({ message: "Thanh toán thất bại" });
     }
   } catch (error) {
-    console.error(
-      "Error in processMonthlyPayment:",
-      error.message,
-      error.stack
-    );
+    console.error("Error in processMonthlyPayment:", error.message, error.stack);
     res.status(500).json({ message: error.message || "Lỗi server nội bộ." });
   }
 };

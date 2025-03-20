@@ -37,6 +37,7 @@ import AdminPage from "./pages/AdminPage.jsx";
 import AdminTablePage from "./pages/AdminTablePage.jsx";
 import AdminAddPage from "./pages/AdminAddPage.jsx";
 import PostOverviewPage from "./pages/PostOverviewPage.jsx";
+import AdminBillingPage from "./pages/AdminBillingPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -150,6 +151,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
             <AdminAddPage />
+          </ProtectedRouteAdmin>
+        ),
+      },
+      {
+        path: "/adminbilling",
+        element: (
+          <ProtectedRouteAdmin redirectPath="/login" requiredRole="admin">
+            <AdminBillingPage />
           </ProtectedRouteAdmin>
         ),
       },
