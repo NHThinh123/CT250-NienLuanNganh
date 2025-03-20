@@ -146,6 +146,7 @@ exports.createBusiness = async (req, res) => {
             contact_info,
             verified: verified || false,
             status: status || "pending",
+            avatar: "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg",
         });
 
         await newBusiness.save();

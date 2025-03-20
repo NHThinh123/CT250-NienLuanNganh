@@ -17,6 +17,7 @@ const CreateBusinessForm = ({ onCreateBusiness, loading, form }) => {
             contact_info: values.contact_info,
             verified: values.verified,
             status: values.status,
+
         });
 
     };
