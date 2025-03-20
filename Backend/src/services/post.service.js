@@ -1104,17 +1104,17 @@ const getPostFrequencyService = async (id, timeRange = "7days") => {
 
   // Debug: Log toàn bộ dữ liệu thô trước khi nhóm
   const rawData = await db.collection("posts").aggregate(pipeline).toArray();
-  console.log(
-    "Raw Data (native):",
-    rawData.map((post) => ({
-      _id: post._id,
-      user_id: post.user_id,
-      business_id: post.business_id,
-      deleted: post.deleted,
-      createdAt: post.createdAt,
-      deletedAt: post.deletedAt,
-    }))
-  );
+  // console.log(
+  //   "Raw Data (native):",
+  //   rawData.map((post) => ({
+  //     _id: post._id,
+  //     user_id: post.user_id,
+  //     business_id: post.business_id,
+  //     deleted: post.deleted,
+  //     createdAt: post.createdAt,
+  //     deletedAt: post.deletedAt,
+  //   }))
+  // );
 
   // Logic nhóm dữ liệu theo timeRange
   if (timeRange === "7days") {
