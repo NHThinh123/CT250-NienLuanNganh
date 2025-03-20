@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Input, Select, Button, TimePicker } from 'antd';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -9,8 +10,8 @@ const CreateBusinessForm = ({ onCreateBusiness, loading, form }) => {
             business_name: values.business_name,
             email: values.email,
             password: values.password,
-            open_hours: values.open_hours,
-            close_hours: values.close_hours,
+            open_hours: dayjs(values.open_hours).format("HH:mm"),
+            close_hours: dayjs(values.close_hours).format("HH:mm"),
             address: { type: "Point", coordinates: values.coordinates },
             location: values.location,
             contact_info: values.contact_info,
