@@ -11,16 +11,15 @@ import {
   Typography,
 } from "antd";
 import { Images, MapPinned, Tags } from "lucide-react";
-
 import { useState } from "react";
 import UploadTag from "../atoms/UploadTag";
 import useCreatePost from "../../hooks/useCreatePost";
-
 import SpinLoading from "../../../../components/atoms/SpinLoading";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 import UploadMedia from "../atoms/UploadMedia";
 import SearchOptionBusiness from "../atoms/SearchOptionBusiness";
 import useBusiness from "../../../business/hooks/useBusiness";
+
 const ModalUploadPost = ({
   isModalOpen,
   handleCancel,
@@ -30,25 +29,18 @@ const ModalUploadPost = ({
 }) => {
   const { entity } = useAuthEntity();
   const { mutate: createPost, isPending } = useCreatePost();
+  const { businessData, isLoading } = useBusiness();
+
   const [tags, setTags] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [isShowUploadImage, setIsShowUploadImage] = useState(false);
   const [isShowUploadTag, setIsShowUploadTag] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [isShowUploadLocation, setIsShowUploadLocation] = useState(false);
-
-  const { businessData, isLoading } = useBusiness();
   const [selectedRestaurant, setSelectedRestaurant] = useState(null); // State cho quán ăn
 
-  const handleShowUploadImage = () => {
-    setIsShowUploadImage(true);
-  };
-  const handleShowUploadTag = () => {
-    setIsShowUploadTag(true);
-  };
-  const handleShowUploadLocation = () => {
-    setIsShowUploadLocation(true);
-  };
+  const handleShowUploadImage = () => setIsShowUploadImage(true);
+  const handleShowUploadTag = () => setIsShowUploadTag(true);
+  const handleShowUploadLocation = () => setIsShowUploadLocation(true);
 
   const onFinish = (values) => {
     const formData = new FormData();
@@ -62,9 +54,7 @@ const ModalUploadPost = ({
     fileList.forEach((file) => {
       formData.append("media", file.originFileObj);
     });
-    // formData.forEach((value, key) => {
-    //   console.log(key, value);
-    // });
+
     createPost(formData, {
       onSuccess: () => {
         message.success("Bài viết đã được tạo thành công!");
@@ -83,6 +73,18 @@ const ModalUploadPost = ({
     });
   };
 
+  // Hàm xử lý khi hủy modal
+  const handleCancelWithReset = () => {
+    handleCancel();
+    setIsShowUploadImage(false);
+    setIsShowUploadTag(false);
+    setIsShowUploadLocation(false);
+    setFileList([]);
+    setTags([]);
+    setSelectedRestaurant(null);
+    form.resetFields();
+  };
+
   return (
     <Modal
       title={
@@ -91,20 +93,14 @@ const ModalUploadPost = ({
         </Typography.Title>
       }
       open={isModalOpen}
-      onOk={handleOk}
-      onCancel={() => {
-        handleCancel();
-        setIsShowUploadImage(false);
-        setIsShowUploadTag(false);
-        setIsShowUploadLocation(false);
-        setFileList([]);
-        setTags([]);
-      }}
+      onOk={() => form.submit()} // Sử dụng form.submit thay vì handleOk
+      onCancel={handleCancelWithReset}
       okText={isPending ? "Đang đăng..." : "Đăng tải"}
       cancelText="Hủy"
       maskClosable={false}
       centered
       style={{ minWidth: "50%" }}
+      okButtonProps={{ disabled: isPending }}
     >
       {isPending && <SpinLoading />}
       <Row>
@@ -114,7 +110,7 @@ const ModalUploadPost = ({
               entity?.avatar ||
               "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
             }
-          ></Avatar>
+          />
         </Col>
         <Col span={20}>
           <Typography.Text style={{ fontWeight: "bold" }}>
@@ -136,28 +132,22 @@ const ModalUploadPost = ({
             <Form.Item
               name="title"
               rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập tiêu đề bài viết!",
-                },
+                { required: true, message: "Vui lòng nhập tiêu đề bài viết!" },
               ]}
             >
-              <Input size="large" placeholder="Nhập tiêu đề bài viết"></Input>
+              <Input size="large" placeholder="Nhập tiêu đề bài viết" />
             </Form.Item>
             <Form.Item
               name="content"
               rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập tiêu nội dung viết!",
-                },
+                { required: true, message: "Vui lòng nhập nội dung bài viết!" },
               ]}
             >
               <Input.TextArea
                 size="large"
                 placeholder="Hãy viết về trải nghiệm ẩm thực của bạn hôm nay!"
                 autoSize={{ minRows: 4, maxRows: 10 }}
-              ></Input.TextArea>
+              />
             </Form.Item>
           </Form>
         </Col>
@@ -167,6 +157,7 @@ const ModalUploadPost = ({
               onSelect={(business) => setSelectedRestaurant(business)}
               businessData={businessData}
               isLoading={isLoading}
+              initialRestaurant={selectedRestaurant} // Truyền giá trị hiện tại của selectedRestaurant
             />
           </Col>
         )}
@@ -181,7 +172,6 @@ const ModalUploadPost = ({
           </Col>
         )}
       </Row>
-
       <Row
         style={{
           border: "1px solid #000",
@@ -190,10 +180,10 @@ const ModalUploadPost = ({
           marginTop: "16px",
           textAlign: "center",
         }}
-        align={"middle"}
+        align="middle"
       >
         <Col span={12}>
-          <Typography.Text style={{ fontWeight: "bold", textAlign: "right" }}>
+          <Typography.Text style={{ fontWeight: "bold" }}>
             Thêm vào bài viết của bạn:
           </Typography.Text>
         </Col>
@@ -219,7 +209,6 @@ const ModalUploadPost = ({
             </Popover>
           </Button>
         </Col>
-
         <Col span={4}>
           <Button
             type="text"
