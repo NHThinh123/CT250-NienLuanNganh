@@ -167,7 +167,7 @@ const PaymentChart = () => {
         <Card title="Số tiền thanh toán theo ngày" headStyle={{ textAlign: "center" }}>
             <Line data={chartData} options={options} />
             <p style={{ textAlign: "right", fontSize: 12 }}>
-                Updated 4 min ago
+                Yumzy
             </p>
         </Card>
     );
