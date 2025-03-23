@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, DatePicker, Select, Button } from 'antd';
+import { Form, Input, DatePicker, Select, Button, Checkbox } from 'antd';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -67,7 +67,7 @@ const CreateUserForm = ({ onCreateUser, loading, form }) => { // Nhận form t�
         </Select>
       </Form.Item>
       <Form.Item name="verified" label="Xác Thực" valuePropName="checked">
-        <Input type="checkbox" />
+        <Checkbox></Checkbox>
       </Form.Item>
       <Form.Item style={{ textAlign: "center" }}>
         <Button type="primary" htmlType="submit" loading={loading} >

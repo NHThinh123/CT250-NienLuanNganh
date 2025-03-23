@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Select, Button, TimePicker } from 'antd';
+import { Form, Input, Select, Button, TimePicker, Checkbox } from 'antd';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -92,7 +92,7 @@ const CreateBusinessForm = ({ onCreateBusiness, loading, form }) => {
                 <Input />
             </Form.Item>
             <Form.Item name="verified" label="Xác Thực" valuePropName="checked">
-                <Input type="checkbox" style={{ textAlign: "left" }} />
+                <Checkbox></Checkbox>
             </Form.Item>
             <Form.Item name="status" label="Trạng Thái" initialValue="pending">
                 <Select>
