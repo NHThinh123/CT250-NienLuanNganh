@@ -256,18 +256,6 @@ const ReviewItem = ({ review, businessId }) => {
           </Col>
         )}
       </Row>
-      <Row>
-        <Col span={24}>
-          <hr
-            style={{
-              height: "2px",
-              border: "no",
-              opacity: "0.2",
-              marginTop: 6,
-            }}
-          />
-        </Col>
-      </Row>
 
       <LoginRequiredModal
         isModalOpen={isLoginRequiredModalOpen}
