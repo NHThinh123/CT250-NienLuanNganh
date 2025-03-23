@@ -17,6 +17,35 @@ const removeAccents = (str) => {
     .replace(/Đ/g, "D"); // Replace Vietnamese 'Đ' with 'D'
 };
 
+const isBusinessOpen = (openHours, closeHours) => {
+  if (!openHours || !closeHours) return false; // Nếu không có giờ, mặc định là đóng
+
+  const now = new Date();
+  const currentHours = now.getHours();
+  const currentMinutes = now.getMinutes();
+  const currentTimeInMinutes = currentHours * 60 + currentMinutes;
+
+  // Chuyển đổi openHours và closeHours sang phút
+  const [openHour, openMinute] = openHours.split(":").map(Number);
+  const [closeHour, closeMinute] = closeHours.split(":").map(Number);
+  const openTimeInMinutes = openHour * 60 + openMinute;
+  const closeTimeInMinutes = closeHour * 60 + closeMinute;
+
+  // Xử lý trường hợp giờ đóng cửa vượt qua nửa đêm (ví dụ: 06:00 - 02:00)
+  if (closeTimeInMinutes < openTimeInMinutes) {
+    return (
+      currentTimeInMinutes >= openTimeInMinutes ||
+      currentTimeInMinutes < closeTimeInMinutes
+    );
+  }
+
+  // Trường hợp bình thường (ví dụ: 08:00 - 22:00)
+  return (
+    currentTimeInMinutes >= openTimeInMinutes &&
+    currentTimeInMinutes < closeTimeInMinutes
+  );
+};
+
 const BusinessList = ({
   businessData,
   searchKeyword,
@@ -138,7 +167,7 @@ const BusinessList = ({
                     borderTopRightRadius: "8px",
                   }}
                   alt="business avatar"
-                  src={business.avatar || "Ảnh"}
+                  src={business.avatar || "default-image.jpg"}
                 />
               }
               onClick={() => navigate(`/businesses/${business._id}`)}
@@ -227,7 +256,23 @@ const BusinessList = ({
                 }}
               >
                 <Clock size={18} style={{ marginRight: "8px" }} />
-                {business.open_hours || "N/A"} - {business.close_hours || "N/A"}
+                <span
+                  style={{
+                    marginRight: "5px",
+                    color: isBusinessOpen(
+                      business.open_hours,
+                      business.close_hours
+                    )
+                      ? "#52c41a" // Màu xanh nếu đang mở
+                      : "#ff4d4f", // Màu đỏ nếu đã đóng
+                    fontWeight: "bold",
+                  }}
+                >
+                  {isBusinessOpen(business.open_hours, business.close_hours)
+                    ? "Đang mở cửa"
+                    : "Đã đóng cửa"}
+                </span>
+                {business.open_hours || "0"} - {business.close_hours || "0"}
               </p>
             </Card>
           </Col>

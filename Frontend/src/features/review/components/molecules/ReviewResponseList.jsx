@@ -119,7 +119,7 @@ const ReviewResponseList = ({ parentReviewId }) => {
                                     fontSize: 12,
                                   }}
                                 >
-                                  {isShowFullContent ? "Ẩn bớt" : "Xem thêm"}
+                                  {isShowFullContent ? "Thu gọn" : "Xem thêm"}
                                 </Button>
                               )}
                             </div>

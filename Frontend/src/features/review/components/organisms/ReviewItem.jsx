@@ -30,9 +30,29 @@ const ReviewItem = ({ review, businessId }) => {
 
   const { mutate: createReview, isLoading } = useCreateReview();
 
+  const replyContainerRef = useRef(null);
+
   useEffect(() => {
     setIsShowReply(false); // Đặt lại trạng thái về false khi review thay đổi
   }, [review._id]);
+
+  // Xử lý ẩn reply khi nhấp ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isShowReply &&
+        replyContainerRef.current &&
+        !replyContainerRef.current.contains(event.target)
+      ) {
+        setIsShowReply(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isShowReply]);
 
   const handleShowReply = () => {
     setIsShowReply(!isShowReply);
@@ -87,7 +107,6 @@ const ReviewItem = ({ review, businessId }) => {
       onSuccess: () => {
         form.resetFields(); // Reset form
         setIsShowReply(false); // Ẩn ô nhập
-        // setIsShowListReply(true);
       },
       onError: (error) => {
         console.error("Lỗi khi gửi phản hồi:", error);
@@ -101,6 +120,7 @@ const ReviewItem = ({ review, businessId }) => {
       replyInputRef.current.focus();
     }
   }, [isShowReply]);
+
   return (
     <>
       <Row>
@@ -157,7 +177,7 @@ const ReviewItem = ({ review, businessId }) => {
                         fontSize: 12,
                       }}
                     >
-                      {isShowFullContent ? "Ẩn bớt" : "Xem thêm"}
+                      {isShowFullContent ? "Thu gọn" : "Xem thêm"}
                     </Button>
                   )}
                 </p>
@@ -200,62 +220,55 @@ const ReviewItem = ({ review, businessId }) => {
           <ReviewResponseList parentReviewId={review._id} />
         </Col>
       </Row>
-      <Row>
+      <div ref={replyContainerRef}>
         {isShowReply && entity?.id && (
-          <Col span={24}>
-            <Row>
-              <Col span={3} style={{ marginTop: 7 }}>
-                <Avatar size={32} src={entity.avatar}></Avatar>
-              </Col>
-              <Col span={20}>
-                <div
-                  style={{
-                    backgroundColor: "#f0f2f5",
-                    borderRadius: "10px",
-                    padding: "4px",
-                  }}
-                >
-                  <Form form={form} onFinish={handleReply}>
-                    <Row>
-                      <Col span={21}>
-                        <Form.Item noStyle name={"review_contents"}>
-                          <TextArea
-                            ref={replyInputRef}
-                            autoSize={{ minRows: 1, maxRows: 5 }}
-                            variant="borderless"
-                            placeholder={`Phản hồi cho ${
-                              !review.user_id && review.business_id_review
-                                ? review.business_id_review.business_name
-                                : review.user_id.name
-                            }`}
-                            onPressEnter={(e) => {
-                              e.preventDefault();
-                              form.submit();
-                            }}
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col span={3}>
-                        <Form.Item noStyle>
-                          <Button
-                            type="text"
-                            htmlType="submit"
-                            loading={isLoading}
-                          >
-                            <SendOutlined
-                              style={{ fontSize: "20px", color: "#1890ff" }}
-                            />
-                          </Button>
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                  </Form>
+          <div style={{ display: "flex", width: "100%" }}>
+            <div style={{ margin: "4px 7px 0 0" }}>
+              <Avatar size={32} src={entity.avatar}></Avatar>
+            </div>
+            <Form form={form} onFinish={handleReply} style={{ flex: 1 }}>
+              <div
+                style={{
+                  backgroundColor: "#f0f2f5",
+                  borderRadius: "10px",
+                  padding: "3px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <div style={{ flex: 1 }}>
+                  <Form.Item noStyle name={"review_contents"}>
+                    <TextArea
+                      ref={replyInputRef}
+                      autoSize={{ minRows: 1, maxRows: 5 }}
+                      variant="borderless"
+                      placeholder={`Phản hồi cho ${
+                        !review.user_id && review.business_id_review
+                          ? review.business_id_review.business_name
+                          : review.user_id.name
+                      }`}
+                      onPressEnter={(e) => {
+                        e.preventDefault();
+                        form.submit();
+                      }}
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
                 </div>
-              </Col>
-            </Row>
-          </Col>
+                <div>
+                  <Form.Item noStyle>
+                    <Button type="text" htmlType="submit" loading={isLoading}>
+                      <SendOutlined
+                        style={{ fontSize: "20px", color: "#1890ff" }}
+                      />
+                    </Button>
+                  </Form.Item>
+                </div>
+              </div>
+            </Form>
+          </div>
         )}
-      </Row>
+      </div>
 
       <LoginRequiredModal
         isModalOpen={isLoginRequiredModalOpen}

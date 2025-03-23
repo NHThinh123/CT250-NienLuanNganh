@@ -1,9 +1,9 @@
-import { List, Row, Col } from "antd";
+import { List, Row, Col, Flex } from "antd";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import "../../../../styles/global.css";
 import ReviewItem from "../organisms/ReviewItem";
 import ReviewFilter from "../organisms/ReviewFilter";
-// import ReviewOverview from "../organisms/ReviewOverview";
+import ReviewOverview from "../organisms/ReviewOverview";
 import { useEffect, useState } from "react";
 
 const ReviewList = ({ reviewData, businessId }) => {
@@ -49,9 +49,22 @@ const ReviewList = ({ reviewData, businessId }) => {
       {" "}
       <BoxContainer>
         <div>
-          {/* <ReviewOverview businessId={businessId} /> */}
-
-          <ReviewFilter onFilterChange={handleFilterChange} />
+          <Flex style={{ display: "flex", alignItems: "stretch" }} gap={16}>
+            <div style={{ flex: 1 }}>
+              <ReviewOverview businessId={businessId} />
+            </div>
+            <div style={{ width: "1px", backgroundColor: "#ddd" }}></div>
+            <div style={{ flex: 1 }}>
+              <ReviewFilter onFilterChange={handleFilterChange} />
+            </div>
+          </Flex>
+          <Row>
+            <Col span={24}>
+              <div
+                style={{ borderTop: "1px solid #ddd", marginBottom: 10 }}
+              ></div>
+            </Col>
+          </Row>
         </div>
         {filteredReviews.length > 0 ? (
           <List

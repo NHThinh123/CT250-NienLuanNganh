@@ -46,7 +46,9 @@ const ReviewFilter = ({ onFilterChange }) => {
 
   return (
     <div style={{ marginBottom: 10 }}>
-      <p style={{ marginBottom: 5 }}>Lọc theo:</p>
+      <p style={{ marginBottom: 10, fontWeight: "bold", fontSize: 14 }}>
+        Lọc theo
+      </p>
       <Space wrap>
         {filterOptions.map((option) => (
           <Button
@@ -60,7 +62,7 @@ const ReviewFilter = ({ onFilterChange }) => {
           </Button>
         ))}
       </Space>
-      <div style={{ borderTop: "1px solid #ddd", marginTop: 10 }}></div>
+      {/* <div style={{ borderTop: "1px solid #ddd", marginTop: 10 }}></div> */}
     </div>
   );
 };
