@@ -6,12 +6,17 @@ const {
   deleteReview,
   getReviewsByBusinessId,
   getNumberOfReviewsByBusinessId,
+  getReviewResponseByParentReviewId,
 } = require("../controllers/review.controller");
 
 const router = express.Router();
 
 router.get("/", getListReview); // Lấy danh sách review, hỗ trợ tìm kiếm & phân trang
 router.get("/getReviewsByBusinessId/:id", getReviewsByBusinessId); //Lấy danh sách review theo business_id
+router.get(
+  "/getReviewResponseByParentReviewId/:id",
+  getReviewResponseByParentReviewId
+); //Lấy danh sách phản hồi review theo parent_review_id
 router.get(
   "/getNumberOfReviewsByBusinessId/:id",
   getNumberOfReviewsByBusinessId

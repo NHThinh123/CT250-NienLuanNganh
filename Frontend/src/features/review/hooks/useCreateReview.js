@@ -8,6 +8,9 @@ const useCreateReview = () => {
     onSuccess: () => {
       queryClient.invalidateQueries("reviews"); // Làm mới danh sách reviews
     },
+    onError: (error) => {
+      console.error("Lỗi khi tạo review:", error);
+    },
   });
 };
 
