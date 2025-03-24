@@ -31,7 +31,6 @@ const reviewSchema = new mongoose.Schema(
     },
     review_contents: {
       type: String,
-      minlength: 1,
       maxlength: 2000,
       trim: true,
       default: null,
