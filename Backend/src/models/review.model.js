@@ -60,20 +60,6 @@ reviewSchema.pre("validate", function (next) {
       )
     );
   }
-  if (this.business_id && this.parent_review_id) {
-    return next(
-      new Error(
-        "Chỉ một trong hai trường business_id hoặc parent_review_id được phép có giá trị."
-      )
-    );
-  }
-  if (!this.business_id && !this.parent_review_id) {
-    return next(
-      new Error(
-        "Cần ít nhất một trong hai trường business_id hoặc parent_review_id."
-      )
-    );
-  }
   next();
 });
 

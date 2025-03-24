@@ -18,8 +18,8 @@ const user_like_postRoutes = require("./routes/user_like_post.route");
 const user_like_commentRoutes = require("./routes/user_like_comment.route");
 const commentRoutes = require("./routes/comment.route");
 const adminRoutes = require("./routes/admin.route");
+const assetReviewsRoutes = require("./routes/asset_reviews.route");
 const initializeWebSocket = require("./websocket/websocket");
-
 
 const app = express();
 const port = process.env.PORT || 8888;
@@ -43,9 +43,8 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/user_like_post", user_like_postRoutes);
 app.use("/api/user_like_comment", user_like_commentRoutes);
 app.use("/api/post_tag", post_tagRoutes);
-app.use("/api/admin", adminRoutes)
-
-
+app.use("/api/admin", adminRoutes);
+app.use("/api/asset_reviews", assetReviewsRoutes);
 
 // Middleware xử lý lỗi
 // app.use(errorHandler);
@@ -56,7 +55,12 @@ const server = app.listen(port, () => {
 });
 
 // Khởi tạo WebSocket Server
-const { notifyClients, notifyUserStats, notifyBusinessStats, notifyPaymentStats } = initializeWebSocket(server);
+const {
+  notifyClients,
+  notifyUserStats,
+  notifyBusinessStats,
+  notifyPaymentStats,
+} = initializeWebSocket(server);
 
 // Xuất các hàm để sử dụng trong các route
 app.set("notifyClients", notifyClients);

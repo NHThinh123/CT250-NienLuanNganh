@@ -7,7 +7,6 @@ import { Progress } from "antd";
 
 const ReviewOverview = ({ businessId }) => {
   const { reviewData } = useReviewByBusinessId(businessId);
-  console.log("reviewData: ", reviewData);
   const { businessData } = useBussinessById(businessId);
 
   // Tạo mảng rating từ 5 đến 1

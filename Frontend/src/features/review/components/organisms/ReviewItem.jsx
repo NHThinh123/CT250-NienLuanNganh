@@ -3,6 +3,7 @@ import { Avatar, Rate, Typography, Row, Col, Button, Form } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import ReviewResponseList from "../molecules/ReviewResponseList";
+import ReviewMedia from "../molecules/ReviewMedia";
 import "../../../../styles/global.css";
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
@@ -11,8 +12,10 @@ import { formatTime } from "../../../../constants/formatTime";
 import useCreateReview from "../../hooks/useCreateReview";
 import { AuthContext } from "../../../../contexts/auth.context";
 import { BusinessContext } from "../../../../contexts/business.context";
+import useAssetReviewByReviewId from "../../hooks/useAssetReviewByReviewId";
 
 const ReviewItem = ({ review, businessId }) => {
+  const { assetReviewData } = useAssetReviewByReviewId(review._id) || null;
   const { auth } = useContext(AuthContext);
   const { business } = useContext(BusinessContext);
   const { entity } = useAuthEntity();
@@ -183,6 +186,9 @@ const ReviewItem = ({ review, businessId }) => {
                 </p>
               </div>
             </div>
+            <Row>
+              <ReviewMedia assetReviewData={assetReviewData} />
+            </Row>
 
             <Row style={{ alignItems: "center", display: "flex", gap: 8 }}>
               <Typography.Text

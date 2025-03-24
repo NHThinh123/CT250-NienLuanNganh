@@ -5,8 +5,11 @@ import ReviewItem from "../organisms/ReviewItem";
 import ReviewFilter from "../organisms/ReviewFilter";
 import ReviewOverview from "../organisms/ReviewOverview";
 import { useEffect, useState } from "react";
+import AssetReviewBussiness from "../organisms/AssetReviewBusiness";
+import useAssetReviewByBusinessId from "../../hooks/useAssetReviewByBusinessId";
 
 const ReviewList = ({ reviewData, businessId }) => {
+  const { assetReviewData } = useAssetReviewByBusinessId(businessId) || null;
   const [filteredReviews, setFilteredReviews] = useState(reviewData);
 
   const handleFilterChange = (filters) => {
@@ -58,6 +61,16 @@ const ReviewList = ({ reviewData, businessId }) => {
               <ReviewFilter onFilterChange={handleFilterChange} />
             </div>
           </Flex>
+          <Row>
+            <Col span={24}>
+              <div
+                style={{ borderTop: "1px solid #ddd", marginBottom: 10 }}
+              ></div>
+            </Col>
+          </Row>
+        </div>
+        <div>
+          <AssetReviewBussiness assetReviewData={assetReviewData} />
           <Row>
             <Col span={24}>
               <div

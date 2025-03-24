@@ -1,4 +1,5 @@
 const Review = require("../models/review.model");
+const Asset_Reviews = require("../models/asset_reviews.model");
 
 const getListReviewService = async (page = 1, limit = 10, search = "") => {
   const skip = (page - 1) * limit;
@@ -35,7 +36,8 @@ const createReviewService = async (
   user_id,
   business_id_review,
   parent_review_id,
-  business_id_feedback
+  business_id_feedback,
+  files
 ) => {
   // Đảm bảo chỉ có một trong hai trường `user_id` hoặc `business_id_review`
   if (user_id && business_id_review && business_id_feedback) {
@@ -50,29 +52,35 @@ const createReviewService = async (
       400
     );
   }
-  // Đảm bảo chỉ có một trong hai trường `business_id` hoặc `parent_review_id`
-  if (business_id && parent_review_id) {
-    throw new AppError(
-      "Only one of business_id or parent_review_id should be provided.",
-      400
-    );
-  }
-  if (!business_id && !parent_review_id) {
-    throw new AppError(
-      "One of business_id or parent_review_id is required.",
-      400
-    );
-  }
 
   let result = await Review.create({
-    business_id: business_id || null,
+    business_id: business_id,
     review_rating: review_rating || null,
-    review_contents,
+    review_contents: review_contents || "",
     user_id: user_id || null,
     business_id_review: business_id_review || null,
     parent_review_id: parent_review_id || null,
     business_id_feedback: business_id_feedback || null,
   });
+
+  if (files && files.length > 0) {
+    const mediaDocs = files.map((file) => {
+      let type = file.mimetype.startsWith("image/")
+        ? "image"
+        : file.mimetype.startsWith("video/")
+        ? "video"
+        : null;
+      if (!type) throw new AppError("Unsupported file type", 400);
+      return {
+        review_id: result._id,
+        business_id: result.business_id,
+        type,
+        url: file.path,
+      };
+    });
+    await Asset_Reviews.insertMany(mediaDocs);
+  }
+
   return result;
 };
 
