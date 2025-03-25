@@ -40,8 +40,8 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
     <>
       <div style={styles.menuPage}>
         <Row>
-          <Col span={2}></Col>
-          <Col span={5}>
+          <Col span={1}></Col>
+          <Col span={6}>
             <div style={{ padding: "13px 26px 0px" }}>
               <p style={styles.titleMenu}>THỰC ĐƠN</p>
             </div>
@@ -55,7 +55,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
           <Col span={2}></Col>
         </Row>
         <Row>
-          <Col span={2}></Col>
+          <Col span={1}></Col>
           <MenuProvider>
             <Col span={5}>
               <div style={{ position: "sticky", top: 70 }}>
@@ -69,7 +69,7 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
                 {/* <MenuFilter /> */}
               </div>
             </Col>
-            <Col span={9}>
+            <Col span={10}>
               <div style={{ position: "sticky", top: 63.8, zIndex: 1000 }}>
                 <DishSearch onSearch={handleSearch} />
               </div>
@@ -80,18 +80,21 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
               />
             </Col>
           </MenuProvider>
-          <Col span={6}>
+          <Col span={7}>
             <div
-              style={{
-                position: "sticky",
-                top: 70,
-              }}
+            // style={{
+            //   position: "sticky",
+            //   top: 70,
+            // }}
             >
-              <ReviewList reviewData={reviewData.reviewData} />
+              <ReviewList
+                reviewData={reviewData.reviewData}
+                businessId={business_id}
+              />
               {!isBusinessOwner && <CreateReview businessId={business_id} />}
             </div>
           </Col>
-          <Col span={2}></Col>
+          <Col span={1}></Col>
         </Row>
       </div>
     </>

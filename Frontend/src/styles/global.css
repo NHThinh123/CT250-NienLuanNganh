@@ -105,3 +105,7 @@ img {
   pointer-events: none;
   user-select: none;
 }
+
+.custom-rate .ant-rate-star {
+  margin-right: 2px !important; /* Thu hẹp khoảng cách giữa các sao */
+}

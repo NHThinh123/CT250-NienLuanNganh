@@ -11,36 +11,66 @@ const reviewSchema = new mongoose.Schema(
     business_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Business",
-      required: true,
+      default: null,
     },
     business_id_review: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Business",
       default: null,
     },
-    review_rating: { type: Number, required: true, min: 1, max: 5 },
+    business_id_feedback: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+      default: null,
+    },
+    review_rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: null,
+    },
     review_contents: {
       type: String,
       minlength: 1,
-      maxlength: 1000,
+      maxlength: 2000,
       trim: true,
+      default: null,
+    },
+    parent_review_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review",
+      default: null,
     },
   },
   { timestamps: true }
 );
 
 reviewSchema.pre("validate", function (next) {
-  if (this.user_id && this.business_id_review) {
+  if (this.user_id && this.business_id_review && this.business_id_feedback) {
     return next(
       new Error(
-        "Chỉ một trong hai trường user_id hoặc business_id_review được phép có giá trị."
+        "Chỉ một trong 3 trường user_id, business_id_feedback hoặc business_id_review được phép có giá trị."
       )
     );
   }
-  if (!this.user_id && !this.business_id_review) {
+  if (!this.user_id && !this.business_id_review && !this.business_id_feedback) {
     return next(
       new Error(
-        "Cần ít nhất một trong hai trường user_id hoặc business_id_review."
+        "Cần ít nhất một trong 3 trường user_id, business_id_feedback hoặc business_id_review."
+      )
+    );
+  }
+  if (this.business_id && this.parent_review_id) {
+    return next(
+      new Error(
+        "Chỉ một trong hai trường business_id hoặc parent_review_id được phép có giá trị."
+      )
+    );
+  }
+  if (!this.business_id && !this.parent_review_id) {
+    return next(
+      new Error(
+        "Cần ít nhất một trong hai trường business_id hoặc parent_review_id."
       )
     );
   }

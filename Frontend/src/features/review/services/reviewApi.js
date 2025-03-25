@@ -25,10 +25,16 @@ const getReviewsByBusinessIdApi = (id) => {
   return axios.get(URL_API);
 };
 
+const getReviewResponseByParentReviewId = (id) => {
+  const URL_API = `/api/reviews/getReviewResponseByParentReviewId/${id}`;
+  return axios.get(URL_API);
+};
+
 export {
   getReviewApi,
   getReviewByIdApi,
   createReviewApi,
   deleteReviewApi,
   getReviewsByBusinessIdApi,
+  getReviewResponseByParentReviewId,
 };

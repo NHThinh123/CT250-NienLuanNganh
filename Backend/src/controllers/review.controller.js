@@ -9,6 +9,7 @@ const {
   getNumberOfReviewsByBusinessIdService,
   deleteReviewService,
   getReviewsByBusinessIdService,
+  getReviewResponseByParentReviewIdService,
 } = require("../services/review.service");
 
 const getListReview = async (req, res, next) => {
@@ -43,6 +44,8 @@ const createReview = async (req, res, next) => {
       review_contents,
       user_id,
       business_id_review,
+      parent_review_id,
+      business_id_feedback,
     } = req.body;
 
     const newReview = await createReviewService(
@@ -50,10 +53,14 @@ const createReview = async (req, res, next) => {
       review_rating,
       review_contents,
       user_id,
-      business_id_review
+      business_id_review,
+      parent_review_id,
+      business_id_feedback
     );
-    await updateRatingAverageService(business_id); //Cập nhật lại rating_average khi tạo một review
-    await updateTotalReviewsService(business_id); //Cập nhật lại số lượng review của business khi tạo một review
+    if (business_id && review_rating) {
+      await updateRatingAverageService(business_id); //Cập nhật lại rating_average khi tạo một review
+      await updateTotalReviewsService(business_id); //Cập nhật lại số lượng review của business khi tạo một review
+    }
 
     res.status(201).json(newReview);
   } catch (error) {
@@ -93,6 +100,16 @@ const getReviewsByBusinessId = async (req, res, next) => {
   }
 };
 
+const getReviewResponseByParentReviewId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await getReviewResponseByParentReviewIdService(id);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getNumberOfReviewsByBusinessId = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -115,4 +132,5 @@ module.exports = {
   getNumberOfReviewsByBusinessId,
   deleteReview,
   getReviewsByBusinessId,
+  getReviewResponseByParentReviewId,
 };

@@ -1,78 +1,130 @@
-import { Avatar, List, Rate, Typography, Row, Col } from "antd";
-import { formatTime } from "../../../../constants/formatTime";
+import { List, Row, Col, Flex } from "antd";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
+import "../../../../styles/global.css";
+import ReviewItem from "../organisms/ReviewItem";
+import ReviewFilter from "../organisms/ReviewFilter";
+import ReviewOverview from "../organisms/ReviewOverview";
+import { useEffect, useState } from "react";
 
-const ReviewList = ({ reviewData }) => {
+const ReviewList = ({ reviewData, businessId }) => {
+  const [filteredReviews, setFilteredReviews] = useState(reviewData);
+
+  const handleFilterChange = (filters) => {
+    let result = [...reviewData];
+
+    // Lọc theo mức sao trước (nếu có)
+    const ratingFilters = filters
+      .map((f) => parseInt(f))
+      .filter((f) => !isNaN(f));
+    if (ratingFilters.length > 0) {
+      result = result.filter((review) =>
+        ratingFilters.includes(review.review_rating)
+      );
+    }
+
+    // Sắp xếp theo thời gian (nếu có "latest" hoặc "oldest")
+    if (filters.includes("latest")) {
+      result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (filters.includes("oldest")) {
+      result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    } else if (filters.length === 0) {
+      // Nếu không có bộ lọc nào, sắp xếp theo thời gian giảm dần (mới nhất trước)
+      result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    setFilteredReviews(result);
+  };
+
+  // Cập nhật filteredReviews khi reviewData thay đổi
+  useEffect(() => {
+    // Ban đầu sắp xếp theo thời gian giảm dần (mới nhất trước) mà không áp dụng bộ lọc
+    const initialReviews = [...reviewData].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    setFilteredReviews(initialReviews);
+  }, [reviewData]);
+
   return (
-    <BoxContainer>
-      {reviewData.length > 0 ? (
-        <List
-          style={{ padding: 10, justifyContent: "center" }}
-          grid={{ gutter: 16, column: 1 }}
-          pagination={{
-            size: "large",
-            onChange: (page) => {
-              console.log(page);
-            },
-            pageSize: 4,
-            align: "center",
-            style: { marginTop: "-16px" },
-            showSizeChanger: false,
-            showLessItems: reviewData.length > 12,
-          }}
-          dataSource={reviewData}
-          renderItem={(review) => (
-            <List.Item>
-              <Row>
-                <Col span={3}>
-                  {/* <div style={{ display: "flex" }}> */}
-                  <Avatar
-                    src={
-                      !review.user_id && review.business_id_review
-                        ? review.business_id_review.avatar
-                        : review.user_id.avatar ||
-                          "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
-                    }
-                    size={35}
-                  />
-                </Col>
-                <Col span={21}>
-                  <div>
-                    <p style={{ fontWeight: "bold", margin: 0 }}>
-                      {!review.user_id && review.business_id_review
-                        ? review.business_id_review.business_name
-                        : review.user_id.name}
-                    </p>
-                    <Rate
-                      value={review.review_rating}
-                      disabled
-                      style={{ fontSize: 15 }}
-                    />
-                  </div>
-                  {/* </div> */}
-                  <Typography.Text style={{ color: "#6D6F71", fontSize: 14 }}>
-                    {formatTime(review.createdAt)}
-                  </Typography.Text>
-                  <p>{review.review_contents}</p>
-                </Col>
-              </Row>
-            </List.Item>
-          )}
-        />
-      ) : (
-        <div
-          style={{
-            placeContent: "center",
-            padding: "20px",
-            fontSize: "16px",
-            color: "#888",
-            display: "flex",
-          }}
-        >
-          Chưa có đánh giá!
+    <>
+      {" "}
+      <BoxContainer>
+        <div>
+          <Flex style={{ display: "flex", alignItems: "stretch" }} gap={16}>
+            <div style={{ flex: 1 }}>
+              <ReviewOverview businessId={businessId} />
+            </div>
+            <div style={{ width: "1px", backgroundColor: "#ddd" }}></div>
+            <div style={{ flex: 1 }}>
+              <ReviewFilter onFilterChange={handleFilterChange} />
+            </div>
+          </Flex>
+          <Row>
+            <Col span={24}>
+              <div
+                style={{ borderTop: "1px solid #ddd", marginBottom: 10 }}
+              ></div>
+            </Col>
+          </Row>
         </div>
-      )}
-    </BoxContainer>
+        {filteredReviews.length > 0 ? (
+          <List
+            style={{ padding: 5, justifyContent: "center" }}
+            grid={{ gutter: 16, column: 1 }}
+            pagination={{
+              size: "large",
+              onChange: (page) => {
+                console.log(page);
+              },
+              pageSize: 3,
+              align: "center",
+              style: { marginTop: "-16px" },
+              showSizeChanger: false,
+              showLessItems: filteredReviews.length > 12,
+            }}
+            dataSource={filteredReviews}
+            renderItem={(review) => (
+              <List.Item>
+                <ReviewItem review={review} businessId={businessId} />
+                <Row>
+                  <Col span={24}>
+                    <div
+                      style={{ borderTop: "1px solid #ddd", marginTop: 5 }}
+                    ></div>
+                  </Col>
+                </Row>
+              </List.Item>
+            )}
+          />
+        ) : (
+          <div
+            style={{
+              placeContent: "center",
+              padding: "20px",
+              fontSize: "16px",
+              color: "#888",
+              display: "flex",
+              textAlign: "center",
+            }}
+          >
+            Không có đánh giá phù hợp với bộ lọc mà bạn chọn!
+          </div>
+        )}
+        {reviewData.length === 0 && (
+          <div
+            style={{
+              placeContent: "center",
+              padding: "20px",
+              fontSize: "16px",
+              color: "#888",
+              display: "flex",
+              textAlign: "center",
+            }}
+          >
+            Chưa có đánh giá nào!
+          </div>
+        )}
+      </BoxContainer>
+    </>
   );
 };
 
