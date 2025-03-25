@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Row, Modal } from "antd";
 import {
   LeftOutlined,
@@ -10,27 +10,46 @@ import {
 const ReviewMedia = ({ assetReviewData }) => {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [videoDurations, setVideoDurations] = useState({});
+  const videoRefs = useRef({});
+
+  useEffect(() => {
+    if (!assetReviewData?.length) {
+      console.log("No assetReviewData provided or empty");
+      return;
+    }
+
+    console.log("Received assetReviewData:", assetReviewData);
+
+    // Cleanup để tránh memory leak
+    return () => {
+      Object.values(videoRefs.current).forEach((video) => {
+        if (video) {
+          video.onloadedmetadata = null;
+          video.onerror = null;
+        }
+      });
+    };
+  }, [assetReviewData]);
 
   if (
     !assetReviewData ||
     !Array.isArray(assetReviewData) ||
     assetReviewData.length === 0
   ) {
+    console.log("Returning null due to invalid assetReviewData");
     return null;
   }
 
-  // Sắp xếp dữ liệu: ưu tiên video lên đầu
   const sortedData = [...assetReviewData].sort((a, b) => {
     if (a.type === "video" && b.type !== "video") return -1;
     if (a.type !== "video" && b.type === "video") return 1;
     return 0;
   });
 
-  // Chỉ lấy 4 phần tử đầu tiên
   const displayData = sortedData.slice(0, 4);
   const remainingCount = sortedData.length - 4;
 
-  // Xử lý khi mở modal
   const openModal = (index) => {
     const realIndex = sortedData.findIndex(
       (item) => item.url === displayData[index].url
@@ -39,28 +58,37 @@ const ReviewMedia = ({ assetReviewData }) => {
     setVisible(true);
   };
 
-  // Xử lý khi đóng modal
-  const closeModal = () => {
-    setVisible(false);
-  };
+  const closeModal = () => setVisible(false);
 
-  // Chuyển về media trước đó
   const prevMedia = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? sortedData.length - 1 : prevIndex - 1
     );
   };
 
-  // Chuyển đến media tiếp theo
   const nextMedia = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === sortedData.length - 1 ? 0 : prevIndex + 1
     );
   };
 
+  const handleMetadataLoaded = (index, duration) => {
+    if (duration && !isNaN(duration) && duration > 0) {
+      const minutes = Math.floor(duration / 60);
+      const seconds = Math.floor(duration % 60);
+      const formattedDuration = `${minutes}:${
+        seconds < 10 ? "0" : ""
+      }${seconds}`;
+      console.log(`Duration set for index ${index}: ${formattedDuration}`);
+      setVideoDurations((prev) => ({ ...prev, [index]: formattedDuration }));
+    } else {
+      console.log(`Invalid duration for index ${index}: ${duration}`);
+      setVideoDurations((prev) => ({ ...prev, [index]: "0:00" }));
+    }
+  };
+
   return (
     <>
-      {/* Hiển thị danh sách thumbnail */}
       <Row style={{ marginTop: 8, overflowX: "auto", whiteSpace: "nowrap" }}>
         {displayData.map((asset, index) => (
           <div
@@ -90,6 +118,24 @@ const ReviewMedia = ({ assetReviewData }) => {
             ) : asset.type === "video" ? (
               <div style={{ position: "relative", display: "inline-block" }}>
                 <video
+                  ref={(el) => {
+                    videoRefs.current[index] = el;
+                    if (el && !videoDurations[index]) {
+                      el.onloadedmetadata = () => {
+                        console.log(
+                          `Metadata loaded for ${asset.url}: duration = ${el.duration}`
+                        );
+                        handleMetadataLoaded(index, el.duration);
+                      };
+                      el.onerror = (e) => {
+                        console.error(`Error loading video ${asset.url}:`, e);
+                        setVideoDurations((prev) => ({
+                          ...prev,
+                          [index]: "0:00",
+                        }));
+                      };
+                    }
+                  }}
                   src={asset.url}
                   style={{
                     width: "70px",
@@ -101,6 +147,7 @@ const ReviewMedia = ({ assetReviewData }) => {
                       : {}),
                   }}
                   muted
+                  preload="metadata"
                 />
                 <div
                   style={{
@@ -108,7 +155,7 @@ const ReviewMedia = ({ assetReviewData }) => {
                     bottom: 8,
                     left: 0,
                     width: "100%",
-                    height: "20px", // Chỉ chiếm một phần nhỏ ở dưới
+                    height: "20px",
                     background: "rgba(0, 0, 0, 0.5)",
                     borderBottomLeftRadius: "8px",
                     borderBottomRightRadius: "8px",
@@ -119,12 +166,14 @@ const ReviewMedia = ({ assetReviewData }) => {
                     fontSize: "12px",
                   }}
                 >
-                  <VideoCameraOutlined style={{ fontSize: "12px" }} />
+                  <VideoCameraOutlined
+                    style={{ fontSize: "12px", marginRight: "4px" }}
+                  />
+                  <span>{videoDurations[index] || "0:00"}</span>
                 </div>
               </div>
             ) : null}
 
-            {/* Overlay cho phần tử thứ 4 nếu còn phần tử khác */}
             {index === 3 && remainingCount > 0 && (
               <div
                 style={{
@@ -150,7 +199,6 @@ const ReviewMedia = ({ assetReviewData }) => {
         ))}
       </Row>
 
-      {/* Modal hiển thị media */}
       <Modal
         open={visible}
         footer={null}
@@ -167,7 +215,6 @@ const ReviewMedia = ({ assetReviewData }) => {
             position: "relative",
           }}
         >
-          {/* Nút điều hướng nằm ngoài media */}
           {sortedData.length > 1 && (
             <>
               <div
@@ -209,7 +256,6 @@ const ReviewMedia = ({ assetReviewData }) => {
             </>
           )}
 
-          {/* Hiển thị ảnh hoặc video trong modal */}
           {sortedData[currentIndex]?.type === "image" ? (
             <img
               src={sortedData[currentIndex].url}
