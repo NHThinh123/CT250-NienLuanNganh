@@ -102,7 +102,7 @@ const AvatarBusinessUpload = ({ avatar }) => {
           }}
         >
           <img
-            src={imageUrl}
+            src={imageUrl || "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg"}
             alt="avatar"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />

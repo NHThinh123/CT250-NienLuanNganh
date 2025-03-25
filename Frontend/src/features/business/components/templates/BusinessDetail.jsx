@@ -296,8 +296,8 @@ const BusinessDetail = ({
         </div>
       )}
       <Row>
-        <Col span={3}></Col>
-        <Col span={9}>
+        <Col span={2}></Col>
+        <Col span={10}>
           <div style={styles.businessAva}>
             <Avatar
               style={styles.businessImage}
@@ -306,7 +306,7 @@ const BusinessDetail = ({
             />
           </div>
         </Col>
-        <Col span={9}>
+        <Col span={10}>
           <div style={styles.businessDetail}>
             <div style={styles.businessBreadcrumb}>
               <Breadcrumb
@@ -396,7 +396,7 @@ const BusinessDetail = ({
             </div>
           </div>
         </Col>
-        <Col span={3}></Col>
+        <Col span={2}></Col>
       </Row>
 
       <Row style={{ marginTop: "20px" }}>
