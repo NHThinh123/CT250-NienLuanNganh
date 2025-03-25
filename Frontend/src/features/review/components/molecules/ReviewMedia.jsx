@@ -105,12 +105,13 @@ const ReviewMedia = ({ assetReviewData }) => {
                 <div
                   style={{
                     position: "absolute",
-                    top: 0,
+                    bottom: 8,
                     left: 0,
                     width: "100%",
-                    height: "90%",
+                    height: "20px", // Chỉ chiếm một phần nhỏ ở dưới
                     background: "rgba(0, 0, 0, 0.5)",
-                    borderRadius: "8px",
+                    borderBottomLeftRadius: "8px",
+                    borderBottomRightRadius: "8px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -118,7 +119,7 @@ const ReviewMedia = ({ assetReviewData }) => {
                     fontSize: "12px",
                   }}
                 >
-                  <VideoCameraOutlined style={{ fontSize: "16px" }} />
+                  <VideoCameraOutlined style={{ fontSize: "12px" }} />
                 </div>
               </div>
             ) : null}

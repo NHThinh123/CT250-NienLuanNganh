@@ -158,24 +158,24 @@ const AssetReviewBussiness = ({ assetReviewData }) => {
                 <div
                   style={{
                     position: "absolute",
-                    top: 0,
+                    bottom: 8, // Đặt overlay ở phía dưới
                     left: 0,
                     width: "100%",
-                    height: "90%",
+                    height: "30%", // Chỉ chiếm 30% chiều cao của video
                     background: "rgba(0, 0, 0, 0.5)",
-                    borderRadius: "8px",
+                    borderRadius: "0 0 8px 8px", // Bo góc dưới để khớp với video
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    flexDirection: "column",
+                    flexDirection: "row", // Icon và thời lượng trên cùng một hàng
                     color: "#fff",
                     fontSize: "12px",
                   }}
                 >
                   <VideoCameraOutlined
-                    style={{ fontSize: "16px", marginBottom: 2 }}
+                    style={{ fontSize: "12px", marginRight: "4px" }} // Giảm kích thước icon và thêm khoảng cách
                   />
-                  {videoDurations[index] || "0:00"}
+                  <span>{videoDurations[index] || "0:00"}</span>
                 </div>
               </div>
             ) : null}
