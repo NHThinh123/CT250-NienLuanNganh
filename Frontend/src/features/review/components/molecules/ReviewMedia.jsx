@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Row, Modal } from "antd";
 import {
   LeftOutlined,
@@ -10,32 +10,6 @@ import {
 const ReviewMedia = ({ assetReviewData }) => {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [videoDurations, setVideoDurations] = useState({});
-
-  // Lấy thời lượng video
-  useEffect(() => {
-    const fetchDurations = () => {
-      const durations = {};
-      assetReviewData.forEach((asset, index) => {
-        if (asset.type === "video") {
-          const video = document.createElement("video");
-          video.src = asset.url;
-          video.onloadedmetadata = () => {
-            const minutes = Math.floor(video.duration / 60);
-            const seconds = Math.floor(video.duration % 60);
-            durations[index] = `${minutes}:${
-              seconds < 10 ? "0" : ""
-            }${seconds}`;
-            setVideoDurations((prevDurations) => ({
-              ...prevDurations,
-              ...durations,
-            }));
-          };
-        }
-      });
-    };
-    fetchDurations();
-  }, [assetReviewData]);
 
   if (
     !assetReviewData ||
@@ -58,7 +32,6 @@ const ReviewMedia = ({ assetReviewData }) => {
 
   // Xử lý khi mở modal
   const openModal = (index) => {
-    // Tìm index thực tế trong sortedData dựa trên displayData
     const realIndex = sortedData.findIndex(
       (item) => item.url === displayData[index].url
     );
@@ -127,6 +100,7 @@ const ReviewMedia = ({ assetReviewData }) => {
                       ? { filter: "brightness(50%)" }
                       : {}),
                   }}
+                  muted
                 />
                 <div
                   style={{
@@ -140,17 +114,11 @@ const ReviewMedia = ({ assetReviewData }) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    flexDirection: "column",
                     color: "#fff",
                     fontSize: "12px",
                   }}
                 >
-                  <VideoCameraOutlined
-                    style={{ fontSize: "16px", marginBottom: 2 }}
-                  />
-                  {videoDurations[
-                    sortedData.findIndex((item) => item.url === asset.url)
-                  ] || "0:00"}
+                  <VideoCameraOutlined style={{ fontSize: "16px" }} />
                 </div>
               </div>
             ) : null}
@@ -188,6 +156,7 @@ const ReviewMedia = ({ assetReviewData }) => {
         onCancel={closeModal}
         centered
         width={800}
+        destroyOnClose
       >
         <div
           style={{
@@ -252,9 +221,10 @@ const ReviewMedia = ({ assetReviewData }) => {
             />
           ) : (
             <video
-              src={sortedData[currentIndex].url}
+              src={sortedData[currentIndex]?.url}
               controls
               autoPlay
+              muted
               style={{
                 maxWidth: "100%",
                 maxHeight: "80vh",
