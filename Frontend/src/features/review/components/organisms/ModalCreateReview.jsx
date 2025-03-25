@@ -15,7 +15,7 @@ import useCreateReview from "../../../review/hooks/useCreateReview";
 import { AuthContext } from "../../../../contexts/auth.context";
 import { BusinessContext } from "../../../../contexts/business.context";
 import { useContext, useRef, useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, EyeOutlined, DeleteOutlined } from "@ant-design/icons"; // Thêm icon EyeOutlined và DeleteOutlined
 
 const ModalCreateReview = ({
   isModalOpen,
@@ -48,60 +48,6 @@ const ModalCreateReview = ({
     }
   };
 
-  const generateVideoThumbnail = (file) => {
-    return new Promise((resolve) => {
-      const video = document.createElement("video");
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-
-      const videoUrl = URL.createObjectURL(file);
-      video.src = videoUrl;
-      video.muted = true;
-      video.playsInline = true;
-
-      // Thêm timeout
-      const timeoutId = setTimeout(() => {
-        URL.revokeObjectURL(videoUrl);
-        resolve(null);
-      }, 5000); // 5 giây timeout
-
-      video.onloadedmetadata = () => {
-        // Kiểm tra metadata
-        if (video.videoWidth === 0 || video.videoHeight === 0) {
-          clearTimeout(timeoutId);
-          URL.revokeObjectURL(videoUrl);
-          resolve(null);
-          return;
-        }
-
-        video.currentTime = Math.min(1, video.duration / 2);
-      };
-
-      video.onseeked = () => {
-        clearTimeout(timeoutId);
-        try {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const thumbnailUrl = canvas.toDataURL("image/png");
-          URL.revokeObjectURL(videoUrl);
-          resolve(thumbnailUrl);
-        } catch {
-          URL.revokeObjectURL(videoUrl);
-          resolve(null);
-        }
-      };
-
-      video.onerror = () => {
-        clearTimeout(timeoutId);
-        URL.revokeObjectURL(videoUrl);
-        resolve(null);
-      };
-
-      video.load();
-    });
-  };
-
   const handleImageChange = async ({ fileList: newFileList }) => {
     if (newFileList.length > MAX_IMAGES) {
       message.error(`Chỉ có thể tải lên tối đa ${MAX_IMAGES} ảnh!`);
@@ -118,33 +64,12 @@ const ModalCreateReview = ({
       return;
     }
 
-    const updatedFileList = await Promise.all(
-      newFileList.map(async (file) => {
-        if (file.originFileObj) {
-          try {
-            const thumbnail = await generateVideoThumbnail(file.originFileObj);
-            if (thumbnail) {
-              file.preview = thumbnail;
-            } else {
-              // Nếu không tạo được thumbnail, có thể sử dụng icon video mặc định
-              file.preview = "/path/to/default/video/icon.png";
-            }
-          } catch (error) {
-            console.error("Lỗi khi tạo thumbnail:", error);
-            file.preview = "/path/to/default/video/icon.png";
-          }
-        }
-        return file;
-      })
-    );
-
-    setVideoFileList(updatedFileList);
+    setVideoFileList(newFileList);
   };
 
   const handlePreview = (file) => {
     const previewUrl =
       file.url ||
-      file.preview ||
       (file.originFileObj ? URL.createObjectURL(file.originFileObj) : "");
 
     const isVideo = file.type?.startsWith("video/");
@@ -152,6 +77,13 @@ const ModalCreateReview = ({
     setPreviewUrl(previewUrl);
     setPreviewType(isVideo ? "video" : "image");
     setPreviewOpen(true);
+  };
+
+  const handleRemoveVideo = (file) => {
+    // Xóa video khỏi videoFileList
+    const updatedFileList = videoFileList.filter((item) => item.uid !== file.uid);
+    setVideoFileList(updatedFileList);
+    message.success("Đã xóa video!");
   };
 
   const imageUploadProps = {
@@ -196,6 +128,48 @@ const ModalCreateReview = ({
     },
     accept: "video/*",
     multiple: false,
+    // Tùy chỉnh giao diện của video
+    itemRender: (originNode, file) => {
+      if (file.type?.startsWith("video/")) {
+        const videoUrl = file.url || (file.originFileObj ? URL.createObjectURL(file.originFileObj) : "");
+        return (
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            <video
+              src={videoUrl}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              muted
+            />
+            {/* Overlay với các icon xem và xóa */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "rgba(0, 0, 0, 0.3)", // Nền mờ để icon nổi bật
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              {/* Icon xem */}
+              <EyeOutlined
+                style={{ fontSize: "24px", color: "white", cursor: "pointer" }}
+                onClick={() => handlePreview(file)}
+              />
+              {/* Icon xóa */}
+              <DeleteOutlined
+                style={{ fontSize: "24px", color: "white", cursor: "pointer" }}
+                onClick={() => handleRemoveVideo(file)}
+              />
+            </div>
+          </div>
+        );
+      }
+      return originNode; // Giữ nguyên giao diện mặc định cho các file khác
+    },
   };
 
   const onFinish = async (values) => {
@@ -386,8 +360,8 @@ const ModalCreateReview = ({
                 }}
                 width={previewType === "video" ? "50%" : "40%"}
               >
-                {previewUrl &&
-                  (previewType === "video" ? (
+                {previewUrl ? (
+                  previewType === "video" ? (
                     <video
                       controls
                       autoPlay
@@ -400,7 +374,10 @@ const ModalCreateReview = ({
                       style={{ width: "100%" }}
                       src={previewUrl}
                     />
-                  ))}
+                  )
+                ) : (
+                  <p>Không có nội dung để hiển thị</p>
+                )}
               </Modal>
             </Form.Item>
           </Form>
