@@ -8,13 +8,13 @@ const ReviewFilter = ({ onFilterChange }) => {
   const filterOptions = [
     { label: "Mới nhất", value: "latest" },
     { label: "Cũ nhất", value: "oldest" },
+    { label: "Có hình ảnh/video", value: "hasMedia" },
+    { label: "Có bình luận", value: "hasComment" },
     { label: "5 sao", value: "5" },
     { label: "4 sao", value: "4" },
     { label: "3 sao", value: "3" },
     { label: "2 sao", value: "2" },
     { label: "1 sao", value: "1" },
-    { label: "Có hình ảnh/video", value: "hasMedia" },
-    { label: "Có bình luận", value: "hasComment" },
   ];
 
   const handleFilterClick = (value) => {
