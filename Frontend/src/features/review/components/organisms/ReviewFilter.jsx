@@ -1,4 +1,3 @@
-// ReviewFilter.jsx
 import { Button, Space } from "antd";
 import { useState } from "react";
 import "../../../../styles/global.css";
@@ -14,6 +13,8 @@ const ReviewFilter = ({ onFilterChange }) => {
     { label: "3 sao", value: "3" },
     { label: "2 sao", value: "2" },
     { label: "1 sao", value: "1" },
+    { label: "Có hình ảnh/video", value: "hasMedia" },
+    { label: "Có bình luận", value: "hasComment" },
   ];
 
   const handleFilterClick = (value) => {
@@ -22,15 +23,13 @@ const ReviewFilter = ({ onFilterChange }) => {
     if (value === "latest" || value === "oldest") {
       // Nếu chọn "Mới nhất" hoặc "Cũ nhất"
       if (newFilters.includes(value)) {
-        // Nếu đã chọn, bỏ chọn
         newFilters = newFilters.filter((f) => f !== value);
       } else {
-        // Nếu chưa chọn, thêm vào và loại bỏ cái còn lại (latest/oldest không cùng tồn tại)
         newFilters = newFilters.filter((f) => f !== "latest" && f !== "oldest");
         newFilters.push(value);
       }
     } else {
-      // Nếu chọn một mức sao, toggle mức sao đó
+      // Toggle các bộ lọc khác (bao gồm hasMedia và hasComment)
       if (newFilters.includes(value)) {
         newFilters = newFilters.filter((f) => f !== value);
       } else {
@@ -62,7 +61,6 @@ const ReviewFilter = ({ onFilterChange }) => {
           </Button>
         ))}
       </Space>
-      {/* <div style={{ borderTop: "1px solid #ddd", marginTop: 10 }}></div> */}
     </div>
   );
 };

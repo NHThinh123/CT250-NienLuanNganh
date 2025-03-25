@@ -1,4 +1,4 @@
-// ReviewItem.jsx
+// ReviewItem.jsx không cần thay đổi lớn, giữ nguyên code hiện tại
 import { Avatar, Rate, Typography, Row, Col, Button, Form } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
@@ -36,10 +36,9 @@ const ReviewItem = ({ review, businessId }) => {
   const replyContainerRef = useRef(null);
 
   useEffect(() => {
-    setIsShowReply(false); // Đặt lại trạng thái về false khi review thay đổi
+    setIsShowReply(false);
   }, [review._id]);
 
-  // Xử lý ẩn reply khi nhấp ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -82,34 +81,31 @@ const ReviewItem = ({ review, businessId }) => {
   };
 
   const handleReply = (values) => {
-    if (!values.review_contents?.trim()) return; // Ngăn gửi nếu rỗng
+    if (!values.review_contents?.trim()) return;
 
     const reviewData = {
       review_contents: values.review_contents,
-      parent_review_id: review._id, // Liên kết phản hồi với review gốc
+      parent_review_id: review._id,
     };
 
     if (entity.id === auth?.user?.id) {
-      // Nếu entity.id khớp với user.id từ AuthContext
       reviewData.user_id = entity.id;
     } else if (
       entity.id === business?.business?.id &&
       business?.business?.id === businessId
     ) {
-      // Nếu entity.id khớp với business.id từ BusinessContext
       reviewData.business_id_feedback = entity.id;
     } else if (
       entity.id === business?.business?.id &&
       business?.business?.id !== businessId
     ) {
-      // Nếu không phải user hoặc business feedback, coi như business review
       reviewData.business_id_review = entity.id;
     }
 
     createReview(reviewData, {
       onSuccess: () => {
-        form.resetFields(); // Reset form
-        setIsShowReply(false); // Ẩn ô nhập
+        form.resetFields();
+        setIsShowReply(false);
       },
       onError: (error) => {
         console.error("Lỗi khi gửi phản hồi:", error);

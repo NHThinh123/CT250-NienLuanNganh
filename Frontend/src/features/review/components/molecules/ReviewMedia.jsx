@@ -1,8 +1,42 @@
-// ReviewMedia.jsx
-import { Row } from "antd";
+import { useState, useEffect } from "react";
+import { Row, Modal } from "antd";
+import {
+  LeftOutlined,
+  RightOutlined,
+  VideoCameraOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 const ReviewMedia = ({ assetReviewData }) => {
-  // Kiểm tra nếu assetReviewData không tồn tại hoặc không phải là mảng
+  const [visible, setVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [videoDurations, setVideoDurations] = useState({});
+
+  // Lấy thời lượng video
+  useEffect(() => {
+    const fetchDurations = () => {
+      const durations = {};
+      assetReviewData.forEach((asset, index) => {
+        if (asset.type === "video") {
+          const video = document.createElement("video");
+          video.src = asset.url;
+          video.onloadedmetadata = () => {
+            const minutes = Math.floor(video.duration / 60);
+            const seconds = Math.floor(video.duration % 60);
+            durations[index] = `${minutes}:${
+              seconds < 10 ? "0" : ""
+            }${seconds}`;
+            setVideoDurations((prevDurations) => ({
+              ...prevDurations,
+              ...durations,
+            }));
+          };
+        }
+      });
+    };
+    fetchDurations();
+  }, [assetReviewData]);
+
   if (
     !assetReviewData ||
     !Array.isArray(assetReviewData) ||
@@ -11,42 +45,226 @@ const ReviewMedia = ({ assetReviewData }) => {
     return null;
   }
 
+  // Sắp xếp dữ liệu: ưu tiên video lên đầu
+  const sortedData = [...assetReviewData].sort((a, b) => {
+    if (a.type === "video" && b.type !== "video") return -1;
+    if (a.type !== "video" && b.type === "video") return 1;
+    return 0;
+  });
+
+  // Chỉ lấy 4 phần tử đầu tiên
+  const displayData = sortedData.slice(0, 4);
+  const remainingCount = sortedData.length - 4;
+
+  // Xử lý khi mở modal
+  const openModal = (index) => {
+    // Tìm index thực tế trong sortedData dựa trên displayData
+    const realIndex = sortedData.findIndex(
+      (item) => item.url === displayData[index].url
+    );
+    setCurrentIndex(realIndex);
+    setVisible(true);
+  };
+
+  // Xử lý khi đóng modal
+  const closeModal = () => {
+    setVisible(false);
+  };
+
+  // Chuyển về media trước đó
+  const prevMedia = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? sortedData.length - 1 : prevIndex - 1
+    );
+  };
+
+  // Chuyển đến media tiếp theo
+  const nextMedia = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === sortedData.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
   return (
-    <Row style={{ marginTop: 8, overflowX: "auto", whiteSpace: "nowrap" }}>
-      {assetReviewData.map((asset, index) => (
+    <>
+      {/* Hiển thị danh sách thumbnail */}
+      <Row style={{ marginTop: 8, overflowX: "auto", whiteSpace: "nowrap" }}>
+        {displayData.map((asset, index) => (
+          <div
+            key={index}
+            style={{
+              position: "relative",
+              display: "inline-block",
+              marginRight: 8,
+              cursor: "pointer",
+            }}
+            onClick={() => openModal(index)}
+          >
+            {asset.type === "image" ? (
+              <img
+                src={asset.url}
+                alt={`Review media ${index + 1}`}
+                style={{
+                  width: "70px",
+                  height: "70px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                  ...(index === 3 && remainingCount > 0
+                    ? { filter: "brightness(50%)" }
+                    : {}),
+                }}
+              />
+            ) : asset.type === "video" ? (
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <video
+                  src={asset.url}
+                  style={{
+                    width: "70px",
+                    height: "70px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    ...(index === 3 && remainingCount > 0
+                      ? { filter: "brightness(50%)" }
+                      : {}),
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "90%",
+                    background: "rgba(0, 0, 0, 0.5)",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    color: "#fff",
+                    fontSize: "12px",
+                  }}
+                >
+                  <VideoCameraOutlined
+                    style={{ fontSize: "16px", marginBottom: 2 }}
+                  />
+                  {videoDurations[
+                    sortedData.findIndex((item) => item.url === asset.url)
+                  ] || "0:00"}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Overlay cho phần tử thứ 4 nếu còn phần tử khác */}
+            {index === 3 && remainingCount > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "90%",
+                  background: "rgba(0, 0, 0, 0.5)",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "16px",
+                }}
+              >
+                <PlusOutlined style={{ marginRight: 4 }} />
+                {remainingCount}
+              </div>
+            )}
+          </div>
+        ))}
+      </Row>
+
+      {/* Modal hiển thị media */}
+      <Modal
+        open={visible}
+        footer={null}
+        onCancel={closeModal}
+        centered
+        width={800}
+      >
         <div
-          key={index}
           style={{
-            display: "inline-block",
-            marginRight: 8,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
           }}
         >
-          {asset.type === "image" ? (
+          {/* Nút điều hướng nằm ngoài media */}
+          {sortedData.length > 1 && (
+            <>
+              <div
+                onClick={prevMedia}
+                style={{
+                  position: "absolute",
+                  left: -50,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontSize: 24,
+                  color: "#333",
+                  cursor: "pointer",
+                  background: "rgba(255, 255, 255, 0.8)",
+                  padding: 10,
+                  borderRadius: "50%",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <LeftOutlined />
+              </div>
+              <div
+                onClick={nextMedia}
+                style={{
+                  position: "absolute",
+                  right: -50,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontSize: 24,
+                  color: "#333",
+                  cursor: "pointer",
+                  background: "rgba(255, 255, 255, 0.8)",
+                  padding: 10,
+                  borderRadius: "50%",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <RightOutlined />
+              </div>
+            </>
+          )}
+
+          {/* Hiển thị ảnh hoặc video trong modal */}
+          {sortedData[currentIndex]?.type === "image" ? (
             <img
-              src={asset.url}
-              alt={`Review media ${index + 1}`}
+              src={sortedData[currentIndex].url}
+              alt="Full view"
               style={{
-                width: "70px",
-                height: "70px",
-                objectFit: "cover",
+                maxWidth: "100%",
+                maxHeight: "80vh",
                 borderRadius: "8px",
               }}
             />
-          ) : asset.type === "video" ? (
+          ) : (
             <video
-              src={asset.url}
+              src={sortedData[currentIndex].url}
               controls
+              autoPlay
               style={{
-                width: "100px",
-                height: "100px",
-                objectFit: "cover",
+                maxWidth: "100%",
+                maxHeight: "80vh",
                 borderRadius: "8px",
               }}
             />
-          ) : null}
+          )}
         </div>
-      ))}
-    </Row>
+      </Modal>
+    </>
   );
 };
 
