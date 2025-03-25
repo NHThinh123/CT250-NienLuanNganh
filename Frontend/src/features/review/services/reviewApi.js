@@ -10,9 +10,11 @@ const getReviewByIdApi = (id) => {
   return axios.get(URL_API);
 };
 
-const createReviewApi = (data) => {
+const createReviewApi = (formData) => {
   const URL_API = "/api/reviews";
-  return axios.post(URL_API, data);
+  return axios.post(URL_API, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 
 const deleteReviewApi = (id) => {
@@ -30,6 +32,16 @@ const getReviewResponseByParentReviewId = (id) => {
   return axios.get(URL_API);
 };
 
+const getAssetReviewByBusinessId = (id) => {
+  const URL_API = `/api/asset_reviews/getAssetReviewByBusinessId/${id}`;
+  return axios.get(URL_API);
+};
+
+const getAssetReviewByReviewId = (id) => {
+  const URL_API = `/api/asset_reviews/getAssetReviewByReviewId/${id}`;
+  return axios.get(URL_API);
+};
+
 export {
   getReviewApi,
   getReviewByIdApi,
@@ -37,4 +49,6 @@ export {
   deleteReviewApi,
   getReviewsByBusinessIdApi,
   getReviewResponseByParentReviewId,
+  getAssetReviewByBusinessId,
+  getAssetReviewByReviewId,
 };

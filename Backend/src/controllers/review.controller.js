@@ -55,7 +55,8 @@ const createReview = async (req, res, next) => {
       user_id,
       business_id_review,
       parent_review_id,
-      business_id_feedback
+      business_id_feedback,
+      req.files
     );
     if (business_id && review_rating) {
       await updateRatingAverageService(business_id); //Cập nhật lại rating_average khi tạo một review

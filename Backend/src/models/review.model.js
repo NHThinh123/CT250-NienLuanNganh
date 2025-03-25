@@ -31,7 +31,6 @@ const reviewSchema = new mongoose.Schema(
     },
     review_contents: {
       type: String,
-      minlength: 1,
       maxlength: 2000,
       trim: true,
       default: null,
@@ -57,20 +56,6 @@ reviewSchema.pre("validate", function (next) {
     return next(
       new Error(
         "Cần ít nhất một trong 3 trường user_id, business_id_feedback hoặc business_id_review."
-      )
-    );
-  }
-  if (this.business_id && this.parent_review_id) {
-    return next(
-      new Error(
-        "Chỉ một trong hai trường business_id hoặc parent_review_id được phép có giá trị."
-      )
-    );
-  }
-  if (!this.business_id && !this.parent_review_id) {
-    return next(
-      new Error(
-        "Cần ít nhất một trong hai trường business_id hoặc parent_review_id."
       )
     );
   }

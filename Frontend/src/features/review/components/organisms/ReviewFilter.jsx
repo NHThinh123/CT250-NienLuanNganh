@@ -1,4 +1,3 @@
-// ReviewFilter.jsx
 import { Button, Space } from "antd";
 import { useState } from "react";
 import "../../../../styles/global.css";
@@ -9,6 +8,8 @@ const ReviewFilter = ({ onFilterChange }) => {
   const filterOptions = [
     { label: "Mới nhất", value: "latest" },
     { label: "Cũ nhất", value: "oldest" },
+    { label: "Có hình ảnh/video", value: "hasMedia" },
+    { label: "Có bình luận", value: "hasComment" },
     { label: "5 sao", value: "5" },
     { label: "4 sao", value: "4" },
     { label: "3 sao", value: "3" },
@@ -22,15 +23,13 @@ const ReviewFilter = ({ onFilterChange }) => {
     if (value === "latest" || value === "oldest") {
       // Nếu chọn "Mới nhất" hoặc "Cũ nhất"
       if (newFilters.includes(value)) {
-        // Nếu đã chọn, bỏ chọn
         newFilters = newFilters.filter((f) => f !== value);
       } else {
-        // Nếu chưa chọn, thêm vào và loại bỏ cái còn lại (latest/oldest không cùng tồn tại)
         newFilters = newFilters.filter((f) => f !== "latest" && f !== "oldest");
         newFilters.push(value);
       }
     } else {
-      // Nếu chọn một mức sao, toggle mức sao đó
+      // Toggle các bộ lọc khác (bao gồm hasMedia và hasComment)
       if (newFilters.includes(value)) {
         newFilters = newFilters.filter((f) => f !== value);
       } else {
@@ -62,7 +61,6 @@ const ReviewFilter = ({ onFilterChange }) => {
           </Button>
         ))}
       </Space>
-      {/* <div style={{ borderTop: "1px solid #ddd", marginTop: 10 }}></div> */}
     </div>
   );
 };

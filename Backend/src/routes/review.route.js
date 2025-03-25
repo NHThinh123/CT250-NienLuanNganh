@@ -8,6 +8,7 @@ const {
   getNumberOfReviewsByBusinessId,
   getReviewResponseByParentReviewId,
 } = require("../controllers/review.controller");
+const uploadReview = require("../middleware/uploadReview");
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.get(
   getNumberOfReviewsByBusinessId
 );
 router.get("/:id", getReviewById); // Lấy chi tiết một review theo ID
-router.post("/", createReview); // Tạo mới một review
+router.post("/", uploadReview.array("media", 5), createReview); // Tạo mới một review
 router.delete("/:id", deleteReview); // Xóa mềm review theo ID
 
 module.exports = router;

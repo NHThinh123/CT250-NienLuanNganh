@@ -139,9 +139,14 @@ const BusinessFilter = ({
       </Row>
       {showFilters && (
         <div>
-          <Row style={{ marginTop: "16px" }}>
+          <Row style={{ marginTop: 10 }}>
             <Col span={1}></Col>
-            <Col span={2}>Sao:</Col>
+            <Col
+              span={2}
+              style={{ placeContent: "center", fontWeight: "bold" }}
+            >
+              Sao:
+            </Col>
             <Col span={21}>
               <Checkbox.Group
                 onChange={handleStarChange}
@@ -211,9 +216,12 @@ const BusinessFilter = ({
               </Checkbox.Group>
             </Col>
           </Row>
-          <Row style={{ marginTop: "16px" }}>
+          <Row>
             <Col span={1}></Col>
-            <Col span={2} style={{ display: "flex", alignItems: "center" }}>
+            <Col
+              span={2}
+              style={{ placeContent: "center", fontWeight: "bold" }}
+            >
               Giá:
             </Col>
             <Col span={14}>
