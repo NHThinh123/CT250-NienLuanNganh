@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Row, Modal } from "antd";
+import { Row, Modal, Col } from "antd";
 import {
   LeftOutlined,
   RightOutlined,
@@ -68,18 +68,7 @@ const AssetReviewBussiness = ({ assetReviewData }) => {
     !Array.isArray(assetReviewData) ||
     assetReviewData.length === 0
   ) {
-    return (
-      <div
-        style={{
-          padding: "20px",
-          fontSize: "16px",
-          color: "#888",
-          textAlign: "center",
-        }}
-      >
-        Không có nội dung media để hiển thị!
-      </div>
-    );
+    return null;
   }
 
   const openModal = (index) => {
@@ -204,6 +193,11 @@ const AssetReviewBussiness = ({ assetReviewData }) => {
             )}
           </div>
         ))}
+      </Row>
+      <Row style={{ marginTop: 10 }}>
+        <Col span={24}>
+          <div style={{ borderTop: "1px solid #ddd", marginBottom: 10 }}></div>
+        </Col>
       </Row>
 
       <Modal

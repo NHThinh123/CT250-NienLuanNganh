@@ -92,13 +92,6 @@ const ReviewList = ({ reviewData, businessId }) => {
       </div>
       <div>
         <AssetReviewBussiness assetReviewData={assetReviewData} />
-        <Row style={{ marginTop: 10 }}>
-          <Col span={24}>
-            <div
-              style={{ borderTop: "1px solid #ddd", marginBottom: 10 }}
-            ></div>
-          </Col>
-        </Row>
       </div>
       {filteredReviews.length > 0 ? (
         <List
