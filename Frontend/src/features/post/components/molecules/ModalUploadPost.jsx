@@ -191,6 +191,17 @@ const ModalUploadPost = ({
           <Button
             type="text"
             style={{ padding: "4px 18px" }}
+            onClick={handleShowUploadLocation}
+          >
+            <Popover content="Thêm địa điểm">
+              <MapPinned color="#ff4d4f" size={24} strokeWidth={2.5} />
+            </Popover>
+          </Button>
+        </Col>
+        <Col span={4}>
+          <Button
+            type="text"
+            style={{ padding: "4px 18px" }}
             onClick={handleShowUploadTag}
           >
             <Popover content="Thêm chủ đề">
@@ -206,17 +217,6 @@ const ModalUploadPost = ({
           >
             <Popover content="Thêm ảnh">
               <Images color="#03c200" size={24} strokeWidth={2.5} />
-            </Popover>
-          </Button>
-        </Col>
-        <Col span={4}>
-          <Button
-            type="text"
-            style={{ padding: "4px 18px" }}
-            onClick={handleShowUploadLocation}
-          >
-            <Popover content="Thêm địa điểm">
-              <MapPinned color="#ff4d4f" size={24} strokeWidth={2.5} />
             </Popover>
           </Button>
         </Col>

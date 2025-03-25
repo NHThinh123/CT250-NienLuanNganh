@@ -266,6 +266,13 @@ const ModalUpdatePost = ({
           </Typography.Text>
         </Col>
         <Col span={4}>
+          <Button type="text" onClick={handleShowUploadLocation}>
+            <Popover content="Thêm địa điểm">
+              <MapPinned color="#ff4d4f" size={24} strokeWidth={2.5} />
+            </Popover>
+          </Button>
+        </Col>
+        <Col span={4}>
           <Button type="text" onClick={handleShowUploadTag}>
             <Popover content="Thêm chủ đề">
               <Tags color="#e09c0b" size={24} strokeWidth={2.5} />
@@ -276,13 +283,6 @@ const ModalUpdatePost = ({
           <Button type="text" onClick={handleShowUploadImage}>
             <Popover content="Thêm ảnh">
               <Images color="#03c200" size={24} strokeWidth={2.5} />
-            </Popover>
-          </Button>
-        </Col>
-        <Col span={4}>
-          <Button type="text" onClick={handleShowUploadLocation}>
-            <Popover content="Thêm địa điểm">
-              <MapPinned color="#ff4d4f" size={24} strokeWidth={2.5} />
             </Popover>
           </Button>
         </Col>

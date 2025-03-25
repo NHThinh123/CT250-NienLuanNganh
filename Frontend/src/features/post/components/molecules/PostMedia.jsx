@@ -14,7 +14,7 @@ const PostMedia = ({ mediaData }) => {
   const renderMedia = (item, index, isThumbnail = false) => {
     const style = isThumbnail
       ? { maxHeight: "100px", width: "100%", objectFit: "cover" }
-      : { maxHeight: "500px", width: "100%", objectFit: "cover" };
+      : { maxHeight: "600px", width: "100%", objectFit: "cover" };
 
     if (item.type === "image") {
       return (

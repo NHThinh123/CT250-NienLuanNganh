@@ -13,7 +13,7 @@ const PostLinkedBusiness = ({ linked_business }) => {
   }
   const formatPrice = (price) => {
     if (typeof price !== "number" || isNaN(price)) {
-      return "N/A";
+      return "0";
     }
     return price.toLocaleString("vi-VN");
   };
@@ -63,7 +63,7 @@ const PostLinkedBusiness = ({ linked_business }) => {
               fractions={10}
               quiet={true}
             />{" "}
-            {linked_business.rating_average || "N/A"} / 5
+            {linked_business.rating_average || "0"} / 5
           </p>
           <p style={{ marginBottom: 4 }}>
             <MapPinHouse
