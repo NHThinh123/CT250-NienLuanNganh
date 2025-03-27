@@ -367,8 +367,8 @@ const BusinessDetail = ({
                     display: "flex",
                     alignItems: "center",
                     gap: "5px",
-                    backgroundColor: "#1a73e8",
-                    borderColor: "#1a73e8",
+                    backgroundColor: "#52c41a",
+                    borderColor: "#52c41a",
                     borderRadius: "5px",
                     height: "35px",
                   }}

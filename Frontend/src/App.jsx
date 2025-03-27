@@ -16,6 +16,7 @@ import ChatWindow from "./components/atoms/ChatWindow";
 import BusinessList from "./features/chat/components/templates/BusinessList";
 import UserList from "./features/chat/components/templates/UserList";
 import "antd/dist/reset.css";
+import { MessageCircleMore } from "lucide-react";
 
 const { Header, Content, Sider } = Layout;
 
@@ -151,8 +152,8 @@ function App() {
       }
     }
 
-    // Log newMessage để debug
-    console.log("New message received:", newMessage);
+
+
 
     // Kiểm tra newMessage và các thuộc tính trước khi truy cập
     if (!newMessage || !newMessage.senderId || !newMessage.receiverId) {
@@ -310,7 +311,7 @@ function App() {
                   minWidth: "16px",
                 }}
               >
-                <MessageOutlined />
+                <MessageCircleMore color="#ffffff" />
               </Badge>
             }
             size="large"
@@ -319,8 +320,8 @@ function App() {
               bottom: 10,
               right: 70,
               zIndex: 1000,
-              backgroundColor: "#1a73e8",
-              borderColor: "#1a73e8",
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
               width: 60,
               height: 60,
               display: "flex",

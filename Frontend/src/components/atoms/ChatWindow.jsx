@@ -9,7 +9,7 @@ const ChatWindow = ({ userId, businessId, businessName, userName, avatar, onClos
         userId,
         businessId,
         (newMessage) => {
-            message.info(`Tin nhắn mới từ ${businessId ? businessName : userName}: ${newMessage.content}`);
+            //message.info(`Tin nhắn mới từ ${businessId ? businessName : userName}: ${newMessage.content}`);
             if (onNewMessage) {
                 onNewMessage(newMessage);
             }

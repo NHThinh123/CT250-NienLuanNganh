@@ -113,7 +113,7 @@ const MessageList = ({ messages, userId, businessId, markAsRead, onSendMessage }
                     if (entry.isIntersecting) {
                         const messageId = entry.target.dataset.messageId;
                         const message = messages.find((msg) => msg._id === messageId);
-                        if (message && message.senderId) { // Kiểm tra message.senderId
+                        if (message && message.senderId) {
                             const senderId = typeof message.senderId === "object" ? message.senderId._id : message.senderId;
                             const currentId = isUserLoggedIn ? currentUserId : currentBusinessId;
                             if (!message.isRead && senderId !== currentId) {

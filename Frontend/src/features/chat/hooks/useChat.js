@@ -1,3 +1,4 @@
+// features/chat/hooks/useChat.js
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import {
@@ -25,22 +26,15 @@ const useChat = (userId, businessId, onNewMessage) => {
     const sendMessageMutation = useMutation({
         mutationFn: sendMessage,
         onSuccess: (newMessage) => {
-            // Log newMessage để kiểm tra cấu trúc
-            console.log("New message from sendMessage:", newMessage);
-
-            // Kiểm tra newMessage trước khi cập nhật
-            if (!newMessage || !newMessage.senderId || !newMessage.receiverId) {
-                console.error("Invalid newMessage structure:", newMessage);
-                return;
-            }
-
             queryClient.setQueryData(["chat", userId, businessId], (old) => {
                 const oldMessages = old || [];
                 if (oldMessages.some((msg) => msg._id === newMessage._id)) {
                     return oldMessages;
                 }
+
                 return [...oldMessages, newMessage];
             });
+
         },
         onError: (error) => {
             message.error(error.message || "Gửi tin nhắn thất bại!");
@@ -62,20 +56,14 @@ const useChat = (userId, businessId, onNewMessage) => {
         wsRef.current = new WebSocket("ws://localhost:8080");
 
         wsRef.current.onopen = () => {
+
             wsRef.current.send(JSON.stringify({ id: userId || businessId }));
         };
 
         wsRef.current.onmessage = (event) => {
+
             const { event: eventType, data } = JSON.parse(event.data);
             if (eventType === "receiveMessage") {
-                // Log data để kiểm tra cấu trúc
-                console.log("New message from WebSocket:", data);
-
-                // Kiểm tra data trước khi xử lý
-                if (!data || !data.senderId || !data.receiverId) {
-                    console.error("Invalid message from WebSocket:", data);
-                    return;
-                }
 
                 queryClient.setQueryData(["chat", userId, businessId], (old) => {
                     const oldMessages = old || [];
@@ -83,19 +71,8 @@ const useChat = (userId, businessId, onNewMessage) => {
                         console.log("Tin nhắn đã tồn tại (WebSocket):", data._id);
                         return oldMessages;
                     }
-                    const senderId = typeof data.senderId === "object" && data.senderId?._id
-                        ? data.senderId._id
-                        : data.senderId;
-                    const receiverId = typeof data.receiverId === "object" && data.receiverId?._id
-                        ? data.receiverId._id
-                        : data.receiverId;
-
-                    // Kiểm tra senderId và receiverId
-                    if (!senderId || !receiverId) {
-                        console.error("Missing senderId or receiverId:", { senderId, receiverId });
-                        return oldMessages;
-                    }
-
+                    const senderId = typeof data.senderId === "object" ? data.senderId._id : data.senderId;
+                    const receiverId = typeof data.receiverId === "object" ? data.receiverId._id : data.receiverId;
                     const isRelevantMessage =
                         (senderId === userId && receiverId === businessId) ||
                         (senderId === businessId && receiverId === userId);
@@ -104,6 +81,7 @@ const useChat = (userId, businessId, onNewMessage) => {
                         return oldMessages;
                     }
                     if (senderId !== (userId || businessId) && onNewMessage) {
+
                         onNewMessage(data);
                     }
                     return [...oldMessages, data];
@@ -112,7 +90,7 @@ const useChat = (userId, businessId, onNewMessage) => {
         };
 
         wsRef.current.onclose = () => {
-            console.log("WebSocket closed");
+
         };
 
         return () => {
