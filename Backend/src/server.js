@@ -48,36 +48,35 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/asset_reviews", assetReviewsRoutes);
 app.use("/api/chat", chatRoutes);
 
-// Middleware xử lý lỗi
-// app.use(errorHandler);
-
-// Khởi động server HTTP
-const server = app.listen(port, () => {
-  console.log(`Backend Nodejs App listening on port ${port}`);
-});
-
-// Khởi tạo WebSocket Server
-const {
-  wss,
-  clients,
-  notifyClients,
-  notifyUserStats,
-  notifyBusinessStats,
-  notifyPaymentStats,
-} = initializeWebSocket(server);
-
-// Xuất các hàm để sử dụng trong các route
-app.set("wss", wss);
-app.set("clients", clients);
-app.set("notifyClients", notifyClients);
-app.set("notifyUserStats", notifyUserStats);
-app.set("notifyBusinessStats", notifyBusinessStats);
-app.set("notifyPaymentStats", notifyPaymentStats);
 // Kết nối database và khởi động server
 (async () => {
   try {
-    await connection();
+    await connection(); // Đợi kết nối database thành công
+    console.log("Database connected successfully");
+
+    // Khởi động server HTTP
+    const server = app.listen(port, () => {
+      console.log(`Backend Nodejs App listening on port ${port}`);
+    });
+
+    // Khởi tạo WebSocket Server
+    const {
+      wss,
+      clients,
+      notifyClients,
+      notifyUserStats,
+      notifyBusinessStats,
+      notifyPaymentStats,
+    } = initializeWebSocket(server);
+
+    app.set("wss", wss);
+    app.set("clients", clients);
+    app.set("notifyClients", notifyClients);
+    app.set("notifyUserStats", notifyUserStats);
+    app.set("notifyBusinessStats", notifyBusinessStats);
+    app.set("notifyPaymentStats", notifyPaymentStats);
   } catch (error) {
-    console.log(">>> Error connect to DB: ", error);
+    console.log(">>> Error connecting to DB: ", error);
+    process.exit(1);
   }
 })();

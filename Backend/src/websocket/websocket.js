@@ -1,15 +1,15 @@
-// websocket/websocket.js
 const { WebSocketServer } = require("ws");
 const User = require("../models/user.model");
 const Business = require("../models/business.model");
 const Payment = require("../models/payment.model");
 
-// Hàm khởi tạo WebSocket
 const initializeWebSocket = (server) => {
     const wss = new WebSocketServer({ server });
     const clients = new Map();
 
     wss.on("connection", (ws) => {
+        console.log("Client connected");
+
         // Gửi dữ liệu user ban đầu khi kết nối
         User.aggregate([
             {
@@ -21,7 +21,9 @@ const initializeWebSocket = (server) => {
             { $sort: { _id: 1 } },
         ])
             .then((stats) => {
-                ws.send(JSON.stringify({ event: "userStats", data: stats }));
+                if (ws.readyState === ws.OPEN) {
+                    ws.send(JSON.stringify({ event: "userStats", data: stats }));
+                }
             })
             .catch((error) => {
                 console.error("Error sending initial user stats:", error);
@@ -38,7 +40,9 @@ const initializeWebSocket = (server) => {
             { $sort: { _id: 1 } },
         ])
             .then((stats) => {
-                ws.send(JSON.stringify({ event: "businessStats", data: stats }));
+                if (ws.readyState === ws.OPEN) {
+                    ws.send(JSON.stringify({ event: "businessStats", data: stats }));
+                }
             })
             .catch((error) => {
                 console.error("Error sending initial business stats:", error);
@@ -55,32 +59,68 @@ const initializeWebSocket = (server) => {
             { $sort: { _id: 1 } },
         ])
             .then((stats) => {
-                ws.send(JSON.stringify({ event: "paymentStats", data: stats }));
+                if (ws.readyState === ws.OPEN) {
+                    ws.send(JSON.stringify({ event: "paymentStats", data: stats }));
+                }
             })
             .catch((error) => {
                 console.error("Error sending initial payment stats:", error);
             });
 
         ws.on("message", (message) => {
-            const data = JSON.parse(message);
-            if (data.businessId) {
-                clients.set(ws, data.businessId); // Lưu ID của business mà client theo dõi
-            }
-            // Thêm logic cho chat: Lưu ID của user hoặc business
-            if (data.id) {
-                clients.set(ws, data.id.toString());
+            try {
+                const data = JSON.parse(message.toString());
+                console.log("Received message:", data);
+
+                // Xử lý tin nhắn từ useBusinessById
+                if (data.businessId) {
+                    clients.set(ws, data.businessId.toString());
+                    console.log(`Client is watching business: ${data.businessId}`);
+                }
+
+                // Xử lý tin nhắn từ useChat
+                if (data.id) {
+                    clients.set(ws, data.id.toString());
+                    console.log(`Client ID: ${data.id}`);
+                }
+
+                // Xử lý tin nhắn chat
+                if (data.event === "sendMessage") {
+                    wss.clients.forEach((client) => {
+                        if (client.readyState === client.OPEN) {
+                            const clientId = clients.get(client);
+                            const { senderId, receiverId } = data.data;
+                            if (clientId === senderId.toString() || clientId === receiverId.toString()) {
+                                client.send(JSON.stringify({
+                                    event: "receiveMessage",
+                                    data: data.data,
+                                }));
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error parsing message:", error);
             }
         });
 
         ws.on("close", () => {
+            console.log("Client disconnected");
             clients.delete(ws);
+        });
+
+        ws.on("error", (error) => {
+            console.error("WebSocket error:", error);
         });
     });
 
-    // Hàm gửi thông báo tới các client theo dõi businessId
+    wss.on("error", (error) => {
+        console.error("WebSocketServer error:", error);
+    });
+
     const notifyClients = (businessId) => {
         clients.forEach((trackedId, client) => {
-            if (trackedId === businessId && client.readyState === client.OPEN) {
+            if (trackedId === businessId.toString() && client.readyState === client.OPEN) {
                 client.send(
                     JSON.stringify({
                         event: "businessUpdated",
@@ -91,7 +131,6 @@ const initializeWebSocket = (server) => {
         });
     };
 
-    // Hàm gửi số lượng user tới tất cả client
     const notifyUserStats = async () => {
         try {
             const stats = await User.aggregate([
@@ -114,7 +153,6 @@ const initializeWebSocket = (server) => {
         }
     };
 
-    // Hàm gửi số lượng business tới tất cả client
     const notifyBusinessStats = async () => {
         try {
             const stats = await Business.aggregate([
@@ -137,7 +175,6 @@ const initializeWebSocket = (server) => {
         }
     };
 
-    // Hàm gửi số tiền thanh toán tới tất cả client
     const notifyPaymentStats = async () => {
         try {
             const stats = await Payment.aggregate([
@@ -159,7 +196,6 @@ const initializeWebSocket = (server) => {
             console.error("Error notifying payment stats:", error);
         }
     };
-
 
     setInterval(() => {
         notifyUserStats();

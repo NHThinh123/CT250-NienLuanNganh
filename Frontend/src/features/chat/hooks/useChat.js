@@ -53,18 +53,18 @@ const useChat = (userId, businessId, onNewMessage) => {
     useEffect(() => {
         if (!userId || !businessId) return;
 
+        // Tạo WebSocket
         wsRef.current = new WebSocket("ws://localhost:8080");
 
         wsRef.current.onopen = () => {
-
+            console.log("WebSocket connected");
             wsRef.current.send(JSON.stringify({ id: userId || businessId }));
         };
 
         wsRef.current.onmessage = (event) => {
-
+            console.log("Received message:", event.data);
             const { event: eventType, data } = JSON.parse(event.data);
             if (eventType === "receiveMessage") {
-
                 queryClient.setQueryData(["chat", userId, businessId], (old) => {
                     const oldMessages = old || [];
                     if (oldMessages.some((msg) => msg._id === data._id)) {
@@ -81,7 +81,6 @@ const useChat = (userId, businessId, onNewMessage) => {
                         return oldMessages;
                     }
                     if (senderId !== (userId || businessId) && onNewMessage) {
-
                         onNewMessage(data);
                     }
                     return [...oldMessages, data];
@@ -90,11 +89,18 @@ const useChat = (userId, businessId, onNewMessage) => {
         };
 
         wsRef.current.onclose = () => {
-
+            console.log("WebSocket closed");
         };
 
+        wsRef.current.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+
+        // Cleanup
         return () => {
-            wsRef.current.close();
+            if (wsRef.current) {
+                wsRef.current.close();
+            }
         };
     }, [userId, businessId, queryClient, onNewMessage]);
 
