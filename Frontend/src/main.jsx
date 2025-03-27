@@ -17,6 +17,7 @@ import BusinessListPage from "./pages/BusinessListPage.jsx";
 import LoginBusinessPage from "./pages/LoginBusinessPage.jsx";
 import SignupBusinessPage from "./pages/SignupBusinessPage.jsx";
 import { AuthWrapper } from "./contexts/auth.context.jsx";
+import { ChatWrapper } from "./contexts/chat.context.jsx";
 import ProfilePage from "./pages/PageProfile.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import { BusinessWrapper } from "./contexts/business.context.jsx";
@@ -212,7 +213,9 @@ createRoot(document.getElementById("root")).render(
       <AntdApp>
         <AuthWrapper>
           <BusinessWrapper>
-            <RouterProvider router={router} />
+            <ChatWrapper>
+              <RouterProvider router={router} />
+            </ChatWrapper>
           </BusinessWrapper>
         </AuthWrapper>
       </AntdApp>
