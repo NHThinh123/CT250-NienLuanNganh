@@ -27,7 +27,7 @@ function App() {
   const { chatSessions, addChatSession, removeChatSession } = useContext(ChatContext);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showBusinessList, setShowBusinessList] = useState(false);
-  const [showUserList, setShowUserList] = useState(false); // Thêm trạng thái cho UserList
+  const [showUserList, setShowUserList] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(() => {
     const saved = localStorage.getItem("unreadMessages");
     return saved ? JSON.parse(saved) : {};

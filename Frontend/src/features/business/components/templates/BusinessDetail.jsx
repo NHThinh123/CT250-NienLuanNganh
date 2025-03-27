@@ -41,6 +41,7 @@ import ChatWindow from "../../../../components/atoms/ChatWindow";
 
 const { Title, Text } = Typography;
 
+
 const CustomMarker = ({
   longitude = 0,
   latitude = 0,
@@ -49,6 +50,7 @@ const CustomMarker = ({
 }) => (
   <Marker longitude={longitude} latitude={latitude} color={color} {...props} />
 );
+
 
 const isBusinessOpen = (openHours, closeHours) => {
   if (!openHours || !closeHours) return false;
@@ -90,9 +92,9 @@ const BusinessDetail = ({
   const [open, setOpen] = useState(false);
 
   // Thêm state và context để quản lý chat
-  const { auth } = useContext(AuthContext); // Lấy thông tin user từ AuthContext
-  const { chatSessions, addChatSession, removeChatSession } = useContext(ChatContext); // Lấy chatSessions từ ChatContext
-  const [chatWindowIndex, setChatWindowIndex] = useState(0); // Để định vị trí của ChatWindow
+  const { auth } = useContext(AuthContext);
+  const { chatSessions, addChatSession, removeChatSession } = useContext(ChatContext);
+  const [chatWindowIndex, setChatWindowIndex] = useState(0);
 
   const isUserLoggedIn = auth?.isAuthenticated;
   const userId = isUserLoggedIn ? auth.user?.id : null;
@@ -178,6 +180,7 @@ const BusinessDetail = ({
   };
 
   // Hàm xử lý khi nhấn nút "Chat với doanh nghiệp"
+
   const handleChatWithBusiness = () => {
     if (!isUserLoggedIn) {
       message.warning("Vui lòng đăng nhập để sử dụng chat!");
@@ -200,6 +203,7 @@ const BusinessDetail = ({
       setChatWindowIndex(existingSessionIndex);
     }
   };
+
 
   const coordinates = businessData.address?.coordinates || [0, 0];
   const longitude = Number(coordinates[0]);
@@ -355,22 +359,25 @@ const BusinessDetail = ({
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <p style={styles.businessName}>{businessData.business_name}</p>
               {/* Thêm nút Chat với doanh nghiệp */}
-              <Button
-                type="primary"
-                onClick={handleChatWithBusiness}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  backgroundColor: "#1a73e8",
-                  borderColor: "#1a73e8",
-                  borderRadius: "5px",
-                  height: "35px",
-                }}
-              >
-                <MessageSquare size={18} />
-                Chat với doanh nghiệp
-              </Button>
+              {isUserLoggedIn && (
+                <Button
+                  type="primary"
+                  onClick={handleChatWithBusiness}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    backgroundColor: "#1a73e8",
+                    borderColor: "#1a73e8",
+                    borderRadius: "5px",
+                    height: "35px",
+                  }}
+                >
+
+                  <MessageSquare size={18} />
+                  Chat với doanh nghiệp
+                </Button>
+              )}
             </div>
             <div style={styles.businessRating}>
               <p>
