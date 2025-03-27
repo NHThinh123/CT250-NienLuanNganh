@@ -7,10 +7,7 @@ import { useAuthEntity } from "../../../hooks/useAuthEntry";
 const useComment = (post_id, enabled) => {
   const { entity } = useAuthEntity();
 
-  const queryKey = useMemo(
-    () => ["comments", post_id, entity],
-    [post_id, entity?.id]
-  );
+  const queryKey = useMemo(() => ["comments", post_id], [post_id, entity?.id]);
 
   const {
     data: commentData = [],

@@ -21,6 +21,7 @@ const commentSchema = new mongoose.Schema(
       ref: "Comment",
     },
     comment_content: { type: String, required: true },
+    isEdited: { type: Boolean, default: false }, // Thêm trường để đánh dấu đã chỉnh sửa
   },
   { timestamps: true }
 );

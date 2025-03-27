@@ -1,15 +1,30 @@
+/* eslint-disable no-unused-vars */
 import {
   CaretDownOutlined,
   CaretUpOutlined,
   CheckCircleFilled,
   HeartFilled,
   SendOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EllipsisOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Col, Form, message, Row, Typography } from "antd";
+import {
+  Avatar,
+  Button,
+  Col,
+  Form,
+  message,
+  Row,
+  Typography,
+  Dropdown,
+  Menu,
+} from "antd";
 import useLikeComment from "../../hooks/useLikeComment";
 import useUnlikeComment from "../../hooks/useUnlikeComment";
+import useUpdateComment from "../../hooks/useUpdateComment";
+import useDeleteComment from "../../hooks/useDeleteComment";
 import { useEffect, useRef, useState } from "react";
-
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
 import TextArea from "antd/es/input/TextArea";
 import CommentList from "../templates/CommentList";
@@ -22,32 +37,33 @@ import { formatTime } from "../../../../constants/formatTime";
 const Comment = ({ commentData, post_id, minWidth }) => {
   const { entity } = useAuthEntity();
   const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
 
   const { mutate: createReply } = useCreateReply(commentData?._id);
   const { mutate: likeComment } = useLikeComment(post_id);
   const { mutate: unlikeComment } = useUnlikeComment(post_id);
+  const { mutate: updateComment, isPending: isUpdating } =
+    useUpdateComment(post_id);
+  const { mutate: deleteComment, isPending: isDeleting } =
+    useDeleteComment(post_id);
+
   const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
     useState(false);
   const [isShowReply, setIsShowReply] = useState(false);
   const [isShowListReply, setIsShowListReply] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { replyData, loading } = useReplyComment(
     commentData?._id,
     isShowListReply
   );
 
-  const handleShowReply = () => {
-    setIsShowReply(!isShowReply);
-  };
-  const showLoginRequiredModal = () => {
-    setIsLoginRequiredModalOpen(true);
-  };
+  const isOwner = entity?.id === commentData?.author?.id;
 
-  const handleCancel = () => {
-    setIsLoginRequiredModalOpen(false);
-  };
+  const handleShowReply = () => setIsShowReply(!isShowReply);
+  const showLoginRequiredModal = () => setIsLoginRequiredModalOpen(true);
+  const handleCancel = () => setIsLoginRequiredModalOpen(false);
 
-  // Hành động được bảo vệ (yêu cầu đăng nhập)
   const handleAction = (action) => {
     if (!entity?.id) {
       showLoginRequiredModal();
@@ -57,20 +73,15 @@ const Comment = ({ commentData, post_id, minWidth }) => {
   };
 
   const handleLike = () => {
-    if (!commentData?.isLike)
-      likeComment({
-        id: entity.id,
-        comment_id: commentData?._id,
-      });
-    else
-      unlikeComment({
-        id: entity.id,
-        comment_id: commentData?._id,
-      });
+    if (!commentData?.isLike) {
+      likeComment({ id: entity.id, comment_id: commentData?._id });
+    } else {
+      unlikeComment({ id: entity.id, comment_id: commentData?._id });
+    }
   };
 
   const handleReply = (values) => {
-    if (!values.comment_content?.trim()) return; // Ngăn gửi nếu rỗng
+    if (!values.comment_content?.trim()) return;
     createReply(
       {
         id: entity.id,
@@ -84,11 +95,29 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           setIsShowReply(false);
           setIsShowListReply(true);
         },
-        onError: () => {
-          message.error("Error creating reply");
+        onError: () => message.error("Error creating reply"),
+      }
+    );
+  };
+
+  const handleUpdate = (values) => {
+    if (!values.comment_content?.trim()) return;
+    updateComment(
+      {
+        comment_id: commentData?._id,
+        comment_content: values.comment_content,
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+          editForm.resetFields();
         },
       }
     );
+  };
+
+  const handleDelete = () => {
+    deleteComment(commentData?._id);
   };
 
   const replyInputRef = useRef(null);
@@ -98,6 +127,20 @@ const Comment = ({ commentData, post_id, minWidth }) => {
     }
   }, [isShowReply]);
 
+  const menu = (
+    <Menu>
+      <Menu.Item
+        key="edit"
+        onClick={() => handleAction(() => setIsEditing(true))}
+      >
+        <EditOutlined /> Sửa
+      </Menu.Item>
+      <Menu.Item key="delete" onClick={() => handleAction(handleDelete)}>
+        <DeleteOutlined /> Xóa
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <Row style={{ minWidth: minWidth || "380px", margin: 0 }}>
       <Col style={{ marginRight: "10px" }}>
@@ -106,7 +149,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
             commentData?.author?.avatar ||
             "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
           }
-        ></Avatar>
+        />
       </Col>
       <Col style={{ maxWidth: "89%" }}>
         <div
@@ -128,13 +171,49 @@ const Comment = ({ commentData, post_id, minWidth }) => {
             )}
           </Typography.Text>
           <br />
-          <Typography.Text>{commentData?.comment_content}</Typography.Text>
+          {isEditing ? (
+            <Form form={editForm} onFinish={handleUpdate}>
+              <Form.Item
+                name="comment_content"
+                initialValue={commentData?.comment_content}
+                rules={[
+                  { required: true, message: "Please enter comment content" },
+                ]}
+              >
+                <TextArea autoSize={{ minRows: 1, maxRows: 5 }} />
+              </Form.Item>
+              <Button type="primary" htmlType="submit" loading={isUpdating}>
+                Lưu
+              </Button>
+              <Button
+                onClick={() => setIsEditing(false)}
+                style={{ marginLeft: 8 }}
+              >
+                Hủy
+              </Button>
+            </Form>
+          ) : (
+            <Typography.Text
+              style={{
+                color: commentData?.deleted ? "#999" : "inherit", // Nhạt màu nếu bị xóa
+                fontWeight: commentData?.deleted ? "lighter" : "normal", // Mỏng hơn nếu bị xóa
+              }}
+            >
+              {commentData?.comment_content}
+              {commentData?.isEdited && !commentData?.deleted && (
+                <span style={{ fontSize: "12px", color: "gray" }}>
+                  {" "}
+                  (đã chỉnh sửa)
+                </span>
+              )}
+            </Typography.Text>
+          )}
         </div>
-        <div style={{ display: "flex", gap: "4px" }}>
+        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
           <Typography.Text
             style={{
               padding: "0px",
-              marginTop: 10,
+
               fontSize: "12px",
               lineHeight: "1",
               color: "gray",
@@ -148,9 +227,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
             onClick={() => handleAction(handleLike)}
           >
             <HeartFilled
-              style={{
-                color: !commentData?.isLike ? "gray" : "#ff4d4f",
-              }}
+              style={{ color: !commentData?.isLike ? "gray" : "#ff4d4f" }}
             />
             <p
               style={{
@@ -172,6 +249,16 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           </Button>
         </div>
       </Col>
+      <Col span={1} style={{ textAlign: "right", marginLeft: 4 }}>
+        {isOwner && !commentData?.deleted && !isEditing && (
+          <Dropdown overlay={menu} trigger={["hover"]}>
+            <Button type="link" style={{ padding: "0px", fontSize: "12px" }}>
+              <EllipsisOutlined style={{ fontSize: "18px", color: "#555" }} />{" "}
+              {/* Đậm hơn */}
+            </Button>
+          </Dropdown>
+        )}
+      </Col>
 
       {commentData?.replyCount > 0 && (
         <Col span={24} style={{ marginBottom: "4px" }}>
@@ -181,13 +268,10 @@ const Comment = ({ commentData, post_id, minWidth }) => {
               <Button
                 type="link"
                 style={{ padding: "0px", fontSize: "12px" }}
-                onClick={() => {
-                  setIsShowListReply(!isShowListReply);
-                }}
+                onClick={() => setIsShowListReply(!isShowListReply)}
               >
                 {!isShowListReply ? (
                   <p>
-                    {" "}
                     <CaretDownOutlined /> Xem {commentData.replyCount} phản hồi
                   </p>
                 ) : (
@@ -203,7 +287,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
       {isShowListReply && (
         <Col span={24}>
           {loading ? (
-            <> đang tải phản hồi</>
+            <>đang tải phản hồi</>
           ) : (
             <Row>
               <Col span={2}></Col>
@@ -224,7 +308,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           <Row>
             <Col span={1}></Col>
             <Col span={2} style={{ textAlign: "center" }}>
-              <Avatar size={"small"} src={entity.avatar}></Avatar>
+              <Avatar size={"small"} src={entity.avatar} />
             </Col>
             <Col span={20}>
               <div
@@ -254,10 +338,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
                       <Form.Item noStyle>
                         <Button type="text" htmlType="submit">
                           <SendOutlined
-                            style={{
-                              fontSize: "20px",
-                              color: "#1890ff",
-                            }}
+                            style={{ fontSize: "20px", color: "#1890ff" }}
                           />
                         </Button>
                       </Form.Item>

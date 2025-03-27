@@ -24,7 +24,6 @@ const createCommentService = async (
 
   const objectId = new mongoose.Types.ObjectId(id);
 
-  // Check if id belongs to user or business
   const user = await User.findById(objectId);
   const business = await Business.findById(objectId);
 
@@ -51,76 +50,87 @@ const getListCommentByPostService = async (query) => {
   const isValidId = id ? mongoose.Types.ObjectId.isValid(id) : false;
   const objectId = isValidId ? new mongoose.Types.ObjectId(id) : null;
 
-  let comments = await Comment.aggregate([
-    { $match: { post_id: new mongoose.Types.ObjectId(post_id) } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "user_id",
-        foreignField: "_id",
-        as: "user",
+  let comments = await Comment.collection
+    .aggregate([
+      { $match: { post_id: new mongoose.Types.ObjectId(post_id) } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_id",
+          foreignField: "_id",
+          as: "user",
+        },
       },
-    },
-    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "businesses",
-        localField: "business_id",
-        foreignField: "_id",
-        as: "business",
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "businesses",
+          localField: "business_id",
+          foreignField: "_id",
+          as: "business",
+        },
       },
-    },
-    { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "user_like_comments",
-        localField: "_id",
-        foreignField: "comment_id",
-        as: "likes",
+      { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "user_like_comments",
+          localField: "_id",
+          foreignField: "comment_id",
+          as: "likes",
+        },
       },
-    },
-    {
-      $addFields: {
-        likeCount: { $size: "$likes" },
-        isLike: isValidId
-          ? {
-              $or: [
-                { $in: [objectId, "$likes.user_id"] },
-                { $in: [objectId, "$likes.business_id"] },
-              ],
-            }
-          : false,
-        author: {
-          $cond: {
-            if: { $ne: ["$user_id", null] },
-            then: {
-              id: "$user_id",
-              name: "$user.name",
-              avatar: "$user.avatar",
-              isBusiness: false,
+      {
+        $addFields: {
+          likeCount: { $size: "$likes" },
+          isLike: isValidId
+            ? {
+                $or: [
+                  { $in: [objectId, "$likes.user_id"] },
+                  { $in: [objectId, "$likes.business_id"] },
+                ],
+              }
+            : false,
+          author: {
+            $cond: {
+              if: { $ne: ["$user_id", null] },
+              then: {
+                id: "$user_id",
+                name: "$user.name",
+                avatar: "$user.avatar",
+                isBusiness: false,
+              },
+              else: {
+                id: "$business_id",
+                name: "$business.business_name",
+                avatar: "$business.avatar",
+                isBusiness: true,
+              },
             },
-            else: {
-              id: "$business_id",
-              name: "$business.business_name",
-              avatar: "$business.avatar",
-              isBusiness: true,
+          },
+          comment_content: {
+            $cond: {
+              if: "$deleted",
+              then: "(bình luận đã bị xóa)",
+              else: "$comment_content",
             },
           },
         },
       },
-    },
-    { $sort: { createdAt: -1 } },
-    {
-      $project: {
-        author: 1,
-        comment_content: 1,
-        createdAt: 1,
-        likeCount: 1,
-        isLike: 1,
-        parent_comment_id: 1,
+      { $sort: { createdAt: -1 } },
+      {
+        $project: {
+          author: 1,
+          comment_content: 1,
+          createdAt: 1,
+          likeCount: 1,
+          isLike: 1,
+          parent_comment_id: 1,
+          isEdited: 1,
+          deleted: 1,
+        },
       },
-    },
-  ]);
+    ])
+    .toArray();
 
   let parentComments = comments.filter((c) => !c.parent_comment_id);
   let result = parentComments.map((comment) => ({
@@ -141,130 +151,154 @@ const getCommentByIdService = async (comment_id, id) => {
   const isValidId = id ? mongoose.Types.ObjectId.isValid(id) : false;
   const objectId = isValidId ? new mongoose.Types.ObjectId(id) : null;
 
-  let result = await Comment.aggregate([
-    { $match: { _id: new mongoose.Types.ObjectId(comment_id) } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "user_id",
-        foreignField: "_id",
-        as: "user",
+  let result = await Comment.collection
+    .aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(comment_id) } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_id",
+          foreignField: "_id",
+          as: "user",
+        },
       },
-    },
-    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "businesses",
-        localField: "business_id",
-        foreignField: "_id",
-        as: "business",
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "businesses",
+          localField: "business_id",
+          foreignField: "_id",
+          as: "business",
+        },
       },
-    },
-    { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "user_like_comments",
-        localField: "_id",
-        foreignField: "comment_id",
-        as: "likes",
+      { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "user_like_comments",
+          localField: "_id",
+          foreignField: "comment_id",
+          as: "likes",
+        },
       },
-    },
-    {
-      $addFields: {
-        likeCount: { $size: "$likes" },
-        isLike: isValidId
-          ? {
-              $or: [
-                { $in: [objectId, "$likes.user_id"] },
-                { $in: [objectId, "$likes.business_id"] },
-              ],
-            }
-          : false,
-        author: {
-          $cond: {
-            if: { $ne: ["$user_id", null] },
-            then: {
-              id: "$user_id",
-              name: "$user.name",
-              avatar: "$user.avatar",
-              isBusiness: false,
+      {
+        $addFields: {
+          likeCount: { $size: "$likes" },
+          isLike: isValidId
+            ? {
+                $or: [
+                  { $in: [objectId, "$likes.user_id"] },
+                  { $in: [objectId, "$likes.business_id"] },
+                ],
+              }
+            : false,
+          author: {
+            $cond: {
+              if: { $ne: ["$user_id", null] },
+              then: {
+                id: "$user_id",
+                name: "$user.name",
+                avatar: "$user.avatar",
+                isBusiness: false,
+              },
+              else: {
+                id: "$business_id",
+                name: "$business.business_name",
+                avatar: "$business.avatar",
+                isBusiness: true,
+              },
             },
-            else: {
-              id: "$business_id",
-              name: "$business.business_name",
-              avatar: "$business.avatar",
-              isBusiness: true,
+          },
+          comment_content: {
+            $cond: {
+              if: "$deleted",
+              then: "(bình luận đã bị xóa)",
+              else: "$comment_content",
             },
           },
         },
       },
-    },
-    {
-      $project: {
-        author: 1,
-        comment_content: 1,
-        createdAt: 1,
-        likeCount: 1,
-        isLike: 1,
-        parent_comment_id: 1,
+      {
+        $project: {
+          author: 1,
+          comment_content: 1,
+          createdAt: 1,
+          likeCount: 1,
+          isLike: 1,
+          parent_comment_id: 1,
+          isEdited: 1,
+          deleted: 1,
+        },
       },
-    },
-  ]);
+    ])
+    .toArray();
 
   if (!result || result.length === 0) {
     throw new AppError("Comment not found", 404);
   }
 
-  let replies = await Comment.aggregate([
-    { $match: { parent_comment_id: new mongoose.Types.ObjectId(comment_id) } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "user_id",
-        foreignField: "_id",
-        as: "user",
+  let replies = await Comment.collection
+    .aggregate([
+      {
+        $match: { parent_comment_id: new mongoose.Types.ObjectId(comment_id) },
       },
-    },
-    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "businesses",
-        localField: "business_id",
-        foreignField: "_id",
-        as: "business",
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_id",
+          foreignField: "_id",
+          as: "user",
+        },
       },
-    },
-    { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
-    {
-      $addFields: {
-        author: {
-          $cond: {
-            if: { $ne: ["$user_id", null] },
-            then: {
-              id: "$user_id",
-              name: "$user.name",
-              avatar: "$user.avatar",
-              isBusiness: false,
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "businesses",
+          localField: "business_id",
+          foreignField: "_id",
+          as: "business",
+        },
+      },
+      { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          author: {
+            $cond: {
+              if: { $ne: ["$user_id", null] },
+              then: {
+                id: "$user_id",
+                name: "$user.name",
+                avatar: "$user.avatar",
+                isBusiness: false,
+              },
+              else: {
+                id: "$business_id",
+                name: "$business.business_name",
+                avatar: "$business.avatar",
+                isBusiness: true,
+              },
             },
-            else: {
-              id: "$business_id",
-              name: "$business.business_name",
-              avatar: "$business.avatar",
-              isBusiness: true,
+          },
+          comment_content: {
+            $cond: {
+              if: "$deleted",
+              then: "(bình luận đã bị xóa)",
+              else: "$comment_content",
             },
           },
         },
       },
-    },
-    {
-      $project: {
-        author: 1,
-        comment_content: 1,
-        createdAt: 1,
-        parent_comment_id: 1,
+      {
+        $project: {
+          author: 1,
+          comment_content: 1,
+          createdAt: 1,
+          parent_comment_id: 1,
+          isEdited: 1,
+          deleted: 1,
+        },
       },
-    },
-  ]);
+    ])
+    .toArray();
 
   return { ...result[0], replies };
 };
@@ -278,75 +312,88 @@ const getReplyByCommentService = async (query) => {
   const isValidId = id ? mongoose.Types.ObjectId.isValid(id) : false;
   const objectId = isValidId ? new mongoose.Types.ObjectId(id) : null;
 
-  let replies = await Comment.aggregate([
-    { $match: { parent_comment_id: new mongoose.Types.ObjectId(comment_id) } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "user_id",
-        foreignField: "_id",
-        as: "user",
+  let replies = await Comment.collection
+    .aggregate([
+      {
+        $match: { parent_comment_id: new mongoose.Types.ObjectId(comment_id) },
       },
-    },
-    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "businesses",
-        localField: "business_id",
-        foreignField: "_id",
-        as: "business",
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_id",
+          foreignField: "_id",
+          as: "user",
+        },
       },
-    },
-    { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "user_like_comments",
-        localField: "_id",
-        foreignField: "comment_id",
-        as: "likes",
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "businesses",
+          localField: "business_id",
+          foreignField: "_id",
+          as: "business",
+        },
       },
-    },
-    {
-      $addFields: {
-        likeCount: { $size: "$likes" },
-        isLike: isValidId
-          ? {
-              $or: [
-                { $in: [objectId, "$likes.user_id"] },
-                { $in: [objectId, "$likes.business_id"] },
-              ],
-            }
-          : false,
-        author: {
-          $cond: {
-            if: { $ne: ["$user_id", null] },
-            then: {
-              id: "$user_id",
-              name: "$user.name",
-              avatar: "$user.avatar",
-              isBusiness: false,
+      { $unwind: { path: "$business", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "user_like_comments",
+          localField: "_id",
+          foreignField: "comment_id",
+          as: "likes",
+        },
+      },
+      {
+        $addFields: {
+          likeCount: { $size: "$likes" },
+          isLike: isValidId
+            ? {
+                $or: [
+                  { $in: [objectId, "$likes.user_id"] },
+                  { $in: [objectId, "$likes.business_id"] },
+                ],
+              }
+            : false,
+          author: {
+            $cond: {
+              if: { $ne: ["$user_id", null] },
+              then: {
+                id: "$user_id",
+                name: "$user.name",
+                avatar: "$user.avatar",
+                isBusiness: false,
+              },
+              else: {
+                id: "$business_id",
+                name: "$business.business_name",
+                avatar: "$business.avatar",
+                isBusiness: true,
+              },
             },
-            else: {
-              id: "$business_id",
-              name: "$business.business_name",
-              avatar: "$business.avatar",
-              isBusiness: true,
+          },
+          comment_content: {
+            $cond: {
+              if: "$deleted",
+              then: "(bình luận đã bị xóa)",
+              else: "$comment_content",
             },
           },
         },
       },
-    },
-    {
-      $project: {
-        author: 1,
-        comment_content: 1,
-        createdAt: 1,
-        likeCount: 1,
-        isLike: 1,
-        parent_comment_id: 1,
+      {
+        $project: {
+          author: 1,
+          comment_content: 1,
+          createdAt: 1,
+          likeCount: 1,
+          isLike: 1,
+          parent_comment_id: 1,
+          isEdited: 1,
+          deleted: 1,
+        },
       },
-    },
-  ]);
+    ])
+    .toArray();
 
   for (let reply of replies) {
     let replyCount = await Comment.countDocuments({
@@ -363,9 +410,16 @@ const updateCommentService = async (comment_id, dataUpdate) => {
     throw new AppError("Invalid comment ID", 400);
   }
 
-  let result = await Comment.findOneAndUpdate({ _id: comment_id }, dataUpdate, {
-    new: true,
-  });
+  const { comment_content } = dataUpdate;
+  if (!comment_content) {
+    throw new AppError("Comment content is required", 400);
+  }
+
+  let result = await Comment.findOneAndUpdate(
+    { _id: comment_id },
+    { comment_content, isEdited: true },
+    { new: true }
+  );
 
   if (!result) {
     throw new AppError("Comment not found", 404);
@@ -379,7 +433,7 @@ const deleteCommentService = async (comment_id) => {
   if (!comment) {
     throw new AppError("Comment not found", 404);
   }
-  let result = comment.delete();
+  let result = await comment.delete();
   return result;
 };
 
