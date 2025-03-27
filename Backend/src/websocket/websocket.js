@@ -1,3 +1,4 @@
+// websocket/websocket.js
 const { WebSocketServer } = require("ws");
 const User = require("../models/user.model");
 const Business = require("../models/business.model");
@@ -47,8 +48,8 @@ const initializeWebSocket = (server) => {
         Payment.aggregate([
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$paymentDate" } }, // Nhóm theo ngày
-                    totalAmount: { $sum: "$amount" }, // Tính tổng amount
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$paymentDate" } },
+                    totalAmount: { $sum: "$amount" },
                 },
             },
             { $sort: { _id: 1 } },
@@ -64,6 +65,10 @@ const initializeWebSocket = (server) => {
             const data = JSON.parse(message);
             if (data.businessId) {
                 clients.set(ws, data.businessId); // Lưu ID của business mà client theo dõi
+            }
+            // Thêm logic cho chat: Lưu ID của user hoặc business
+            if (data.id) {
+                clients.set(ws, data.id.toString());
             }
         });
 
@@ -138,8 +143,8 @@ const initializeWebSocket = (server) => {
             const stats = await Payment.aggregate([
                 {
                     $group: {
-                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$paymentDate" } }, // Nhóm theo ngày
-                        totalAmount: { $sum: "$amount" }, // Tính tổng amount
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$paymentDate" } },
+                        totalAmount: { $sum: "$amount" },
                     },
                 },
                 { $sort: { _id: 1 } },
@@ -155,14 +160,21 @@ const initializeWebSocket = (server) => {
         }
     };
 
-    // Gửi dữ liệu định kỳ (mỗi 1 phút)
+
     setInterval(() => {
         notifyUserStats();
         notifyBusinessStats();
         notifyPaymentStats();
     }, 60000);
 
-    return { notifyClients, notifyUserStats, notifyBusinessStats, notifyPaymentStats };
+    return {
+        wss,
+        clients,
+        notifyClients,
+        notifyUserStats,
+        notifyBusinessStats,
+        notifyPaymentStats,
+    };
 };
 
 module.exports = initializeWebSocket;

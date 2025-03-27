@@ -11,24 +11,29 @@ const { Option } = Select;
 const ProfileBusinessForm = ({ business, onCancel }) => {
     const [form] = Form.useForm();
     const { business: businessData, setBusiness } = useContext(BusinessContext);
-    const updateProfile = useUpdateProfileBusiness();
+    const updateProfile = useUpdateProfileBusiness({
+        onSuccess: (res) => {
+            console.log("onSuccess:", res); // Debug
+            const updatedBusiness = { ...businessData, business: { ...businessData.business, ...res.business } };
+            setBusiness(updatedBusiness);
+            localStorage.setItem("authBusiness", JSON.stringify(updatedBusiness));
+            onCancel();
+        },
+        onError: (error) => {
+            console.log("onError:", error.message); // Debug
+        },
+    });
 
-    // Trạng thái để lưu tọa độ từ bản đồ
-    const [coordinates, setCoordinates] = useState(
-        business.address?.coordinates || [106.6297, 10.8231]
-    );
+    const [coordinates, setCoordinates] = useState(business.address?.coordinates || [106.6297, 10.8231]);
     const [longitude, latitude] = coordinates;
-
-    // Trạng thái cho bản đồ viewport
     const [viewport, setViewport] = useState({
         longitude,
         latitude,
         zoom: 14,
     });
 
-    const mapboxToken = import.meta.env.VITE_TOKENMAPBOX; // Lấy token từ .env
+    const mapboxToken = import.meta.env.VITE_TOKENMAPBOX;
 
-    // Trạng thái cho danh sách địa chỉ
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
@@ -36,14 +41,12 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
     const [selectedDistrict, setSelectedDistrict] = useState(null);
     const [selectedWard, setSelectedWard] = useState(null);
 
-    // Debug log
     useEffect(() => {
         console.log("Mapbox Token:", mapboxToken);
         console.log("Coordinates:", coordinates);
         console.log("Viewport:", viewport);
     }, [mapboxToken, coordinates, viewport]);
 
-    // Fetch danh sách tỉnh/thành phố
     useEffect(() => {
         const fetchProvinces = async () => {
             try {
@@ -58,7 +61,6 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
         fetchProvinces();
     }, []);
 
-    // Fetch danh sách quận/huyện khi chọn tỉnh
     useEffect(() => {
         if (selectedProvince) {
             const fetchDistricts = async () => {
@@ -82,7 +84,6 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
         }
     }, [selectedProvince, provinces]);
 
-    // Fetch danh sách phường/xã khi chọn quận/huyện
     useEffect(() => {
         if (selectedDistrict) {
             const fetchWards = async () => {
@@ -107,7 +108,6 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
         }
     }, [selectedDistrict, districts, provinces]);
 
-    // Điều chỉnh bản đồ khi chọn phường/xã
     useEffect(() => {
         if (selectedWard) {
             const fullAddress = `${wards.find((w) => w.code === selectedWard)?.name}, ${districts.find((d) => d.code === selectedDistrict)?.name
@@ -116,7 +116,6 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
         }
     }, [selectedWard, wards, districts, provinces]);
 
-    // Hàm điều chỉnh bản đồ dựa trên địa chỉ
     const adjustMapToAddress = async (addressName) => {
         if (!addressName) return;
         try {
@@ -134,15 +133,12 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
                     latitude: lat,
                     zoom: selectedWard ? 14 : selectedDistrict ? 12 : selectedProvince ? 10 : 5,
                 });
-            } else {
-                console.warn("Không tìm thấy tọa độ cho:", addressName);
             }
         } catch (error) {
             console.error("Lỗi khi điều chỉnh bản đồ:", error);
         }
     };
 
-    // Cập nhật tọa độ khi người dùng nhấp vào bản đồ
     const handleMapClick = (event) => {
         const { lng, lat } = event.lngLat;
         setCoordinates([lng, lat]);
@@ -157,7 +153,7 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
         });
     };
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = (values) => {
         const provinceName = provinces.find((p) => p.code === selectedProvince)?.name || "";
         const districtName = districts.find((d) => d.code === selectedDistrict)?.name || "";
         const wardName = wards.find((w) => w.code === selectedWard)?.name || "";
@@ -175,17 +171,18 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
             close_hours: values.close_hours,
         };
 
-        try {
-            const res = await updateProfile.mutateAsync({ id: business.id, data: updatedData });
-            const updatedBusiness = { ...businessData, business: { ...businessData.business, ...res.business } };
-            setBusiness(updatedBusiness);
-            localStorage.setItem("authBusiness", JSON.stringify(updatedBusiness));
-            message.success("Cập nhật thông tin thành công!");
-            onCancel();
-        } catch (error) {
-            message.error("Cập nhật thất bại, vui lòng thử lại.");
-            console.error("Lỗi cập nhật business:", error);
+        // Thêm mật khẩu nếu có
+        if (values.oldPassword || values.newPassword) {
+            if (!values.oldPassword || !values.newPassword) {
+                message.error("Vui lòng nhập cả mật khẩu cũ và mới để đổi mật khẩu!");
+                return;
+            }
+            updatedData.oldPassword = values.oldPassword;
+            updatedData.newPassword = values.newPassword;
         }
+
+        console.log("Gửi dữ liệu:", updatedData); // Debug
+        updateProfile.mutate({ id: business.id, data: updatedData });
     };
 
     return (
@@ -219,14 +216,39 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
             <Form.Item label="Giờ đóng cửa" name="close_hours">
                 <Input placeholder="VD: 10:00 PM" />
             </Form.Item>
+            <Form.Item
+                label="Mật khẩu cũ"
+                name="oldPassword"
+                rules={[
+                    {
+                        required: !!form.getFieldValue("newPassword"),
+                        message: "Vui lòng nhập mật khẩu cũ khi đổi mật khẩu!",
+                    },
+                ]}
+            >
+                <Input.Password placeholder="Nhập mật khẩu cũ" />
+            </Form.Item>
+            <Form.Item
+                label="Mật khẩu mới"
+                name="newPassword"
+                rules={[
+                    {
+                        required: !!form.getFieldValue("oldPassword"),
+                        message: "Vui lòng nhập mật khẩu mới khi đổi mật khẩu!",
+                    },
+                    {
+                        pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$#!%*?&]{8,}$/,
+                        message:
+                            "Mật khẩu phải dài ít nhất 8 ký tự, chứa 1 chữ cái in hoa, 1 số và 1 ký tự đặc biệt trong @$!%*?&#!",
+                    },
+                ]}
+            >
+                <Input.Password placeholder="Nhập mật khẩu mới" />
+            </Form.Item>
 
             <Row gutter={16}>
                 <Col xs={24} sm={8}>
-                    <Form.Item
-                        label="Tỉnh/Thành phố"
-                        name="province"
-                        rules={[{ required: false, message: "Vui lòng chọn tỉnh/thành phố!" }]}
-                    >
+                    <Form.Item label="Tỉnh/Thành phố" name="province">
                         <Select
                             size="large"
                             placeholder="Chọn tỉnh/thành phố"
@@ -247,11 +269,7 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
                     </Form.Item>
                 </Col>
                 <Col xs={24} sm={8}>
-                    <Form.Item
-                        label="Quận/Huyện"
-                        name="district"
-                        rules={[{ required: false, message: "Vui lòng chọn quận/huyện!" }]}
-                    >
+                    <Form.Item label="Quận/Huyện" name="district">
                         <Select
                             size="large"
                             placeholder="Chọn quận/huyện"
@@ -272,11 +290,7 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
                     </Form.Item>
                 </Col>
                 <Col xs={24} sm={8}>
-                    <Form.Item
-                        label="Phường/Xã"
-                        name="ward"
-                        rules={[{ required: false, message: "Vui lòng chọn phường/xã!" }]}
-                    >
+                    <Form.Item label="Phường/Xã" name="ward">
                         <Select
                             size="large"
                             placeholder="Chọn phường/xã"
@@ -293,7 +307,6 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
                     </Form.Item>
                 </Col>
             </Row>
-
 
             <Form.Item label="Chọn vị trí trên bản đồ">
                 {mapboxToken && !isNaN(longitude) && !isNaN(latitude) ? (

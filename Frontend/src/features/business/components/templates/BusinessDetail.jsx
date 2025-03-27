@@ -26,14 +26,18 @@ import {
   MessageCircle,
   AlignJustify,
   Check,
+  MessageSquare, // Thêm icon cho nút chat
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import ProfileBusinessPage from "../../../../pages/ProfileBusinessPage";
 import { Map as ReactMapGL, Marker } from "react-map-gl";
 import { useNavigate } from "react-router-dom";
 import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
+import { AuthContext } from "../../../../contexts/auth.context";
+import { ChatContext } from "../../../../contexts/chat.context";
+import ChatWindow from "../../../../components/atoms/ChatWindow";
 
 const { Title, Text } = Typography;
 
@@ -47,20 +51,18 @@ const CustomMarker = ({
 );
 
 const isBusinessOpen = (openHours, closeHours) => {
-  if (!openHours || !closeHours) return false; // Nếu không có giờ, mặc định là đóng
+  if (!openHours || !closeHours) return false;
 
   const now = new Date();
   const currentHours = now.getHours();
   const currentMinutes = now.getMinutes();
   const currentTimeInMinutes = currentHours * 60 + currentMinutes;
 
-  // Chuyển đổi openHours và closeHours sang phút
   const [openHour, openMinute] = openHours.split(":").map(Number);
   const [closeHour, closeMinute] = closeHours.split(":").map(Number);
   const openTimeInMinutes = openHour * 60 + openMinute;
   const closeTimeInMinutes = closeHour * 60 + closeMinute;
 
-  // Xử lý trường hợp giờ đóng cửa vượt qua nửa đêm (ví dụ: 06:00 - 02:00)
   if (closeTimeInMinutes < openTimeInMinutes) {
     return (
       currentTimeInMinutes >= openTimeInMinutes ||
@@ -68,7 +70,6 @@ const isBusinessOpen = (openHours, closeHours) => {
     );
   }
 
-  // Trường hợp bình thường (ví dụ: 08:00 - 22:00)
   return (
     currentTimeInMinutes >= openTimeInMinutes &&
     currentTimeInMinutes < closeTimeInMinutes
@@ -88,23 +89,35 @@ const BusinessDetail = ({
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
+  // Thêm state và context để quản lý chat
+  const { auth } = useContext(AuthContext); // Lấy thông tin user từ AuthContext
+  const { chatSessions, addChatSession, removeChatSession } = useContext(ChatContext); // Lấy chatSessions từ ChatContext
+  const [chatWindowIndex, setChatWindowIndex] = useState(0); // Để định vị trí của ChatWindow
+
+  const isUserLoggedIn = auth?.isAuthenticated;
+  const userId = isUserLoggedIn ? auth.user?.id : null;
+
   const formatPrice = (price) => {
     if (typeof price !== "number" || isNaN(price)) {
       return "N/A";
     }
     return price.toLocaleString("vi-VN");
   };
+
   const showDrawer = () => {
     setOpen(true);
   };
+
   const onClose = () => {
     setOpen(false);
   };
+
   const containerStyle = {
     position: "relative",
     height: 50,
     overflow: "hidden",
   };
+
   const formatDate = (date) => {
     if (!date) return "Chưa có thông tin";
     return new Date(date).toLocaleDateString("vi-VN", {
@@ -114,7 +127,6 @@ const BusinessDetail = ({
     });
   };
 
-  // Hàm tính số ngày còn lại đến hạn thanh toán
   const getDaysUntilDueDate = () => {
     if (!businessData.nextPaymentDueDate) return Infinity;
     const today = new Date();
@@ -151,7 +163,6 @@ const BusinessDetail = ({
     const daysUntilDue = getDaysUntilDueDate();
 
     if (daysUntilDue <= 3) {
-      // Nếu còn 3 ngày trở lại, cho phép thanh toán
       navigate(`/subscription/plans/${businessData._id}`, {
         state: {
           businessId: businessData._id,
@@ -162,8 +173,31 @@ const BusinessDetail = ({
       });
       setIsPaymentModalOpen(false);
     } else {
-      // Nếu còn hơn 3 ngày, hiển thị thông báo
       message.warning("Chưa đến hạn thanh toán!");
+    }
+  };
+
+  // Hàm xử lý khi nhấn nút "Chat với doanh nghiệp"
+  const handleChatWithBusiness = () => {
+    if (!isUserLoggedIn) {
+      message.warning("Vui lòng đăng nhập để sử dụng chat!");
+      return;
+    }
+
+    const businessId = businessData._id;
+    const businessName = businessData.business_name;
+    const avatar = businessData.avatar;
+
+    // Kiểm tra xem phiên chat đã tồn tại chưa
+    if (!chatSessions.some((session) => session.userId === userId && session.businessId === businessId)) {
+      addChatSession(userId, businessId, businessName, null, avatar);
+      setChatWindowIndex(chatSessions.length); // Đặt vị trí cho ChatWindow
+    } else {
+      // Nếu phiên chat đã tồn tại, tìm index của phiên chat để đặt vị trí ChatWindow
+      const existingSessionIndex = chatSessions.findIndex(
+        (session) => session.userId === userId && session.businessId === businessId
+      );
+      setChatWindowIndex(existingSessionIndex);
     }
   };
 
@@ -318,8 +352,25 @@ const BusinessDetail = ({
                 ]}
               />
             </div>
-            <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <p style={styles.businessName}>{businessData.business_name}</p>
+              {/* Thêm nút Chat với doanh nghiệp */}
+              <Button
+                type="primary"
+                onClick={handleChatWithBusiness}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                  backgroundColor: "#1a73e8",
+                  borderColor: "#1a73e8",
+                  borderRadius: "5px",
+                  height: "35px",
+                }}
+              >
+                <MessageSquare size={18} />
+                Chat với doanh nghiệp
+              </Button>
             </div>
             <div style={styles.businessRating}>
               <p>
@@ -372,8 +423,8 @@ const BusinessDetail = ({
                       businessData.open_hours,
                       businessData.close_hours
                     )
-                      ? "#52c41a" // Màu xanh nếu đang mở
-                      : "#ff4d4f", // Màu đỏ nếu đã đóng
+                      ? "#52c41a"
+                      : "#ff4d4f",
                     fontWeight: "bold",
                   }}
                 >
@@ -434,6 +485,29 @@ const BusinessDetail = ({
         </Col>
         <Col span={2}></Col>
       </Row>
+
+      {/* Hiển thị ChatWindow nếu có phiên chat với business này */}
+      {chatSessions.some(
+        (session) =>
+          session.userId === userId && session.businessId === businessData._id
+      ) && (
+          <ChatWindow
+            userId={userId}
+            businessId={businessData._id}
+            businessName={businessData.business_name}
+            userName={null}
+            avatar={businessData.avatar}
+            onClose={() => removeChatSession(userId, businessData._id)}
+            onNewMessage={(newMessage) => {
+              console.log("New message:", newMessage);
+            }}
+            style={{
+              bottom: 80 + chatWindowIndex * 50,
+              right: 20,
+              zIndex: 1000,
+            }}
+          />
+        )}
 
       <Modal
         title="Chỉnh sửa thông tin doanh nghiệp"
@@ -706,8 +780,8 @@ const styles = {
     width: "100%",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center", // Căn giữa theo chiều dọc
-    height: "100%", // Đảm bảo chiều cao để căn giữa
+    justifyContent: "center",
+    height: "100%",
   },
   businessBreadcrumb: {
     marginBottom: "7px",

@@ -1,15 +1,20 @@
+// App.jsx
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { Layout, Button, Space, Avatar, Dropdown, Spin, message } from "antd";
-import { UserOutlined } from "@ant-design/icons";
-import { useContext, useState } from "react";
+import { Layout, Button, Space, Avatar, Dropdown, Spin, message, Badge } from "antd";
+import { UserOutlined, MessageOutlined } from "@ant-design/icons";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "./contexts/auth.context";
 import { BusinessContext } from "./contexts/business.context";
+import { ChatContext } from "./contexts/chat.context";
 import NavBar from "./components/templates/NavBar";
 import logo from "../src/assets/logo/logo.png";
 import Footer from "./components/templates/Footer";
 import ScrollToTop from "./components/atoms/ScrollToTop";
 import ScrollToTopButton from "./components/atoms/ScrollToTopButton";
-import Sidebar from "./components/templates/SideBar"; // Đảm bảo import đúng
+import Sidebar from "./components/templates/SideBar";
+import ChatWindow from "./components/atoms/ChatWindow";
+import BusinessList from "./features/chat/components/templates/BusinessList";
+import UserList from "./features/chat/components/templates/UserList";
 import "antd/dist/reset.css";
 
 const { Header, Content, Sider } = Layout;
@@ -19,7 +24,14 @@ function App() {
   const location = useLocation();
   const { auth, setAuth } = useContext(AuthContext);
   const { business, setBusiness } = useContext(BusinessContext);
+  const { chatSessions, addChatSession, removeChatSession } = useContext(ChatContext);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showBusinessList, setShowBusinessList] = useState(false);
+  const [showUserList, setShowUserList] = useState(false); // Thêm trạng thái cho UserList
+  const [unreadMessages, setUnreadMessages] = useState(() => {
+    const saved = localStorage.getItem("unreadMessages");
+    return saved ? JSON.parse(saved) : {};
+  });
 
   const isUserLoggedIn = auth?.isAuthenticated;
   const isBusinessLoggedIn = business?.isAuthenticated;
@@ -35,6 +47,13 @@ function App() {
     : isBusinessLoggedIn
       ? business.business?.business_name
       : "";
+
+  const userId = isUserLoggedIn ? auth.user?.id : null;
+  const businessId = isBusinessLoggedIn ? business.business?.id : null;
+
+  useEffect(() => {
+    localStorage.setItem("unreadMessages", JSON.stringify(unreadMessages));
+  }, [unreadMessages]);
 
   const handleLogout = () => {
     setIsLoggingOut(true);
@@ -85,6 +104,90 @@ function App() {
   const isAdminTablePage = location.pathname === "/admintable";
   const isAdminAddPage = location.pathname === "/adminadd";
   const isAdminBillingPage = location.pathname === "/adminbilling";
+  const isAdminRoute = isAdminPage || isAdminTablePage || isAdminAddPage || isAdminBillingPage;
+
+  const handleOpenChat = () => {
+    if (!userId && !businessId) {
+      message.warning("Vui lòng đăng nhập để sử dụng chat!");
+      return;
+    }
+    if (isUserLoggedIn) {
+      setShowBusinessList(true);
+    } else if (isBusinessLoggedIn) {
+      setShowUserList(true);
+    }
+  };
+
+  const handleSelectBusiness = ({ businessId, businessName, avatar }) => {
+    if (userId) {
+      if (!chatSessions.some((session) => session.userId === userId && session.businessId === businessId)) {
+        addChatSession(userId, businessId, businessName, avatar);
+      }
+      setShowBusinessList(false);
+    } else {
+      message.error("Không tìm thấy userId!");
+    }
+  };
+
+  const handleSelectUser = ({ userId, userName, avatar }) => {
+    if (businessId) {
+      if (!chatSessions.some((session) => session.businessId === businessId && session.userId === userId)) {
+        addChatSession(userId, businessId, userName, avatar);
+      }
+      setShowUserList(false);
+    } else {
+      message.error("Không tìm thấy businessId!");
+    }
+  };
+
+  const handleNewMessage = (newMessage, businessId, userId, name, avatar) => {
+    if (isUserLoggedIn) {
+      if (!chatSessions.some((session) => session.businessId === businessId)) {
+        addChatSession(userId, businessId, name, avatar);
+      }
+    } else if (isBusinessLoggedIn) {
+      if (!chatSessions.some((session) => session.userId === userId)) {
+        addChatSession(userId, businessId, name, avatar);
+      }
+    }
+
+    // Log newMessage để debug
+    console.log("New message received:", newMessage);
+
+    // Kiểm tra newMessage và các thuộc tính trước khi truy cập
+    if (!newMessage || !newMessage.senderId || !newMessage.receiverId) {
+      console.error("Invalid newMessage structure:", newMessage);
+      return;
+    }
+
+    const senderId = typeof newMessage.senderId === "object" && newMessage.senderId?._id
+      ? newMessage.senderId._id
+      : newMessage.senderId;
+    const receiverId = typeof newMessage.receiverId === "object" && newMessage.receiverId?._id
+      ? newMessage.receiverId._id
+      : newMessage.receiverId;
+
+    // Kiểm tra senderId và receiverId
+    if (!senderId || !receiverId) {
+      console.error("Missing senderId or receiverId:", { senderId, receiverId });
+      return;
+    }
+
+    const targetId = isUserLoggedIn ? businessId : userId;
+    if (!newMessage.isRead && senderId !== (isUserLoggedIn ? userId : businessId)) {
+      setUnreadMessages((prev) => {
+        const newUnreadMessages = {
+          ...prev,
+          [targetId]: (prev[targetId] || 0) + 1,
+        };
+        console.log("Updated unreadMessages:", newUnreadMessages);
+        return newUnreadMessages;
+      });
+    }
+  };
+
+  const totalUnreadCount = Object.values(unreadMessages).reduce((sum, count) => sum + count, 0);
+
 
   return (
     <Layout style={{ margin: 0, position: "relative" }}>
@@ -107,12 +210,10 @@ function App() {
         </div>
       )}
 
-      {/* Header cố định */}
       <Header
         style={{
           position: "fixed",
           top: 0,
-
           width: "100%",
           zIndex: 1000,
           backgroundColor: "#fff",
@@ -130,7 +231,6 @@ function App() {
             height: "100%",
           }}
         >
-          {/* Logo */}
           <div style={{ flexShrink: 0, marginTop: "10px" }}>
             <img
               src={logo}
@@ -139,13 +239,11 @@ function App() {
             />
           </div>
 
-          {/* NavBar */}
-          {!isAdminPage && !isAdminTablePage && !isAdminAddPage && !isAdminBillingPage && (
+          {!isAdminRoute && (
             <div style={{ flexGrow: 1, padding: "0 20px" }}>
               <NavBar />
             </div>
           )}
-          {/* Đăng nhập/Đăng ký hoặc Avatar */}
           <div style={{ flexShrink: 0 }}>
             <Space>
               {isUserLoggedIn || isBusinessLoggedIn ? (
@@ -168,7 +266,7 @@ function App() {
         </div>
       </Header>
 
-      {(isAdminPage || isAdminTablePage || isAdminAddPage || isAdminBillingPage) && (
+      {isAdminRoute && (
         <Sider
           width={150}
           style={{
@@ -185,17 +283,91 @@ function App() {
         </Sider>
       )}
 
-      {/* Nội dung chính */}
-      <Layout style={{ marginLeft: (isAdminPage || isAdminTablePage || isAdminAddPage || isAdminBillingPage) ? 150 : 0, minHeight: "100vh" }}>
+      <Layout style={{ marginLeft: isAdminRoute ? 150 : 0, minHeight: "100vh" }}>
         <Content style={{ paddingTop: "64px" }}>
           <ScrollToTop />
           <ScrollToTopButton />
           <Outlet />
         </Content>
-        {!isAdminPage && !isAdminTablePage && !isAdminAddPage && !isAdminBillingPage && (
-          <Footer />
-        )}
+        {!isAdminRoute && <Footer />}
       </Layout>
+
+      {(isUserLoggedIn || isBusinessLoggedIn) && !isAdminRoute && (
+        <>
+          <Button
+            type="primary"
+            shape="circle"
+            icon={
+              <Badge
+                count={totalUnreadCount}
+                offset={[-5, 5]}
+                style={{
+                  backgroundColor: "#f5222d",
+                  boxShadow: "0 0 0 2px white",
+                  fontSize: "12px",
+                  lineHeight: "16px",
+                  height: "16px",
+                  minWidth: "16px",
+                }}
+              >
+                <MessageOutlined />
+              </Badge>
+            }
+            size="large"
+            style={{
+              position: "fixed",
+              bottom: 10,
+              right: 70,
+              zIndex: 1000,
+              backgroundColor: "#1a73e8",
+              borderColor: "#1a73e8",
+              width: 60,
+              height: 60,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={handleOpenChat}
+          />
+          {showBusinessList && (
+            <BusinessList
+              userId={userId}
+              onSelectBusiness={handleSelectBusiness}
+              onClose={() => setShowBusinessList(false)}
+            />
+          )}
+          {showUserList && (
+            <UserList
+              businessId={businessId}
+              onSelectUser={handleSelectUser}
+              onClose={() => setShowUserList(false)}
+            />
+          )}
+          {chatSessions.length > 0 ? (
+            chatSessions.map((session, index) => (
+              <ChatWindow
+                key={`${session.userId}-${session.businessId}`}
+                userId={session.userId}
+                businessId={session.businessId}
+                businessName={session.businessName}
+                userName={session.userName}
+                avatar={session.avatar}
+                onClose={() => removeChatSession(session.userId, session.businessId)}
+                onNewMessage={(newMessage) =>
+                  handleNewMessage(newMessage, session.businessId, session.userId, session.businessName || session.userName, session.avatar)
+                }
+                style={{
+                  bottom: 80 + index * 50,
+                  right: 20,
+                }}
+              />
+            ))
+          ) : (
+            <div style={{ position: "fixed", bottom: 80, right: 20, zIndex: 1000 }}>
+            </div>
+          )}
+        </>
+      )}
     </Layout>
   );
 }

@@ -10,6 +10,7 @@ const ProfileInfo = ({ user, onEdit }) => {
                 <Descriptions.Item label="Ngày sinh">
                     {user.dateOfBirth ? dayjs(user.dateOfBirth).format("YYYY-MM-DD") : "Chưa cập nhật"}
                 </Descriptions.Item>
+                <Descriptions.Item label="Mật khẩu">********</Descriptions.Item>
             </Descriptions>
             <Button type="primary" onClick={onEdit} style={{ marginTop: 16 }}>
                 Chỉnh sửa

@@ -11,7 +11,6 @@ const {
   getListUserService,
   helloUserService,
   getUserByIdService,
-  updateUserService,
 } = require("../services/user.service");
 const User = require("../models/user.model");
 const ResetToken = require("../models/userResetpassword.model");
@@ -62,9 +61,9 @@ const getUserById = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, dateOfBirth } = req.body;
+    const { name, dateOfBirth, oldPassword, newPassword } = req.body;
     let updateData = {};
-
+    console.log("req.body:", req.body);
     // Tìm user trước khi cập nhật
     const user = await User.findById(id);
     if (!user) {
@@ -83,6 +82,31 @@ const updateUser = async (req, res, next) => {
         return res.status(400).json({ error: "Ngày sinh không hợp lệ!" });
       }
       updateData.dateOfBirth = dob;
+    }
+    //Nếu có mật khẩu mới kiểm tra mật khẩu mới và cập nhật
+    if (newPassword) {
+      // Yêu cầu mật khẩu cũ nếu thay đổi mật khẩu
+      if (!oldPassword) {
+        return res.status(400).json({ error: "Vui lòng cung cấp mật khẩu cũ!" });
+      }
+
+      // So sánh mật khẩu cũ với mật khẩu trong DB
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ error: "Mật khẩu cũ không đúng!" });
+      }
+
+      // Kiểm tra định dạng mật khẩu mới bằng regex
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$#!%*?&]{8,}$/;
+      if (!passwordRegex.test(newPassword)) {
+        return res.status(400).json({
+          error: "Mật khẩu mới phải dài ít nhất 8 ký tự, chứa ít nhất 1 chữ cái in hoa, 1 số và 1 ký tự đặc biệt trong @$!%*?&#!"
+        });
+      }
+
+      // Mã hóa mật khẩu mới
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      updateData.password = hashedPassword;
     }
 
     // Nếu có file ảnh mới => upload lên Cloudinary
@@ -120,6 +144,7 @@ const updateUser = async (req, res, next) => {
         email: updatedUser.email,
         avatar: updatedUser.avatar,
         dateOfBirth: updatedUser.dateOfBirth,
+
       },
     });
   } catch (error) {

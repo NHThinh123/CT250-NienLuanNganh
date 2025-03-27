@@ -15,11 +15,11 @@ const ReviewMedia = ({ assetReviewData }) => {
 
   useEffect(() => {
     if (!assetReviewData?.length) {
-      console.log("No assetReviewData provided or empty");
+      //console.log("No assetReviewData provided or empty");
       return;
     }
 
-    console.log("Received assetReviewData:", assetReviewData);
+    //console.log("Received assetReviewData:", assetReviewData);
 
     // Cleanup để tránh memory leak
     return () => {
@@ -37,7 +37,7 @@ const ReviewMedia = ({ assetReviewData }) => {
     !Array.isArray(assetReviewData) ||
     assetReviewData.length === 0
   ) {
-    console.log("Returning null due to invalid assetReviewData");
+    //console.log("Returning null due to invalid assetReviewData");
     return null;
   }
 
@@ -76,13 +76,12 @@ const ReviewMedia = ({ assetReviewData }) => {
     if (duration && !isNaN(duration) && duration > 0) {
       const minutes = Math.floor(duration / 60);
       const seconds = Math.floor(duration % 60);
-      const formattedDuration = `${minutes}:${
-        seconds < 10 ? "0" : ""
-      }${seconds}`;
-      console.log(`Duration set for index ${index}: ${formattedDuration}`);
+      const formattedDuration = `${minutes}:${seconds < 10 ? "0" : ""
+        }${seconds}`;
+      //console.log(`Duration set for index ${index}: ${formattedDuration}`);
       setVideoDurations((prev) => ({ ...prev, [index]: formattedDuration }));
     } else {
-      console.log(`Invalid duration for index ${index}: ${duration}`);
+      //console.log(`Invalid duration for index ${index}: ${duration}`);
       setVideoDurations((prev) => ({ ...prev, [index]: "0:00" }));
     }
   };
@@ -122,9 +121,9 @@ const ReviewMedia = ({ assetReviewData }) => {
                     videoRefs.current[index] = el;
                     if (el && !videoDurations[index]) {
                       el.onloadedmetadata = () => {
-                        console.log(
-                          `Metadata loaded for ${asset.url}: duration = ${el.duration}`
-                        );
+                        // console.log(
+                        //   `Metadata loaded for ${asset.url}: duration = ${el.duration}`
+                        // );
                         handleMetadataLoaded(index, el.duration);
                       };
                       el.onerror = (e) => {

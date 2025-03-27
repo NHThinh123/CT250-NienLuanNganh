@@ -51,6 +51,8 @@ const updateBusiness = async (req, res, next) => {
       contact_info,
       location,
       address,
+      oldPassword,
+      newPassword,
     } = req.body;
     let updateData = {};
 
@@ -83,6 +85,30 @@ const updateBusiness = async (req, res, next) => {
           console.error("Lỗi khi xóa ảnh cũ trên Cloudinary:", err);
         }
       }
+    }
+    if (newPassword) {
+      // Yêu cầu mật khẩu cũ nếu thay đổi mật khẩu
+      if (!oldPassword) {
+        return res.status(400).json({ error: "Vui lòng cung cấp mật khẩu cũ!" });
+      }
+
+      // So sánh mật khẩu cũ với mật khẩu trong DB
+      const isMatch = await bcrypt.compare(oldPassword, business.password);
+      if (!isMatch) {
+        return res.status(400).json({ error: "Mật khẩu cũ không đúng!" });
+      }
+
+      // Kiểm tra định dạng mật khẩu mới bằng regex
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$#!%*?&]{8,}$/;
+      if (!passwordRegex.test(newPassword)) {
+        return res.status(400).json({
+          error: "Mật khẩu mới phải dài ít nhất 8 ký tự, chứa ít nhất 1 chữ cái in hoa, 1 số và 1 ký tự đặc biệt trong @$!%*?&#!"
+        });
+      }
+
+      // Mã hóa mật khẩu mới
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      updateData.password = hashedPassword;
     }
 
     // Kiểm tra nếu không có dữ liệu nào để cập nhật
