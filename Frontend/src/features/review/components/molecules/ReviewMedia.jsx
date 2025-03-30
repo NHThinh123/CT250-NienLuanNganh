@@ -19,8 +19,6 @@ const ReviewMedia = ({ assetReviewData }) => {
       return;
     }
 
-    console.log("Received assetReviewData:", assetReviewData);
-
     // Cleanup để tránh memory leak
     return () => {
       Object.values(videoRefs.current).forEach((video) => {
@@ -96,8 +94,12 @@ const ReviewMedia = ({ assetReviewData }) => {
             style={{
               position: "relative",
               display: "inline-block",
+              width: "70px",
+              height: "70px",
               marginRight: 8,
+              marginBottom: 8,
               cursor: "pointer",
+              overflow: "hidden",
             }}
             onClick={() => openModal(index)}
           >
@@ -181,7 +183,7 @@ const ReviewMedia = ({ assetReviewData }) => {
                   top: 0,
                   left: 0,
                   width: "100%",
-                  height: "90%",
+                  height: "100%",
                   background: "rgba(0, 0, 0, 0.5)",
                   borderRadius: "8px",
                   display: "flex",

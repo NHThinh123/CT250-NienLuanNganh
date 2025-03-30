@@ -31,69 +31,77 @@ const ReviewOverview = ({ businessId }) => {
   }, {});
 
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div
+      style={{
+        marginBottom: 16,
+        width: "100%",
+      }}
+    >
       <p style={{ fontWeight: "bold", margin: 0, fontSize: 14 }}>
         Tổng quan đánh giá
       </p>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <div
-          style={{
-            fontSize: 28,
-            fontWeight: "bold",
-            marginRight: 8,
-          }}
-        >
-          {businessData.rating_average}
-        </div>
-        <Rating
-          initialRating={businessData.rating_average}
-          readonly
-          emptySymbol={
-            <FontAwesomeIcon
-              icon={solidStar}
-              style={{ fontSize: 18, color: "#E0E0E0" }}
-            />
-          }
-          fullSymbol={
-            <FontAwesomeIcon
-              icon={solidStar}
-              style={{ fontSize: 18, color: "#FFD700" }}
-            />
-          }
-          fractions={10}
-          quiet={true}
-        />
-      </div>
-      ({businessData.totalReviews} đánh giá)
-      {ratingLevels.map((rating) => (
-        <div key={rating} style={{ display: "flex" }}>
+      <div style={{ marginLeft: 4 }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              fontSize: 29,
+              fontWeight: "bold",
+              marginRight: 8,
+            }}
+          >
+            {businessData.rating_average}
+          </div>
           <Rating
-            initialRating={rating}
+            initialRating={businessData.rating_average}
             readonly
             emptySymbol={
               <FontAwesomeIcon
                 icon={solidStar}
-                style={{ fontSize: 12, color: "#E0E0E0" }}
+                style={{ fontSize: 20, color: "#E0E0E0" }}
               />
             }
             fullSymbol={
               <FontAwesomeIcon
                 icon={solidStar}
-                style={{ fontSize: 12, color: "#FFD700" }}
+                style={{ fontSize: 20, color: "#FFD700" }}
               />
             }
             fractions={10}
             quiet={true}
           />
-          <Progress
-            percent={ratingPercentages[rating]} // Sử dụng phần trăm tính được
-            size={"small"}
-            style={{ width: "60%", marginLeft: 4, fontSize: 13 }}
-            format={() => `${ratingCounts[rating]}`} // Hiển thị số lượng đánh giá
-          />
         </div>
-      ))}
-      {/* <div style={{ borderTop: "1px solid #ddd", marginTop: 10 }}></div> */}
+        <div style={{ fontSize: 15, marginBottom: 8 }}>
+          ({businessData.totalReviews} đánh giá)
+        </div>
+        {ratingLevels.map((rating) => (
+          <div key={rating} style={{ display: "flex" }}>
+            <Rating
+              initialRating={rating}
+              readonly
+              emptySymbol={
+                <FontAwesomeIcon
+                  icon={solidStar}
+                  style={{ fontSize: 14, color: "#E0E0E0" }}
+                />
+              }
+              fullSymbol={
+                <FontAwesomeIcon
+                  icon={solidStar}
+                  style={{ fontSize: 14, color: "#FFD700" }}
+                />
+              }
+              fractions={10}
+              quiet={true}
+            />
+            <Progress
+              percent={ratingPercentages[rating]} // Sử dụng phần trăm tính được
+              size={"small"}
+              style={{ width: "56%", marginLeft: 4, fontSize: 13 }}
+              format={() => `${ratingCounts[rating]}`} // Hiển thị số lượng đánh giá
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

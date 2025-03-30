@@ -216,12 +216,9 @@ const ReviewItem = ({ review, businessId }) => {
           </div>
         </Col>
       </Row>
-      <Row>
-        <Col span={3}></Col>
-        <Col span={21}>
-          <ReviewResponseList parentReviewId={review._id} />
-        </Col>
-      </Row>
+      <div style={{ marginLeft: 55 }}>
+        <ReviewResponseList parentReviewId={review._id} />
+      </div>
       <div ref={replyContainerRef}>
         {isShowReply && entity?.id && (
           <div style={{ display: "flex", width: "100%" }}>
