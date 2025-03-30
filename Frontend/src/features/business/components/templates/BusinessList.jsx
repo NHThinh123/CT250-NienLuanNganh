@@ -134,7 +134,7 @@ const BusinessList = ({
       ) : (
         <>
           <Row
-            gutter={[24, 24]}
+            gutter={[8, 12]}
             justify={paginatedData.length / 4 === 0 ? "space-between" : "start"}
           >
             {paginatedData.map((business) => (
@@ -147,183 +147,205 @@ const BusinessList = ({
                 xl={6}
                 style={{ display: "flex" }}
               >
-                <Card
-                  hoverable
-                  cover={
-                    <div style={{ position: "relative", paddingTop: "60%" }}>
-                      <img
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          borderTopLeftRadius: "8px",
-                          borderTopRightRadius: "8px",
-                        }}
-                        alt="business avatar"
-                        src={business.avatar || "default-image.jpg"}
-                      />
-                    </div>
-                  }
-                  onClick={() => navigate(`/businesses/${business._id}`)}
+                <div
                   style={{
                     width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+                    transition: "box-shadow 0.3s ease-in-out",
                   }}
-                  styles={{ body: { padding: "15px", borderRadius: 0 } }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.boxShadow =
+                      "0 6px 16px rgba(0, 0, 0, 0.2)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.boxShadow =
+                      "0 4px 10px rgba(0, 0, 0, 0.1)")
+                  }
                 >
-                  <div
+                  <Card
+                    hoverable
+                    cover={
+                      <div style={{ position: "relative", paddingTop: "60%" }}>
+                        <img
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderTopLeftRadius: "8px",
+                            borderTopRightRadius: "8px",
+                          }}
+                          alt="business avatar"
+                          src={business.avatar || "default-image.jpg"}
+                        />
+                      </div>
+                    }
+                    onClick={() => navigate(`/businesses/${business._id}`)}
                     style={{
-                      flex: 1,
+                      width: "100%",
                       display: "flex",
                       flexDirection: "column",
+                      height: "100%",
+                    }}
+                    styles={{
+                      body: { padding: "15px", borderRadius: 0 },
                     }}
                   >
-                    <Card.Meta
-                      title={
+                    <div
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <Card.Meta
+                        title={
+                          <div
+                            className="business-title"
+                            style={{ marginBottom: "8px" }}
+                          >
+                            <span
+                              style={{
+                                display: "block",
+                                fontSize: "18px",
+                                fontWeight: "bold",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {business.business_name || "N/A"}
+                            </span>
+                          </div>
+                        }
+                      />
+                      <div
+                        style={{
+                          fontSize: "14px",
+                          color: "#666",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          marginBottom: 12,
+                        }}
+                      >
+                        {business.location || "N/A"}
+                      </div>
+                    </div>
+                    <div
+                      className="business-info"
+                      style={{ marginTop: "auto" }}
+                    >
+                      <div
+                        className="business-price"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "8px",
+                          fontSize: "14px",
+                        }}
+                      >
+                        <CircleDollarSign
+                          size={16}
+                          style={{ marginRight: "8px", flexShrink: 0 }}
+                        />
                         <div
-                          className="business-title"
-                          style={{ marginBottom: "8px" }}
+                          style={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {formatPrice(business.dish_lowest_cost)}đ -{" "}
+                          {formatPrice(business.dish_highest_cost)}đ
+                        </div>
+                      </div>
+
+                      <div
+                        className="business-rating"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "8px",
+                          fontSize: "14px",
+                        }}
+                      >
+                        <span style={{ marginRight: "5px" }}>
+                          {business.rating_average || "0"}
+                        </span>
+                        <Rating
+                          initialRating={business.rating_average}
+                          readonly
+                          emptySymbol={
+                            <FontAwesomeIcon
+                              icon={regularStar}
+                              style={{ fontSize: 14, color: "#ccc" }}
+                            />
+                          }
+                          fullSymbol={
+                            <FontAwesomeIcon
+                              icon={solidStar}
+                              style={{ fontSize: 14, color: "#FFD700" }}
+                            />
+                          }
+                          fractions={10}
+                          quiet={true}
+                        />
+                        <span style={{ marginLeft: "5px" }}>
+                          ({business.totalReviews || "0"})
+                        </span>
+                      </div>
+
+                      <div
+                        className="business-hours"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          fontSize: "14px",
+                        }}
+                      >
+                        <Clock
+                          size={16}
+                          style={{ marginRight: "8px", flexShrink: 0 }}
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            alignItems: "center",
+                          }}
                         >
                           <span
                             style={{
-                              display: "block",
-                              fontSize: "18px",
+                              marginRight: "5px",
+                              color: isBusinessOpen(
+                                business.open_hours,
+                                business.close_hours
+                              )
+                                ? "#52c41a"
+                                : "#ff4d4f",
                               fontWeight: "bold",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
                             }}
                           >
-                            {business.business_name || "N/A"}
-                          </span>
-                        </div>
-                      }
-                    />
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        color: "#666",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        marginBottom: 12,
-                      }}
-                    >
-                      {business.location || "N/A"}
-                    </div>
-                  </div>
-                  <div className="business-info" style={{ marginTop: "auto" }}>
-                    <div
-                      className="business-price"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "8px",
-                        fontSize: "14px",
-                      }}
-                    >
-                      <CircleDollarSign
-                        size={16}
-                        style={{ marginRight: "8px", flexShrink: 0 }}
-                      />
-                      <div
-                        style={{
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {formatPrice(business.dish_lowest_cost)}đ -{" "}
-                        {formatPrice(business.dish_highest_cost)}đ
-                      </div>
-                    </div>
-
-                    <div
-                      className="business-rating"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "8px",
-                        fontSize: "14px",
-                      }}
-                    >
-                      <span style={{ marginRight: "5px" }}>
-                        {business.rating_average || "0"}
-                      </span>
-                      <Rating
-                        initialRating={business.rating_average}
-                        readonly
-                        emptySymbol={
-                          <FontAwesomeIcon
-                            icon={regularStar}
-                            style={{ fontSize: 14, color: "#ccc" }}
-                          />
-                        }
-                        fullSymbol={
-                          <FontAwesomeIcon
-                            icon={solidStar}
-                            style={{ fontSize: 14, color: "#FFD700" }}
-                          />
-                        }
-                        fractions={10}
-                        quiet={true}
-                      />
-                      <span style={{ marginLeft: "5px" }}>
-                        ({business.totalReviews || "0"})
-                      </span>
-                    </div>
-
-                    <div
-                      className="business-hours"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        fontSize: "14px",
-                      }}
-                    >
-                      <Clock
-                        size={16}
-                        style={{ marginRight: "8px", flexShrink: 0 }}
-                      />
-                      <div
-                        style={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          alignItems: "center",
-                        }}
-                      >
-                        <span
-                          style={{
-                            marginRight: "5px",
-                            color: isBusinessOpen(
+                            {isBusinessOpen(
                               business.open_hours,
                               business.close_hours
                             )
-                              ? "#52c41a"
-                              : "#ff4d4f",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {isBusinessOpen(
-                            business.open_hours,
-                            business.close_hours
-                          )
-                            ? "Đang mở cửa"
-                            : "Đã đóng cửa"}
-                        </span>
-                        <span style={{ whiteSpace: "nowrap" }}>
-                          {business.open_hours || "0"} -{" "}
-                          {business.close_hours || "0"}
-                        </span>
+                              ? "Đang mở cửa"
+                              : "Đã đóng cửa"}
+                          </span>
+                          <span style={{ whiteSpace: "nowrap" }}>
+                            {business.open_hours || "0"} -{" "}
+                            {business.close_hours || "0"}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                </div>
               </Col>
             ))}
           </Row>
