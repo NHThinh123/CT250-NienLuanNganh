@@ -99,6 +99,7 @@ const Businesses = ({ businessData }) => {
           onClose={onClose}
           open={visible}
           width="60%" // Chiều rộng phù hợp với màn hình nhỏ
+          styles={{ body: { padding: 0 } }}
         >
           <BusinessFilter
             handleSearch={handleSearch}

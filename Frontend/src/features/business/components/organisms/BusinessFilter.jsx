@@ -147,7 +147,7 @@ const BusinessFilter = ({
             <Col xs={24} sm={4} md={3} style={{ fontWeight: "bold" }}>
               Giá:
             </Col>
-            <Col xs={14} sm={14} md={15}>
+            <Col xs={24} sm={14} md={15}>
               <Slider
                 range={{ draggableTrack: true }}
                 defaultValue={priceRange}
@@ -159,11 +159,10 @@ const BusinessFilter = ({
               />
             </Col>
             <Col
-              xs={10}
+              xs={24}
               sm={6}
               md={6}
               style={{
-                textAlign: "center",
                 display: "flex",
                 alignItems: "center",
               }}

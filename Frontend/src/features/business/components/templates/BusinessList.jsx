@@ -141,7 +141,7 @@ const BusinessList = ({
               <Col
                 key={business._id}
                 xs={12}
-                sm={12}
+                sm={8}
                 md={8}
                 lg={6}
                 xl={6}
