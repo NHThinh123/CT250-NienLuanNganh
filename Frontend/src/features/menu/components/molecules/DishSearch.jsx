@@ -17,7 +17,9 @@ const DishSearch = ({ onSearch }) => {
   // };
 
   return (
-    <BoxContainer>
+    <BoxContainer
+      style={{ position: "sticky", top: 63.8, zIndex: 100, width: "100%" }}
+    >
       <Input.Search
         placeholder="Tìm kiếm món"
         value={searchValue}

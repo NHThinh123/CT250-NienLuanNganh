@@ -1,4 +1,4 @@
-import { List, Row, Col, Button } from "antd";
+import { List, Button } from "antd";
 import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 import DeleteDish from "../../../dish/components/templates/DeleteDish";
 import { useContext, useState } from "react";
@@ -21,19 +21,17 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
   const { business } = useContext(BusinessContext);
   const isBusinessOwner =
     business.isAuthenticated && business.business.id == businessId;
-  const MAX_LENGTH = 150; // Giới hạn số ký tự mô tả
-  const MAX_VISIBLE_DISHES = 4; // Giới hạn số món ăn hiển thị ban đầu
+  const MAX_LENGTH = 150;
+  const MAX_VISIBLE_DISHES = 4;
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  // Hàm định dạng giá tiền
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN");
   };
 
-  // Lọc món ăn dựa trên từ khóa tìm kiếm không dấu
   const filteredDishes = dishData.filter(
     (dish) =>
       removeAccents(dish.dish_name.toLowerCase()).includes(
@@ -44,12 +42,10 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
       )
   );
 
-  // Danh sách món ăn hiển thị
   const visibleDishes = showAllDishes
     ? filteredDishes
     : filteredDishes.slice(0, MAX_VISIBLE_DISHES);
 
-  // Nếu không có món ăn nào khớp với từ khóa tìm kiếm, không hiển thị menu
   if (filteredDishes.length === 0) {
     return null;
   }
@@ -62,53 +58,88 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
             grid={{ gutter: 16, column: 1 }}
             dataSource={visibleDishes}
             renderItem={(dish) => (
-              <List.Item styles={{ paddingRight: 0, boderRadius: 8 }}>
-                <Row style={{ padding: 0 }}>
-                  <Col span={4}>
+              <List.Item style={{ paddingRight: 0, borderRadius: 8 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    padding: 0,
+                    boxSizing: "border-box",
+                    width: "100%",
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: "0 0 16.6667%",
+                      maxWidth: "16.6667%",
+                      boxSizing: "border-box",
+                    }}
+                  >
                     <img
-                      style={{ width: "70px", height: "70px" }}
+                      style={{
+                        width: "70px",
+                        height: "70px",
+                        objectFit: "cover",
+                      }}
                       src={dish.dish_url}
                       alt="Ảnh"
                     />
-                  </Col>
-                  <Col span={isBusinessOwner ? 13 : 15} style={{ padding: 0 }}>
-                    <Row>
+                  </div>
+                  <div
+                    style={{
+                      flex: `0 0 ${isBusinessOwner ? "54.1667%" : "62.5%"}`,
+                      maxWidth: `${isBusinessOwner ? "54.1667%" : "62.5%"}`,
+                      padding: 0,
+                      boxSizing: "border-box",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "16px",
+                        color: "#464646",
+                        fontWeight: "bold",
+                        overflowWrap: "break-word",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {dish.dish_name}
+                    </div>
+                    <div>
                       <div
                         style={{
-                          fontSize: "16px",
-                          color: "#464646",
-                          fontWeight: "bold",
+                          textAlign: "justify",
+                          overflowWrap: "break-word",
+                          wordBreak: "break-word",
                         }}
                       >
-                        {dish.dish_name}
+                        {dish.dish_description.length > MAX_LENGTH &&
+                        !isExpanded
+                          ? dish.dish_description.slice(0, MAX_LENGTH) + "..."
+                          : dish.dish_description}
                       </div>
-                    </Row>
-                    <Row>
-                      <div>
-                        <div style={{ textAlign: "justify" }}>
-                          {dish.dish_description.length > MAX_LENGTH &&
-                          !isExpanded
-                            ? dish.dish_description.slice(0, MAX_LENGTH) + "..."
-                            : dish.dish_description}
-                        </div>
-                        {dish.dish_description.length > MAX_LENGTH && (
-                          <button
-                            onClick={toggleExpand}
-                            style={{
-                              color: "blue",
-                              cursor: "pointer",
-                              border: "none",
-                              background: "none",
-                              padding: 0,
-                            }}
-                          >
-                            {isExpanded ? "Ẩn bớt" : "Xem thêm"}
-                          </button>
-                        )}
-                      </div>
-                    </Row>
-                  </Col>
-                  <Col span={isBusinessOwner ? 5 : 5}>
+                      {dish.dish_description.length > MAX_LENGTH && (
+                        <button
+                          onClick={toggleExpand}
+                          style={{
+                            color: "blue",
+                            cursor: "pointer",
+                            border: "none",
+                            background: "none",
+                            padding: 0,
+                          }}
+                        >
+                          {isExpanded ? "Ẩn bớt" : "Xem thêm"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      flex: "0 0 20.8333%",
+                      maxWidth: "20.8333%",
+                      boxSizing: "border-box",
+                    }}
+                  >
                     <div
                       style={{
                         fontSize: "16px",
@@ -120,13 +151,21 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
                         height: "100%",
                         width: "100%",
                         paddingRight: 8,
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {formatPrice(dish.dish_price)}đ
                     </div>
-                  </Col>
+                  </div>
                   {isBusinessOwner && (
-                    <Col span={2}>
+                    <div
+                      style={{
+                        flex: "0 0 8.3333%",
+                        maxWidth: "8.3333%",
+                        boxSizing: "border-box",
+                      }}
+                    >
                       <div
                         style={{
                           display: "grid",
@@ -155,15 +194,16 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
                           />
                         </div>
                       </div>
-                    </Col>
+                    </div>
                   )}
-                </Row>
+                </div>
                 <hr
                   style={{
                     height: "2px",
-                    border: "no",
+                    border: "none",
                     opacity: "0.2",
                     marginTop: 6,
+                    width: "100%",
                   }}
                 />
               </List.Item>
@@ -178,6 +218,8 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
             fontSize: "16px",
             color: "#888",
             display: "flex",
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
           Chưa có món! Vui lòng nhấn vào nút <SquarePlus strokeWidth={1} /> để
@@ -185,7 +227,7 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
         </div>
       )}
       {filteredDishes.length > MAX_VISIBLE_DISHES && (
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", width: "100%" }}>
           <Button
             type="link"
             onClick={() => setShowAllDishes(!showAllDishes)}

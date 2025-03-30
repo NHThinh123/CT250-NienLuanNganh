@@ -1,4 +1,4 @@
-import { Col, List, Row } from "antd";
+import { List } from "antd";
 import DisplayDishesByMenu from "../molecules/DisplayDishesByMenu";
 import { useContext } from "react";
 import { MenuContext } from "../molecules/MenuContext";
@@ -25,26 +25,27 @@ const MenuDetailList = ({ menuData, capitalizeMenuName, searchKeyword }) => {
                 data-menu-id={menu._id}
                 style={styles.twocol}
               >
-                <div>
-                  <Row>
-                    <Col span={23}>
-                      <div
-                        style={{
-                          color: "#6D6f71",
-                          fontSize: "15px",
-                          paddingBottom: "18px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {capitalizeMenuName(menu.menu_name)}
-                      </div>
-                    </Col>
-                    <Col span={1}>
-                      <div>
-                        <AddDish menuData={menu} />
-                      </div>
-                    </Col>
-                  </Row>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <div
+                    style={{
+                      color: "#6D6f71",
+                      fontSize: "15px",
+                      paddingBottom: "18px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {capitalizeMenuName(menu.menu_name)}
+                  </div>
+                  <div>
+                    <AddDish menuData={menu} />
+                  </div>
                 </div>
                 <DisplayDishesByMenu
                   menuId={menu._id}

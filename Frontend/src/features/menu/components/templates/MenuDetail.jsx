@@ -40,61 +40,62 @@ const MenuDetail = ({ menuData, isLoadingMenu, isErrorMenu, business_id }) => {
     <>
       <div style={styles.menuPage}>
         <Row>
-          <Col span={1}></Col>
-          <Col span={6}>
-            <div style={{ padding: "13px 26px 0px" }}>
-              <p style={styles.titleMenu}>THỰC ĐƠN</p>
-            </div>
-          </Col>
-          <Col span={9}></Col>
-          <Col span={8}>
-            <div style={{ padding: "13px 26px 0px" }}>
-              <p style={styles.titleMenu}>ĐÁNH GIÁ</p>
-            </div>
-          </Col>
-          <Col span={2}></Col>
-        </Row>
-        <Row>
-          <Col span={1}></Col>
+          <Col xs={1} sm={2} md={0} lg={0} xl={1}></Col>
           <MenuProvider>
-            <Col span={5}>
-              <div style={{ position: "sticky", top: 70 }}>
-                {menuData.length > 0 && (
-                  <MenuList
-                    menuData={menuData}
-                    searchKeyword={searchKeyword}
-                  ></MenuList>
-                )}
-                {isBusinessOwner && <AddMenu businessId={business_id} />}
-                {/* <MenuFilter /> */}
-              </div>
+            <Col xs={22} sm={20} md={9} lg={6} xl={5}>
+              <Row>
+                <div style={{ padding: "13px 26px 0px", width: "100%" }}>
+                  <p style={styles.titleMenu}>THỰC ĐƠN</p>
+                </div>
+              </Row>
+              <Row style={{ position: "sticky", top: 70 }}>
+                <div style={{ width: "100%" }}>
+                  {menuData.length > 0 && (
+                    <MenuList
+                      menuData={menuData}
+                      searchKeyword={searchKeyword}
+                    ></MenuList>
+                  )}
+                  {isBusinessOwner && <AddMenu businessId={business_id} />}
+                  {/* <MenuFilter /> */}
+                </div>
+              </Row>
             </Col>
-            <Col span={10}>
-              <div style={{ position: "sticky", top: 63.8, zIndex: 1000 }}>
+            <Col xs={1} sm={2} md={0} lg={0} xl={0}></Col>
+            <Col xs={0} sm={1} md={0} lg={0} xl={0}></Col>
+            <Col xs={24} sm={22} md={15} lg={11} xl={10}>
+              <Row>
+                <div style={{ padding: "13px 26px 0px" }}>
+                  <p style={styles.titleMenu}>MÓN ĂN</p>
+                </div>
+              </Row>
+              <Row>
                 <DishSearch onSearch={handleSearch} />
-              </div>
-              <MenuDetailList
-                menuData={menuData}
-                capitalizeMenuName={capitalizeMenuName}
-                searchKeyword={searchKeyword}
-              />
+                <MenuDetailList
+                  menuData={menuData}
+                  capitalizeMenuName={capitalizeMenuName}
+                  searchKeyword={searchKeyword}
+                />
+              </Row>
             </Col>
+            <Col xs={0} sm={1} md={0} lg={0} xl={0}></Col>
           </MenuProvider>
-          <Col span={7}>
-            <div
-            // style={{
-            //   position: "sticky",
-            //   top: 70,
-            // }}
-            >
+          <Col xs={0} sm={1} md={0} lg={0} xl={0}></Col>
+          <Col xs={24} sm={22} md={24} lg={7} xl={7}>
+            <Row>
+              <div style={{ padding: "13px 26px 0px" }}>
+                <p style={styles.titleMenu}>ĐÁNH GIÁ</p>
+              </div>
+            </Row>
+            <Row>
               <ReviewList
                 reviewData={reviewData.reviewData}
                 businessId={business_id}
               />
               {!isBusinessOwner && <CreateReview businessId={business_id} />}
-            </div>
+            </Row>
           </Col>
-          <Col span={1}></Col>
+          <Col xs={0} sm={1} md={0} lg={0} xl={1}></Col>
         </Row>
       </div>
     </>

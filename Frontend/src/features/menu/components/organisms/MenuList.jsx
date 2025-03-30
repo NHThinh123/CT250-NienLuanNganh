@@ -5,7 +5,7 @@ import DeleteMenu from "../molecules/DeleteMenu";
 import UpdateMenu from "../molecules/UpdateMenu";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 
-const MenuList = ({ menuData, searchKeyword }) => {
+const MenuList = ({ menuData }) => {
   const menuContext = useContext(MenuContext);
 
   if (!menuContext) {
