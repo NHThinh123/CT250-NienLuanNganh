@@ -6,32 +6,30 @@ import Rating from "react-rating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
+import BusinessPagination from "../molecules/BusinessPagination";
 
 const removeAccents = (str) => {
-  // Ensure str is a string before calling normalize
   return str
-    .toString() // Convert to string if it’s not already
-    .normalize("NFD") // Normalize to decompose accents
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritical marks
-    .replace(/đ/g, "d") // Replace Vietnamese 'đ' with 'd'
-    .replace(/Đ/g, "D"); // Replace Vietnamese 'Đ' with 'D'
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
 };
 
 const isBusinessOpen = (openHours, closeHours) => {
-  if (!openHours || !closeHours) return false; // Nếu không có giờ, mặc định là đóng
+  if (!openHours || !closeHours) return false;
 
   const now = new Date();
   const currentHours = now.getHours();
   const currentMinutes = now.getMinutes();
   const currentTimeInMinutes = currentHours * 60 + currentMinutes;
 
-  // Chuyển đổi openHours và closeHours sang phút
   const [openHour, openMinute] = openHours.split(":").map(Number);
   const [closeHour, closeMinute] = closeHours.split(":").map(Number);
   const openTimeInMinutes = openHour * 60 + openMinute;
   const closeTimeInMinutes = closeHour * 60 + closeMinute;
 
-  // Xử lý trường hợp giờ đóng cửa vượt qua nửa đêm (ví dụ: 06:00 - 02:00)
   if (closeTimeInMinutes < openTimeInMinutes) {
     return (
       currentTimeInMinutes >= openTimeInMinutes ||
@@ -39,7 +37,6 @@ const isBusinessOpen = (openHours, closeHours) => {
     );
   }
 
-  // Trường hợp bình thường (ví dụ: 08:00 - 22:00)
   return (
     currentTimeInMinutes >= openTimeInMinutes &&
     currentTimeInMinutes < closeTimeInMinutes
@@ -56,12 +53,12 @@ const BusinessList = ({
   itemsPerPage,
   priceRange,
   setFilteredTotalItems,
+  onPageChange, // Thêm prop để xử lý phân trang
 }) => {
   const navigate = useNavigate();
 
-  // Hàm lọc businesses theo rating
   const filterByRating = (business) => {
-    if (starFilters.length === 0) return true; // Nếu không chọn bộ lọc, hiển thị tất cả
+    if (starFilters.length === 0) return true;
     const rating = business.rating_average || 0;
     return (
       (starFilters.includes("0_to_1_star") && rating >= 0 && rating <= 1) ||
@@ -72,7 +69,6 @@ const BusinessList = ({
     );
   };
 
-  // Lọc businesses theo từ khóa và đánh giá
   const filteredBusinessData = businessData
     .filter((business) => {
       const businessName = removeAccents(
@@ -89,10 +85,8 @@ const BusinessList = ({
       );
     });
 
-  // Cập nhật số lượng business sau khi lọc để phân trang chính xác
   setFilteredTotalItems(filteredBusinessData.length);
 
-  // Sắp xếp danh sách businesses theo tùy chọn của người dùng
   const sortedBusinessData = [...filteredBusinessData].sort((a, b) => {
     if (typeSortOption === "cost") {
       if (sortOption === "low_to_high") {
@@ -113,7 +107,7 @@ const BusinessList = ({
         return (b.totalReviews || 0) - (a.totalReviews || 0);
       }
     }
-    return 0; // Nếu không chọn gì thì giữ nguyên thứ tự
+    return 0;
   });
 
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -129,155 +123,224 @@ const BusinessList = ({
     return price.toLocaleString("vi-VN");
   };
 
-  if (paginatedData.length === 0) {
-    return (
-      <BoxContainer style={{ textAlign: "center", padding: "20px" }}>
-        <p style={{ fontSize: "16px", color: "#888" }}>
-          Không có kết quả phù hợp với tìm kiếm/bộ lọc mà bạn đang tìm/chọn
-        </p>
-      </BoxContainer>
-    );
-  }
-
   return (
     <BoxContainer>
-      <Row
-        gutter={[24, 24]}
-        justify={paginatedData.length / 4 == 0 ? "space-between" : "start"}
-      >
-        {paginatedData.map((business) => (
-          <Col
-            key={business._id}
-            xs={24} // 1 card trên dòng khi màn hình nhỏ
-            sm={12} // 2 card trên dòng khi màn hình nhỏ hơn
-            md={8} // 3 card trên dòng khi màn hình trung bình
-            lg={6} // 4 card trên dòng khi màn hình lớn
-            xl={6} // Giữ nguyên 4 card trên dòng ở màn hình rất lớn
-            style={{ display: "flex", justifyContent: "center" }}
+      {paginatedData.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "20px" }}>
+          <p style={{ fontSize: "16px", color: "#888" }}>
+            Không có kết quả phù hợp với tìm kiếm/bộ lọc mà bạn đang tìm/chọn
+          </p>
+        </div>
+      ) : (
+        <>
+          <Row
+            gutter={[24, 24]}
+            justify={paginatedData.length / 4 === 0 ? "space-between" : "start"}
           >
-            <Card
-              hoverable
-              cover={
-                <img
+            {paginatedData.map((business) => (
+              <Col
+                key={business._id}
+                xs={12}
+                sm={12}
+                md={8}
+                lg={6}
+                xl={6}
+                style={{ display: "flex" }}
+              >
+                <Card
+                  hoverable
+                  cover={
+                    <div style={{ position: "relative", paddingTop: "60%" }}>
+                      <img
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderTopLeftRadius: "8px",
+                          borderTopRightRadius: "8px",
+                        }}
+                        alt="business avatar"
+                        src={business.avatar || "default-image.jpg"}
+                      />
+                    </div>
+                  }
+                  onClick={() => navigate(`/businesses/${business._id}`)}
                   style={{
                     width: "100%",
-                    height: "180px",
-                    objectFit: "cover", // Giữ tỷ lệ ảnh mà không bị méo
-                    borderTopLeftRadius: "8px",
-                    borderTopRightRadius: "8px",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
                   }}
-                  alt="business avatar"
-                  src={business.avatar || "default-image.jpg"}
-                />
-              }
-              onClick={() => navigate(`/businesses/${business._id}`)}
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                minHeight: "250px",
-              }}
-            >
-              <div>
-                <Card.Meta
-                  title={
-                    <span
+                  styles={{ body: { padding: "15px", borderRadius: 0 } }}
+                >
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Card.Meta
+                      title={
+                        <div
+                          className="business-title"
+                          style={{ marginBottom: "8px" }}
+                        >
+                          <span
+                            style={{
+                              display: "block",
+                              fontSize: "18px",
+                              fontWeight: "bold",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {business.business_name || "N/A"}
+                          </span>
+                        </div>
+                      }
+                    />
+                    <div
                       style={{
-                        maxWidth: "100%",
-                        display: "block",
+                        fontSize: "14px",
+                        color: "#666",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-                        fontSize: 18,
+                        marginBottom: 12,
                       }}
                     >
-                      {business.business_name || "N/A"}
-                    </span>
-                  }
-                />
-                <div
-                  style={{
-                    fontSize: "14px",
-                    color: "#666",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    marginTop: 8,
-                  }}
-                >
-                  {business.location || "N/A"}
-                </div>
-              </div>
-              <p
-                style={{
-                  marginTop: "8px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <CircleDollarSign size={18} style={{ marginRight: "8px" }} />
-                {formatPrice(business.dish_lowest_cost)}đ -{" "}
-                {formatPrice(business.dish_highest_cost)}đ
-              </p>
-              <p
-                style={{
-                  marginTop: "8px",
-                  display: "flex",
-                  gap: 5,
-                }}
-              >
-                {business.rating_average || "0"}
-                <Rating
-                  initialRating={business.rating_average}
-                  readonly
-                  emptySymbol={
-                    <FontAwesomeIcon
-                      icon={regularStar}
-                      style={{ fontSize: 15, color: "#ccc" }}
-                    />
-                  }
-                  fullSymbol={
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 15, color: "#FFD700" }}
-                    />
-                  }
-                  fractions={10}
-                  quiet={true}
-                />
-                ({business.totalReviews || "0"})
-              </p>
-              <p
-                style={{
-                  marginTop: "8px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Clock size={18} style={{ marginRight: "8px" }} />
-                <span
-                  style={{
-                    marginRight: "5px",
-                    color: isBusinessOpen(
-                      business.open_hours,
-                      business.close_hours
-                    )
-                      ? "#52c41a" // Màu xanh nếu đang mở
-                      : "#ff4d4f", // Màu đỏ nếu đã đóng
-                    fontWeight: "bold",
-                  }}
-                >
-                  {isBusinessOpen(business.open_hours, business.close_hours)
-                    ? "Đang mở cửa"
-                    : "Đã đóng cửa"}
-                </span>
-                {business.open_hours || "0"} - {business.close_hours || "0"}
-              </p>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                      {business.location || "N/A"}
+                    </div>
+                  </div>
+                  <div className="business-info" style={{ marginTop: "auto" }}>
+                    <div
+                      className="business-price"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <CircleDollarSign
+                        size={16}
+                        style={{ marginRight: "8px", flexShrink: 0 }}
+                      />
+                      <div
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {formatPrice(business.dish_lowest_cost)}đ -{" "}
+                        {formatPrice(business.dish_highest_cost)}đ
+                      </div>
+                    </div>
+
+                    <div
+                      className="business-rating"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <span style={{ marginRight: "5px" }}>
+                        {business.rating_average || "0"}
+                      </span>
+                      <Rating
+                        initialRating={business.rating_average}
+                        readonly
+                        emptySymbol={
+                          <FontAwesomeIcon
+                            icon={regularStar}
+                            style={{ fontSize: 14, color: "#ccc" }}
+                          />
+                        }
+                        fullSymbol={
+                          <FontAwesomeIcon
+                            icon={solidStar}
+                            style={{ fontSize: 14, color: "#FFD700" }}
+                          />
+                        }
+                        fractions={10}
+                        quiet={true}
+                      />
+                      <span style={{ marginLeft: "5px" }}>
+                        ({business.totalReviews || "0"})
+                      </span>
+                    </div>
+
+                    <div
+                      className="business-hours"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <Clock
+                        size={16}
+                        style={{ marginRight: "8px", flexShrink: 0 }}
+                      />
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span
+                          style={{
+                            marginRight: "5px",
+                            color: isBusinessOpen(
+                              business.open_hours,
+                              business.close_hours
+                            )
+                              ? "#52c41a"
+                              : "#ff4d4f",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {isBusinessOpen(
+                            business.open_hours,
+                            business.close_hours
+                          )
+                            ? "Đang mở cửa"
+                            : "Đã đóng cửa"}
+                        </span>
+                        <span style={{ whiteSpace: "nowrap" }}>
+                          {business.open_hours || "0"} -{" "}
+                          {business.close_hours || "0"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+          <div
+            style={{
+              marginTop: "24px",
+              placeItems: "center",
+            }}
+          >
+            <BusinessPagination
+              totalItems={filteredBusinessData.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={onPageChange}
+            />
+          </div>
+        </>
+      )}
     </BoxContainer>
   );
 };
