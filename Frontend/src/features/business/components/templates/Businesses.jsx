@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button, Drawer } from "antd";
-import { FilterOutlined } from "@ant-design/icons";
+// import { FilterOutlined } from "@ant-design/icons";
 import BusinessFilter from "../organisms/BusinessFilter";
 import BusinessList from "./BusinessList";
+import BoxContainer from "../../../../components/atoms/BoxContainer";
 
 const Businesses = ({ businessData }) => {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -73,7 +74,16 @@ const Businesses = ({ businessData }) => {
         </div>
       )}
 
-      {/* Nút thả nổi chỉ hiển thị trên xs và sm */}
+      {/* Nút tìm kiếm và lọc chỉ hiển thị trên xs và sm */}
+      {isSmallScreen && (
+        <BoxContainer>
+          <Button onClick={showDrawer} block>
+            Tìm kiếm và lọc
+          </Button>
+        </BoxContainer>
+      )}
+
+      {/* Nút thả nổi chỉ hiển thị trên xs và sm
       {isSmallScreen && !visible && (
         <Button
           type="primary"
@@ -88,13 +98,12 @@ const Businesses = ({ businessData }) => {
             zIndex: 10010,
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
           }}
-        />
-      )}
+        /> */}
 
       {/* Drawer chỉ hiển thị trên xs và sm */}
       {isSmallScreen && (
         <Drawer
-          title="Tìm kiếm và bộ lọc"
+          title="Tìm kiếm và lọc"
           placement="left"
           onClose={onClose}
           open={visible}

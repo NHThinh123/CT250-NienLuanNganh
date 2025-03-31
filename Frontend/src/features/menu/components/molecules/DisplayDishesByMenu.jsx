@@ -1,7 +1,7 @@
 import { List, Button } from "antd";
 import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 import DeleteDish from "../../../dish/components/templates/DeleteDish";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { SquarePlus } from "lucide-react";
 import UpdateDish from "./UpdateDish";
 import { BusinessContext } from "../../../../contexts/business.context";
@@ -18,11 +18,19 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
   const { dishData } = useDishByMenuId(menuId);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAllDishes, setShowAllDishes] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth); // Theo dõi chiều rộng màn hình
   const { business } = useContext(BusinessContext);
   const isBusinessOwner =
     business.isAuthenticated && business.business.id == businessId;
   const MAX_LENGTH = 150;
   const MAX_VISIBLE_DISHES = 4;
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -50,6 +58,9 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
     return null;
   }
 
+  // Điều kiện để thay đổi layout
+  const isSmallScreen = windowWidth < 450;
+
   return (
     <>
       {dishData.length > 0 ? (
@@ -62,54 +73,161 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
                 <div
                   style={{
                     display: "flex",
+                    flexDirection: isSmallScreen ? "column" : "row",
                     padding: 0,
                     boxSizing: "border-box",
                     width: "100%",
+                    alignItems: isSmallScreen ? "stretch" : "center",
                   }}
                 >
+                  {/* Hàng 1: Ảnh, Tên (và Mô tả khi ≥ 450px), Giá, Nút */}
                   <div
                     style={{
-                      flex: "0 0 16.6667%",
-                      maxWidth: "16.6667%",
-                      boxSizing: "border-box",
-                    }}
-                  >
-                    <img
-                      style={{
-                        width: "70px",
-                        height: "70px",
-                        objectFit: "cover",
-                      }}
-                      src={dish.dish_url}
-                      alt="Ảnh"
-                    />
-                  </div>
-                  <div
-                    style={{
-                      flex: `0 0 ${isBusinessOwner ? "54.1667%" : "62.5%"}`,
-                      maxWidth: `${isBusinessOwner ? "54.1667%" : "62.5%"}`,
-                      padding: 0,
-                      boxSizing: "border-box",
-                      overflow: "hidden",
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                      flexWrap: isSmallScreen ? "wrap" : "nowrap",
                     }}
                   >
                     <div
                       style={{
-                        fontSize: "16px",
-                        color: "#464646",
-                        fontWeight: "bold",
-                        overflowWrap: "break-word",
-                        wordBreak: "break-word",
+                        maxWidth: isSmallScreen ? "70px" : "16.6667%",
+                        minWidth: "70px",
+                        boxSizing: "border-box",
                       }}
                     >
-                      {dish.dish_name}
+                      <img
+                        style={{
+                          width: "70px",
+                          height: "70px",
+                          objectFit: "cover",
+                        }}
+                        src={dish.dish_url}
+                        alt="Ảnh"
+                      />
                     </div>
-                    <div>
+                    <div
+                      style={{
+                        flex: isSmallScreen
+                          ? "1 1 40vw"
+                          : `1 1 ${isBusinessOwner ? "65%" : "80%"}`, // Khi ≥ 450px, giữ tỷ lệ như code cũ
+                        maxWidth: isSmallScreen
+                          ? "40vw"
+                          : `${isBusinessOwner ? "65%" : "80%"}`,
+                        padding: "0 1.5vw",
+                        boxSizing: "border-box",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "16px",
+                          color: "#464646",
+                          fontWeight: "bold",
+                          overflowWrap: "break-word",
+                          wordBreak: "break-word",
+                          whiteSpace: "normal",
+                        }}
+                      >
+                        {dish.dish_name}
+                      </div>
+                      {/* Mô tả nằm cùng container với tên khi ≥ 450px */}
+                      {!isSmallScreen && (
+                        <div
+                          style={{
+                            textAlign: "justify",
+                            overflowWrap: "break-word",
+                            wordBreak: "break-word",
+                            whiteSpace: "normal",
+                          }}
+                        >
+                          {dish.dish_description.length > MAX_LENGTH &&
+                          !isExpanded
+                            ? dish.dish_description.slice(0, MAX_LENGTH) + "..."
+                            : dish.dish_description}
+                          {dish.dish_description.length > MAX_LENGTH && (
+                            <button
+                              onClick={toggleExpand}
+                              style={{
+                                color: "blue",
+                                cursor: "pointer",
+                                border: "none",
+                                background: "none",
+                                padding: 0,
+                              }}
+                            >
+                              {isExpanded ? "Ẩn bớt" : "Xem thêm"}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        flex: "0 0 95px",
+                        minWidth: "80px",
+                        boxSizing: "border-box",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "16px",
+                          color: "#0288D1",
+                          fontWeight: "bold",
+                          whiteSpace: "nowrap",
+                          paddingRight: 4,
+                        }}
+                      >
+                        {formatPrice(dish.dish_price)}đ
+                      </div>
+                    </div>
+                    {isBusinessOwner && (
+                      <div
+                        style={{
+                          flex: "0 0 auto",
+                          minWidth: "60px",
+                          boxSizing: "border-box",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 4,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <UpdateDish
+                            dishId={dish._id}
+                            businessId={businessId}
+                          />
+                          <DeleteDish
+                            dishName={dish.dish_name}
+                            dishId={dish._id}
+                            businessId={businessId}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Hàng 2: Mô tả khi < 450px */}
+                  {isSmallScreen && (
+                    <div
+                      style={{
+                        padding: "8px 0 0 0",
+                        boxSizing: "border-box",
+                        width: "100%",
+                      }}
+                    >
                       <div
                         style={{
                           textAlign: "justify",
                           overflowWrap: "break-word",
                           wordBreak: "break-word",
+                          whiteSpace: "normal",
                         }}
                       >
                         {dish.dish_description.length > MAX_LENGTH &&
@@ -132,80 +250,11 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
                         </button>
                       )}
                     </div>
-                  </div>
-                  <div
-                    style={{
-                      flex: "0 0 20.8333%",
-                      maxWidth: "20.8333%",
-                      boxSizing: "border-box",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "16px",
-                        color: "#0288D1",
-                        fontWeight: "bold",
-                        display: "grid",
-                        placeItems: "center",
-                        justifyContent: "flex-end",
-                        height: "100%",
-                        width: "100%",
-                        paddingRight: 8,
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {formatPrice(dish.dish_price)}đ
-                    </div>
-                  </div>
-                  {isBusinessOwner && (
-                    <div
-                      style={{
-                        flex: "0 0 8.3333%",
-                        maxWidth: "8.3333%",
-                        boxSizing: "border-box",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "grid",
-                          placeItems: "center",
-                          height: "100%",
-                          width: "100%",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: 4,
-                            alignItems: "center",
-                          }}
-                        >
-                          <div>
-                            <UpdateDish
-                              dishId={dish._id}
-                              businessId={businessId}
-                            />
-                          </div>
-                          <DeleteDish
-                            dishName={dish.dish_name}
-                            dishId={dish._id}
-                            businessId={businessId}
-                          />
-                        </div>
-                      </div>
-                    </div>
                   )}
                 </div>
-                <hr
-                  style={{
-                    height: "2px",
-                    border: "none",
-                    opacity: "0.2",
-                    marginTop: 6,
-                    width: "100%",
-                  }}
-                />
+                <div
+                  style={{ borderTop: "1px solid #ddd", marginTop: 5 }}
+                ></div>
               </List.Item>
             )}
           />

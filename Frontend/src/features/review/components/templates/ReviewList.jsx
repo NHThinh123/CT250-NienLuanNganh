@@ -1,4 +1,4 @@
-import { List, Row, Col, Flex } from "antd";
+import { List, Row, Col } from "antd";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import "../../../../styles/global.css";
 import ReviewItem from "../organisms/ReviewItem";
