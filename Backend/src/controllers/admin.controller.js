@@ -3,6 +3,7 @@ const Business = require("../models/business.model");
 const bcrypt = require("bcryptjs");
 const Payment = require("../models/payment.model");
 
+const stripe = require
 // Lấy danh sách tất cả users
 exports.getAllUsers = async (req, res) => {
     try {
@@ -18,21 +19,20 @@ exports.createUser = async (req, res) => {
     try {
         const { name, email, password, dateOfBirth, role, verified } = req.body;
 
-        // Validation
+
         if (!name || !email || !password || !dateOfBirth || !role) {
             return res.status(400).json({ message: "Thiếu thông tin bắt buộc" });
         }
 
-        // Kiểm tra email đã tồn tại
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(409).json({ message: "Email đã tồn tại" });
         }
 
-        // Hash mật khẩu
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Tạo user mới
+
         const newUser = new User({
             name,
             email,
@@ -70,7 +70,7 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-// Xóa mềm user
+// Xóa  user
 exports.deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -110,7 +110,7 @@ exports.createBusiness = async (req, res) => {
             status,
         } = req.body;
 
-        // Validation
+
         if (
             !business_name ||
             !email ||
@@ -125,16 +125,14 @@ exports.createBusiness = async (req, res) => {
             return res.status(400).json({ message: "Thiếu thông tin bắt buộc" });
         }
 
-        // Kiểm tra email đã tồn tại
+
         const existingBusiness = await Business.findOne({ email });
         if (existingBusiness) {
             return res.status(400).json({ message: "Email đã tồn tại" });
         }
 
-        // Hash mật khẩu
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Tạo business mới
         const newBusiness = new Business({
             business_name,
             email,
@@ -179,7 +177,7 @@ exports.updateBusiness = async (req, res) => {
     }
 };
 
-// Xóa mềm business
+// Xóa business
 exports.deleteBusiness = async (req, res) => {
     try {
         const { id } = req.params;

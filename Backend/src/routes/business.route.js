@@ -14,6 +14,7 @@ const {
   requestBusinessPasswordReset,
   resetBusinessPassword,
   getBusinessEmail,
+  getBilling
 } = require("../controllers/business.controller");
 const router = express.Router();
 const upload = require("../middleware/uploadAvatar");
@@ -46,14 +47,14 @@ router.get("/get-email/:token", getBusinessEmail);
 router.post("/", async (req, res) => {
   try {
     const newUser = await Business.create(req.body);
-    // Gửi thông báo qua WebSocket khi user mới được tạo
     req.app.get("notifyBusinessrStats")();
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ message: "Error creating user", error });
   }
 });
-
+//Lấy danh sách hóa đơn
+router.get("/billing/:businessId", getBilling);
 router.get("/id/:id", getBusinessById);
 router.put("/id/:id", upload.single("avatar"), updateBusiness);
 router.post("/signupBusiness", upload.single("avatar"), signupBusiness);

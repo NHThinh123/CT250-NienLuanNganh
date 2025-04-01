@@ -770,6 +770,36 @@ const getBusinessEmail = async (req, res) => {
     res.status(500).json({ message: "Lỗi server, vui lòng thử lại" });
   }
 };
+//Lấy danh sách hóa đơn
+const getBilling = async (req, res) => {
+  const { businessId } = req.params;
+
+  try {
+
+    const payments = await Payment.find({ businessId }).sort({ paymentDate: -1 });
+
+
+    const stripeInvoices = await stripe.invoices.list({
+      customer: payments[0]?.customerId,
+      limit: 100,
+    });
+
+
+    const billingData = payments.map((payment) => ({
+      paymentId: payment.paymentId,
+      amount: payment.amount,
+      paymentDate: payment.paymentDate,
+      businessName: payment.businessName,
+      invoicePdf: payment.invoicePdf || null,
+      status: "active",
+    }));
+
+    res.status(200).json(billingData);
+  } catch (error) {
+    console.error("Error fetching billing data:", error);
+    res.status(500).json({ message: "Lỗi khi lấy danh sách hóa đơn" });
+  }
+};
 
 module.exports = {
   getBusiness,
@@ -785,4 +815,5 @@ module.exports = {
   requestBusinessPasswordReset,
   resetBusinessPassword,
   getBusinessEmail,
+  getBilling
 };

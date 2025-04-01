@@ -8,7 +8,7 @@ const initializeWebSocket = (server) => {
     const clients = new Map();
 
     wss.on("connection", (ws) => {
-        console.log("Client connected");
+
 
         // Gửi dữ liệu user ban đầu khi kết nối
         User.aggregate([
@@ -70,18 +70,18 @@ const initializeWebSocket = (server) => {
         ws.on("message", (message) => {
             try {
                 const data = JSON.parse(message.toString());
-                console.log("Received message:", data);
 
-                // Xử lý tin nhắn từ useBusinessById
+
+
                 if (data.businessId) {
                     clients.set(ws, data.businessId.toString());
-                    console.log(`Client is watching business: ${data.businessId}`);
+
                 }
 
-                // Xử lý tin nhắn từ useChat
+
                 if (data.id) {
                     clients.set(ws, data.id.toString());
-                    console.log(`Client ID: ${data.id}`);
+
                 }
 
                 // Xử lý tin nhắn chat
@@ -105,7 +105,7 @@ const initializeWebSocket = (server) => {
         });
 
         ws.on("close", () => {
-            console.log("Client disconnected");
+
             clients.delete(ws);
         });
 

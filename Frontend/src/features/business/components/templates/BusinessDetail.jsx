@@ -1,3 +1,4 @@
+
 import {
   Breadcrumb,
   Col,
@@ -26,7 +27,7 @@ import {
   MessageCircle,
   AlignJustify,
   Check,
-  MessageSquare, // Thêm icon cho nút chat
+  MessageSquare,
 } from "lucide-react";
 import { useState, useEffect, useRef, useContext } from "react";
 import ProfileBusinessPage from "../../../../pages/ProfileBusinessPage";
@@ -38,9 +39,10 @@ import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
 import { AuthContext } from "../../../../contexts/auth.context";
 import { ChatContext } from "../../../../contexts/chat.context";
 import ChatWindow from "../../../../components/atoms/ChatWindow";
+import BillingModal from "../organisms/BillingModal";
+import { useBilling } from "../../hooks/useBilling";
 
 const { Title, Text } = Typography;
-
 
 const CustomMarker = ({
   longitude = 0,
@@ -50,7 +52,6 @@ const CustomMarker = ({
 }) => (
   <Marker longitude={longitude} latitude={latitude} color={color} {...props} />
 );
-
 
 const isBusinessOpen = (openHours, closeHours) => {
   if (!openHours || !closeHours) return false;
@@ -86,18 +87,20 @@ const BusinessDetail = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isBillingModalOpen, setIsBillingModalOpen] = useState(false);
   const mapRef = useRef(null);
   const directionsRef = useRef(null);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  // Thêm state và context để quản lý chat
   const { auth } = useContext(AuthContext);
   const { chatSessions, addChatSession, removeChatSession } = useContext(ChatContext);
   const [chatWindowIndex, setChatWindowIndex] = useState(0);
 
   const isUserLoggedIn = auth?.isAuthenticated;
   const userId = isUserLoggedIn ? auth.user?.id : null;
+
+  const { data: billingData, isLoading: billingLoading, refetch } = useBilling(businessData?._id, isBillingModalOpen);
 
   const formatPrice = (price) => {
     if (typeof price !== "number" || isNaN(price)) {
@@ -179,8 +182,6 @@ const BusinessDetail = ({
     }
   };
 
-  // Hàm xử lý khi nhấn nút "Chat với doanh nghiệp"
-
   const handleChatWithBusiness = () => {
     if (!isUserLoggedIn) {
       message.warning("Vui lòng đăng nhập để sử dụng chat!");
@@ -191,12 +192,10 @@ const BusinessDetail = ({
     const businessName = businessData.business_name;
     const avatar = businessData.avatar;
 
-    // Kiểm tra xem phiên chat đã tồn tại chưa
     if (!chatSessions.some((session) => session.userId === userId && session.businessId === businessId)) {
       addChatSession(userId, businessId, businessName, null, avatar);
-      setChatWindowIndex(chatSessions.length); // Đặt vị trí cho ChatWindow
+      setChatWindowIndex(chatSessions.length);
     } else {
-      // Nếu phiên chat đã tồn tại, tìm index của phiên chat để đặt vị trí ChatWindow
       const existingSessionIndex = chatSessions.findIndex(
         (session) => session.userId === userId && session.businessId === businessId
       );
@@ -204,6 +203,10 @@ const BusinessDetail = ({
     }
   };
 
+  const handleBilling = () => {
+    setIsBillingModalOpen(true);
+    refetch();
+  };
 
   const coordinates = businessData.address?.coordinates || [0, 0];
   const longitude = Number(coordinates[0]);
@@ -328,6 +331,24 @@ const BusinessDetail = ({
                 >
                   Trạng thái thanh toán
                 </Button>
+                <Button
+                  type="text"
+                  onClick={handleBilling}
+                  block
+                  style={{
+                    height: "40px",
+                    borderRadius: "8px",
+                    border: "none",
+                    fontWeight: "500",
+                    transition: "all 0.3s",
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    paddingLeft: "10px",
+                    textAlign: "left",
+                  }}
+                >
+                  Hóa Đơn Thanh Toán
+                </Button>
               </Space>
             </Drawer>
           </div>
@@ -358,7 +379,7 @@ const BusinessDetail = ({
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <p style={styles.businessName}>{businessData.business_name}</p>
-              {/* Thêm nút Chat với doanh nghiệp */}
+
               {isUserLoggedIn && (
                 <Button
                   type="primary"
@@ -373,7 +394,6 @@ const BusinessDetail = ({
                     height: "35px",
                   }}
                 >
-
                   <MessageSquare size={18} />
                   Chat với doanh nghiệp
                 </Button>
@@ -493,7 +513,6 @@ const BusinessDetail = ({
         <Col span={2}></Col>
       </Row>
 
-      {/* Hiển thị ChatWindow nếu có phiên chat với business này */}
       {chatSessions.some(
         (session) =>
           session.userId === userId && session.businessId === businessData._id
@@ -632,7 +651,7 @@ const BusinessDetail = ({
                 strokeWidth={1.75}
                 style={{ marginRight: "8px" }}
               />
-              Chiến dịch khuyến mãi & ưu đãi độc quyền – Hỗ trợ các chương trình
+              Chiến dịch khuyến F mãi & ưu đãi độc quyền – Hỗ trợ các chương trình
               giảm giá, voucher để thu hút khách hàng mới.
             </li>
           </ul>
@@ -753,6 +772,13 @@ const BusinessDetail = ({
           </Space>
         </Card>
       </Modal>
+
+      <BillingModal
+        open={isBillingModalOpen}
+        onClose={() => setIsBillingModalOpen(false)}
+        billingData={billingData}
+        isLoading={billingLoading}
+      />
     </div>
   );
 };
