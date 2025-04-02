@@ -1,6 +1,5 @@
 import { Pagination } from "antd";
 const BusinessPagination = ({ onPageChange, totalItems, itemsPerPage }) => {
-  console.log("totalItem và itemPerPage:", totalItems, itemsPerPage);
   let totalPages = Math.ceil(totalItems / itemsPerPage);
   if (totalPages <= 1) totalPages = 1; // Đảm bảo luôn có ít nhất 1 trang
   return (

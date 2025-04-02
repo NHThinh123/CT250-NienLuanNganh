@@ -78,6 +78,10 @@ const ModalAddMenu = ({
                   required: true,
                   message: "Vui lòng nhập tên thực đơn!",
                 },
+                {
+                  max: 50,
+                  message: "Tên thực đơn không được vượt quá 50 ký tự!",
+                },
               ]}
             >
               <Input

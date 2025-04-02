@@ -46,7 +46,7 @@ const CreateReview = ({ businessId }) => {
   };
 
   return (
-    <BoxContainer>
+    <BoxContainer style={{ width: "100%" }}>
       {!(business.business.id == businessId) && (
         <Button
           type="link"

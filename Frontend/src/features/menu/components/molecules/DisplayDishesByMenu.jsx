@@ -1,7 +1,7 @@
-import { List, Row, Col, Button } from "antd";
+import { List, Button } from "antd";
 import useDishByMenuId from "../../../dish/hooks/useDishByMenuId";
 import DeleteDish from "../../../dish/components/templates/DeleteDish";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { SquarePlus } from "lucide-react";
 import UpdateDish from "./UpdateDish";
 import { BusinessContext } from "../../../../contexts/business.context";
@@ -18,22 +18,28 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
   const { dishData } = useDishByMenuId(menuId);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAllDishes, setShowAllDishes] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth); // Theo dõi chiều rộng màn hình
   const { business } = useContext(BusinessContext);
   const isBusinessOwner =
     business.isAuthenticated && business.business.id == businessId;
-  const MAX_LENGTH = 150; // Giới hạn số ký tự mô tả
-  const MAX_VISIBLE_DISHES = 4; // Giới hạn số món ăn hiển thị ban đầu
+  const MAX_LENGTH = 150;
+  const MAX_VISIBLE_DISHES = 4;
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  // Hàm định dạng giá tiền
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN");
   };
 
-  // Lọc món ăn dựa trên từ khóa tìm kiếm không dấu
   const filteredDishes = dishData.filter(
     (dish) =>
       removeAccents(dish.dish_name.toLowerCase()).includes(
@@ -44,15 +50,16 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
       )
   );
 
-  // Danh sách món ăn hiển thị
   const visibleDishes = showAllDishes
     ? filteredDishes
     : filteredDishes.slice(0, MAX_VISIBLE_DISHES);
 
-  // Nếu không có món ăn nào khớp với từ khóa tìm kiếm, không hiển thị menu
   if (filteredDishes.length === 0) {
     return null;
   }
+
+  // Điều kiện để thay đổi layout
+  const isSmallScreen = windowWidth < 450;
 
   return (
     <>
@@ -62,77 +69,126 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
             grid={{ gutter: 16, column: 1 }}
             dataSource={visibleDishes}
             renderItem={(dish) => (
-              <List.Item styles={{ paddingRight: 0, boderRadius: 8 }}>
-                <Row style={{ padding: 0 }}>
-                  <Col span={4}>
-                    <img
-                      style={{ width: "70px", height: "70px" }}
-                      src={dish.dish_url}
-                      alt="Ảnh"
-                    />
-                  </Col>
-                  <Col span={isBusinessOwner ? 13 : 15} style={{ padding: 0 }}>
-                    <Row>
+              <List.Item style={{ paddingRight: 0, borderRadius: 8 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: isSmallScreen ? "column" : "row",
+                    padding: 0,
+                    boxSizing: "border-box",
+                    width: "100%",
+                    alignItems: isSmallScreen ? "stretch" : "center",
+                  }}
+                >
+                  {/* Hàng 1: Ảnh, Tên (và Mô tả khi ≥ 450px), Giá, Nút */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                      flexWrap: isSmallScreen ? "wrap" : "nowrap",
+                    }}
+                  >
+                    <div
+                      style={{
+                        maxWidth: isSmallScreen ? "70px" : "16.6667%",
+                        minWidth: "70px",
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      <img
+                        style={{
+                          width: "70px",
+                          height: "70px",
+                          objectFit: "cover",
+                        }}
+                        src={dish.dish_url}
+                        alt="Ảnh"
+                      />
+                    </div>
+                    <div
+                      style={{
+                        flex: isSmallScreen
+                          ? "1 1 40vw"
+                          : `1 1 ${isBusinessOwner ? "65%" : "80%"}`, // Khi ≥ 450px, giữ tỷ lệ như code cũ
+                        maxWidth: isSmallScreen
+                          ? "40vw"
+                          : `${isBusinessOwner ? "65%" : "80%"}`,
+                        padding: "0 1.5vw",
+                        boxSizing: "border-box",
+                        overflow: "hidden",
+                      }}
+                    >
                       <div
                         style={{
                           fontSize: "16px",
                           color: "#464646",
                           fontWeight: "bold",
+                          overflowWrap: "break-word",
+                          wordBreak: "break-word",
+                          whiteSpace: "normal",
                         }}
                       >
                         {dish.dish_name}
                       </div>
-                    </Row>
-                    <Row>
-                      <div>
-                        <div style={{ textAlign: "justify" }}>
+                      {/* Mô tả nằm cùng container với tên khi ≥ 450px */}
+                      {!isSmallScreen && (
+                        <div
+                          style={{
+                            textAlign: "justify",
+                            overflowWrap: "break-word",
+                            wordBreak: "break-word",
+                            whiteSpace: "normal",
+                          }}
+                        >
                           {dish.dish_description.length > MAX_LENGTH &&
                           !isExpanded
                             ? dish.dish_description.slice(0, MAX_LENGTH) + "..."
                             : dish.dish_description}
+                          {dish.dish_description.length > MAX_LENGTH && (
+                            <button
+                              onClick={toggleExpand}
+                              style={{
+                                color: "blue",
+                                cursor: "pointer",
+                                border: "none",
+                                background: "none",
+                                padding: 0,
+                              }}
+                            >
+                              {isExpanded ? "Ẩn bớt" : "Xem thêm"}
+                            </button>
+                          )}
                         </div>
-                        {dish.dish_description.length > MAX_LENGTH && (
-                          <button
-                            onClick={toggleExpand}
-                            style={{
-                              color: "blue",
-                              cursor: "pointer",
-                              border: "none",
-                              background: "none",
-                              padding: 0,
-                            }}
-                          >
-                            {isExpanded ? "Ẩn bớt" : "Xem thêm"}
-                          </button>
-                        )}
-                      </div>
-                    </Row>
-                  </Col>
-                  <Col span={isBusinessOwner ? 5 : 5}>
+                      )}
+                    </div>
                     <div
                       style={{
-                        fontSize: "16px",
-                        color: "#0288D1",
-                        fontWeight: "bold",
-                        display: "grid",
-                        placeItems: "center",
+                        flex: "0 0 95px",
+                        minWidth: "80px",
+                        boxSizing: "border-box",
+                        display: "flex",
                         justifyContent: "flex-end",
-                        height: "100%",
-                        width: "100%",
-                        paddingRight: 8,
                       }}
                     >
-                      {formatPrice(dish.dish_price)}đ
-                    </div>
-                  </Col>
-                  {isBusinessOwner && (
-                    <Col span={2}>
                       <div
                         style={{
-                          display: "grid",
-                          placeItems: "center",
-                          height: "100%",
-                          width: "100%",
+                          fontSize: "16px",
+                          color: "#0288D1",
+                          fontWeight: "bold",
+                          whiteSpace: "nowrap",
+                          paddingRight: 4,
+                        }}
+                      >
+                        {formatPrice(dish.dish_price)}đ
+                      </div>
+                    </div>
+                    {isBusinessOwner && (
+                      <div
+                        style={{
+                          flex: "0 0 auto",
+                          minWidth: "60px",
+                          boxSizing: "border-box",
                         }}
                       >
                         <div
@@ -140,14 +196,13 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
                             display: "flex",
                             gap: 4,
                             alignItems: "center",
+                            justifyContent: "center",
                           }}
                         >
-                          <div>
-                            <UpdateDish
-                              dishId={dish._id}
-                              businessId={businessId}
-                            />
-                          </div>
+                          <UpdateDish
+                            dishId={dish._id}
+                            businessId={businessId}
+                          />
                           <DeleteDish
                             dishName={dish.dish_name}
                             dishId={dish._id}
@@ -155,17 +210,51 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
                           />
                         </div>
                       </div>
-                    </Col>
+                    )}
+                  </div>
+
+                  {/* Hàng 2: Mô tả khi < 450px */}
+                  {isSmallScreen && (
+                    <div
+                      style={{
+                        padding: "8px 0 0 0",
+                        boxSizing: "border-box",
+                        width: "100%",
+                      }}
+                    >
+                      <div
+                        style={{
+                          textAlign: "justify",
+                          overflowWrap: "break-word",
+                          wordBreak: "break-word",
+                          whiteSpace: "normal",
+                        }}
+                      >
+                        {dish.dish_description.length > MAX_LENGTH &&
+                        !isExpanded
+                          ? dish.dish_description.slice(0, MAX_LENGTH) + "..."
+                          : dish.dish_description}
+                      </div>
+                      {dish.dish_description.length > MAX_LENGTH && (
+                        <button
+                          onClick={toggleExpand}
+                          style={{
+                            color: "blue",
+                            cursor: "pointer",
+                            border: "none",
+                            background: "none",
+                            padding: 0,
+                          }}
+                        >
+                          {isExpanded ? "Ẩn bớt" : "Xem thêm"}
+                        </button>
+                      )}
+                    </div>
                   )}
-                </Row>
-                <hr
-                  style={{
-                    height: "2px",
-                    border: "no",
-                    opacity: "0.2",
-                    marginTop: 6,
-                  }}
-                />
+                </div>
+                <div
+                  style={{ borderTop: "1px solid #ddd", marginTop: 5 }}
+                ></div>
               </List.Item>
             )}
           />
@@ -178,6 +267,8 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
             fontSize: "16px",
             color: "#888",
             display: "flex",
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
           Chưa có món! Vui lòng nhấn vào nút <SquarePlus strokeWidth={1} /> để
@@ -185,7 +276,7 @@ const DisplayDishesByMenu = ({ menuId, businessId, searchKeyword }) => {
         </div>
       )}
       {filteredDishes.length > MAX_VISIBLE_DISHES && (
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", width: "100%" }}>
           <Button
             type="link"
             onClick={() => setShowAllDishes(!showAllDishes)}

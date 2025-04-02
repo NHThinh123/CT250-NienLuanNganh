@@ -121,7 +121,10 @@ const ModalAddDish = ({
             <Form.Item
               label="Tên món:"
               name="dish_name"
-              rules={[{ required: true, message: "Vui lòng nhập tên món!" }]}
+              rules={[
+                { required: true, message: "Vui lòng nhập tên món!" },
+                { max: 50, message: "Tên món không được vượt quá 50 ký tự!" },
+              ]}
             >
               <Input size="large" placeholder="Nhập tên món" />
             </Form.Item>
@@ -140,7 +143,12 @@ const ModalAddDish = ({
                 {
                   type: "number",
                   min: 1000,
-                  message: "Giá món phải từ 1000 VND!",
+                  message: "Giá món phải từ 1.000 VND!",
+                },
+                {
+                  type: "number",
+                  max: 100000000,
+                  message: "Giá món phải nhỏ hơn 100.000.000 VND!",
                 },
               ]}
             >

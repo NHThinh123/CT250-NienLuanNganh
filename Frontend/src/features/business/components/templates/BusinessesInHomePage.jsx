@@ -54,127 +54,204 @@ const BusinessInHomePage = ({ businessData }) => {
       {businessData.slice(0, 10).map((business) => (
         <Col
           key={business._id}
-          xs={24}
-          sm={12}
+          xs={12}
+          sm={8}
           md={8}
           lg={6}
           xl={6}
-          style={{ padding: "10px" }}
+          style={{ display: "flex" }}
         >
-          <Card
-            hoverable
-            cover={
-              <img
-                style={{ width: "100%", height: "200px" }}
-                alt="business avatar"
-                src={business.avatar || "default-image.jpg"}
-              />
-            }
-            onClick={() => navigate(`/businesses/${business._id}`)}
+          <div
             style={{
               width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: "250px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+              transition: "box-shadow 0.3s ease-in-out",
             }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.boxShadow =
+                "0 6px 16px rgba(0, 0, 0, 0.2)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.boxShadow =
+                "0 4px 10px rgba(0, 0, 0, 0.1)")
+            }
           >
-            <div>
-              <Card.Meta
-                title={
-                  <span
+            <Card
+              hoverable
+              cover={
+                <div style={{ position: "relative", paddingTop: "60%" }}>
+                  <img
                     style={{
-                      maxWidth: "100%",
-                      display: "block",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      fontSize: 18,
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderTopLeftRadius: "8px",
+                      borderTopRightRadius: "8px",
                     }}
-                  >
-                    {business.business_name || "N/A"}
-                  </span>
-                }
-              />
+                    alt="business avatar"
+                    src={business.avatar || "default-image.jpg"}
+                  />
+                </div>
+              }
+              onClick={() => navigate(`/businesses/${business._id}`)}
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+              }}
+              styles={{ body: { padding: "15px", borderRadius: 0 } }}
+            >
               <div
                 style={{
-                  fontSize: "14px",
-                  color: "#666",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  marginTop: 8,
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
-                {business.location || "N/A"}
+                <Card.Meta
+                  title={
+                    <div
+                      className="business-title"
+                      style={{ marginBottom: "8px" }}
+                    >
+                      <span
+                        style={{
+                          display: "block",
+                          fontSize: "18px",
+                          fontWeight: "bold",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {business.business_name || "N/A"}
+                      </span>
+                    </div>
+                  }
+                />
+                <div
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    marginBottom: 12,
+                  }}
+                >
+                  {business.location || "N/A"}
+                </div>
               </div>
-            </div>
-            <p
-              style={{
-                marginTop: "8px",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <CircleDollarSign size={18} style={{ marginRight: "8px" }} />
-              {formatPrice(business.dish_lowest_cost)}đ -{" "}
-              {formatPrice(business.dish_highest_cost)}đ
-            </p>
-            <p
-              style={{
-                marginTop: "8px",
-                display: "flex",
-                gap: 5,
-              }}
-            >
-              {business.rating_average || "0"}
-              <Rating
-                initialRating={business.rating_average}
-                readonly
-                emptySymbol={
-                  <FontAwesomeIcon
-                    icon={regularStar}
-                    style={{ fontSize: 15, color: "#ccc" }}
+              <div className="business-info" style={{ marginTop: "auto" }}>
+                <div
+                  className="business-price"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "8px",
+                    fontSize: "14px",
+                  }}
+                >
+                  <CircleDollarSign
+                    size={16}
+                    style={{ marginRight: "8px", flexShrink: 0 }}
                   />
-                }
-                fullSymbol={
-                  <FontAwesomeIcon
-                    icon={solidStar}
-                    style={{ fontSize: 15, color: "#FFD700" }}
+                  <div
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatPrice(business.dish_lowest_cost)}đ -{" "}
+                    {formatPrice(business.dish_highest_cost)}đ
+                  </div>
+                </div>
+
+                <div
+                  className="business-rating"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "8px",
+                    fontSize: "14px",
+                  }}
+                >
+                  <span style={{ marginRight: "5px" }}>
+                    {business.rating_average || "0"}
+                  </span>
+                  <Rating
+                    initialRating={business.rating_average}
+                    readonly
+                    emptySymbol={
+                      <FontAwesomeIcon
+                        icon={regularStar}
+                        style={{ fontSize: 14, color: "#ccc" }}
+                      />
+                    }
+                    fullSymbol={
+                      <FontAwesomeIcon
+                        icon={solidStar}
+                        style={{ fontSize: 14, color: "#FFD700" }}
+                      />
+                    }
+                    fractions={10}
+                    quiet={true}
                   />
-                }
-                fractions={10}
-                quiet={true}
-              />
-              ({business.totalReviews || "0"})
-            </p>
-            <p
-              style={{
-                marginTop: "8px",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Clock size={18} style={{ marginRight: "8px" }} />
-              <span
-                style={{
-                  marginRight: "5px",
-                  color: isBusinessOpen(
-                    business.open_hours,
-                    business.close_hours
-                  )
-                    ? "#52c41a" // Màu xanh nếu đang mở
-                    : "#ff4d4f", // Màu đỏ nếu đã đóng
-                  fontWeight: "bold",
-                }}
-              >
-                {isBusinessOpen(business.open_hours, business.close_hours)
-                  ? "Đang mở cửa"
-                  : "Đã đóng cửa"}
-              </span>
-              {business.open_hours || "0"} - {business.close_hours || "0"}
-            </p>
-          </Card>
+                  <span style={{ marginLeft: "5px" }}>
+                    ({business.totalReviews || "0"})
+                  </span>
+                </div>
+
+                <div
+                  className="business-hours"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "14px",
+                  }}
+                >
+                  <Clock
+                    size={16}
+                    style={{ marginRight: "8px", flexShrink: 0 }}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span
+                      style={{
+                        marginRight: "5px",
+                        color: isBusinessOpen(
+                          business.open_hours,
+                          business.close_hours
+                        )
+                          ? "#52c41a"
+                          : "#ff4d4f",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {isBusinessOpen(business.open_hours, business.close_hours)
+                        ? "Đang mở cửa"
+                        : "Đã đóng cửa"}
+                    </span>
+                    <span style={{ whiteSpace: "nowrap" }}>
+                      {business.open_hours || "0"} -{" "}
+                      {business.close_hours || "0"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
         </Col>
       ))}
     </Row>

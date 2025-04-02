@@ -1,4 +1,3 @@
-
 import {
   Breadcrumb,
   Col,
@@ -94,18 +93,21 @@ const BusinessDetail = ({
   const [open, setOpen] = useState(false);
 
   const { auth } = useContext(AuthContext);
-  const { chatSessions, addChatSession, removeChatSession } = useContext(ChatContext);
+  const { chatSessions, addChatSession, removeChatSession } =
+    useContext(ChatContext);
   const [chatWindowIndex, setChatWindowIndex] = useState(0);
 
   const isUserLoggedIn = auth?.isAuthenticated;
   const userId = isUserLoggedIn ? auth.user?.id : null;
 
-  const { data: billingData, isLoading: billingLoading, refetch } = useBilling(businessData?._id, isBillingModalOpen);
+  const {
+    data: billingData,
+    isLoading: billingLoading,
+    refetch,
+  } = useBilling(businessData?._id, isBillingModalOpen);
 
   const formatPrice = (price) => {
-    if (typeof price !== "number" || isNaN(price)) {
-      return "N/A";
-    }
+    if (typeof price !== "number" || isNaN(price)) return "N/A";
     return price.toLocaleString("vi-VN");
   };
 
@@ -137,36 +139,19 @@ const BusinessDetail = ({
     const today = new Date();
     const dueDate = new Date(businessData.nextPaymentDueDate);
     const timeDiff = dueDate - today;
-    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-    return daysDiff;
+    return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
   };
 
-  if (isLoading) {
-    return <h1 style={styles.loadingText}>Loading...</h1>;
-  }
-  if (isError) {
-    return <h1 style={styles.errorText}>Error...</h1>;
-  }
+  if (isLoading) return <h1 style={styles.loadingText}>Loading...</h1>;
+  if (isError) return <h1 style={styles.errorText}>Error...</h1>;
 
-  const handleEdit = () => {
-    setIsModalOpen(true);
-  };
-
-  const handlePaymentStatus = () => {
-    setIsPaymentModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handlePaymentModalClose = () => {
-    setIsPaymentModalOpen(false);
-  };
+  const handleEdit = () => setIsModalOpen(true);
+  const handlePaymentStatus = () => setIsPaymentModalOpen(true);
+  const handleModalClose = () => setIsModalOpen(false);
+  const handlePaymentModalClose = () => setIsPaymentModalOpen(false);
 
   const handlePaymentClick = () => {
     const daysUntilDue = getDaysUntilDueDate();
-
     if (daysUntilDue <= 3) {
       navigate(`/subscription/plans/${businessData._id}`, {
         state: {
@@ -192,12 +177,18 @@ const BusinessDetail = ({
     const businessName = businessData.business_name;
     const avatar = businessData.avatar;
 
-    if (!chatSessions.some((session) => session.userId === userId && session.businessId === businessId)) {
+    if (
+      !chatSessions.some(
+        (session) =>
+          session.userId === userId && session.businessId === businessId
+      )
+    ) {
       addChatSession(userId, businessId, businessName, null, avatar);
       setChatWindowIndex(chatSessions.length);
     } else {
       const existingSessionIndex = chatSessions.findIndex(
-        (session) => session.userId === userId && session.businessId === businessId
+        (session) =>
+          session.userId === userId && session.businessId === businessId
       );
       setChatWindowIndex(existingSessionIndex);
     }
@@ -214,20 +205,8 @@ const BusinessDetail = ({
   const mapboxToken = import.meta.env.VITE_TOKENMAPBOX;
 
   useEffect(() => {
-    if (
-      !mapRef.current ||
-      !mapboxToken ||
-      isNaN(longitude) ||
-      isNaN(latitude)
-    ) {
-      console.error("Cannot initialize directions:", {
-        map: !!mapRef.current,
-        token: !!mapboxToken,
-        longitude,
-        latitude,
-      });
+    if (!mapRef.current || !mapboxToken || isNaN(longitude) || isNaN(latitude))
       return;
-    }
 
     mapRef.current.flyTo({
       center: [longitude, latitude],
@@ -354,9 +333,16 @@ const BusinessDetail = ({
           </div>
         </div>
       )}
-      <Row>
-        <Col span={2}></Col>
-        <Col span={10}>
+      <Row gutter={[32, 0]}>
+        <Col xs={0} sm={2} md={1} lg={2} xl={2}></Col>
+        <Col
+          xs={24}
+          sm={20}
+          md={11}
+          lg={10}
+          xl={10}
+          style={{ placeContent: "center" }}
+        >
           <div style={styles.businessAva}>
             <Avatar
               style={styles.businessImage}
@@ -365,7 +351,16 @@ const BusinessDetail = ({
             />
           </div>
         </Col>
-        <Col span={10}>
+        <Col xs={0} sm={2} md={0} lg={0} xl={0}></Col>
+        <Col xs={0} sm={2} md={0} lg={0} xl={0}></Col>
+        <Col
+          xs={24}
+          sm={20}
+          md={11}
+          lg={10}
+          xl={10}
+          style={{ placeContent: "center" }}
+        >
           <div style={styles.businessDetail}>
             <div style={styles.businessBreadcrumb}>
               <Breadcrumb
@@ -373,7 +368,7 @@ const BusinessDetail = ({
                 items={[
                   { title: "Trang chủ", href: "/" },
                   { title: "Quán ăn", href: "/businesses" },
-                  { title: `${businessData.business_name}` },
+                  { title: businessData.business_name },
                 ]}
               />
             </div>
@@ -400,26 +395,21 @@ const BusinessDetail = ({
               )}
             </div>
             <div style={styles.businessRating}>
-              <p>
-                <Rating
-                  initialRating={businessData.rating_average}
-                  readonly
-                  emptySymbol={
-                    <FontAwesomeIcon
-                      icon={regularStar}
-                      style={{ fontSize: 20, color: "#ccc" }}
-                    />
-                  }
-                  fullSymbol={
-                    <FontAwesomeIcon
-                      icon={solidStar}
-                      style={{ fontSize: 20, color: "#FFD700" }}
-                    />
-                  }
-                  fractions={10}
-                  quiet={true}
-                />
-              </p>
+              <Rating
+                initialRating={businessData.rating_average}
+                readonly
+                emptySymbol={
+                  <FontAwesomeIcon icon={regularStar} style={styles.starIcon} />
+                }
+                fullSymbol={
+                  <FontAwesomeIcon
+                    icon={solidStar}
+                    style={styles.starIconFull}
+                  />
+                }
+                fractions={10}
+                quiet={true}
+              />
               <p style={styles.ratingText}>{businessData.rating_average}/5</p>
             </div>
             <div style={styles.businessTotalReviews}>
@@ -464,9 +454,7 @@ const BusinessDetail = ({
                 </span>
                 {businessData.open_hours} - {businessData.close_hours}
               </p>
-            </div>
-            <div>
-              <p>
+              <p style={styles.businessPrice}>
                 <CircleDollarSign size={20} style={styles.icon} />
                 {formatPrice(businessData.dish_lowest_cost)}đ -{" "}
                 {formatPrice(businessData.dish_highest_cost)}đ
@@ -474,22 +462,28 @@ const BusinessDetail = ({
             </div>
           </div>
         </Col>
-        <Col span={2}></Col>
+        <Col xs={0} sm={2} md={1} lg={2} xl={2}></Col>
       </Row>
 
-      <Row style={{ marginTop: "20px" }}>
-        <Col span={2}></Col>
-        <Col span={20}>
+      <Row gutter={[16, 16]} style={{ marginTop: "20px" }}>
+        <Col xs={0} sm={0} md={1} lg={2}></Col>
+        <Col
+          xs={24}
+          sm={24}
+          md={22}
+          lg={20}
+          // offset={window.innerWidth < 768 ? 0 : 2}
+        >
           <div style={styles.mapContainer}>
             {mapboxToken && !isNaN(longitude) && !isNaN(latitude) ? (
               <ReactMapGL
                 ref={mapRef}
                 initialViewState={{
-                  longitude: longitude,
-                  latitude: latitude,
+                  longitude,
+                  latitude,
                   zoom: 14,
                 }}
-                style={{ width: "100%", height: "300px" }}
+                style={styles.map}
                 mapStyle="mapbox://styles/mapbox/streets-v11"
                 mapboxAccessToken={mapboxToken}
                 scrollZoom={true}
@@ -510,43 +504,44 @@ const BusinessDetail = ({
             )}
           </div>
         </Col>
-        <Col span={2}></Col>
+        <Col xs={0} sm={0} md={1} lg={2}></Col>
       </Row>
 
       {chatSessions.some(
         (session) =>
           session.userId === userId && session.businessId === businessData._id
       ) && (
-          <ChatWindow
-            userId={userId}
-            businessId={businessData._id}
-            businessName={businessData.business_name}
-            userName={null}
-            avatar={businessData.avatar}
-            onClose={() => removeChatSession(userId, businessData._id)}
-            onNewMessage={(newMessage) => {
-              console.log("New message:", newMessage);
-            }}
-            style={{
-              bottom: 80 + chatWindowIndex * 50,
-              right: 20,
-              zIndex: 1000,
-            }}
-          />
-        )}
+        <ChatWindow
+          userId={userId}
+          businessId={businessData._id}
+          businessName={businessData.business_name}
+          userName={null}
+          avatar={businessData.avatar}
+          onClose={() => removeChatSession(userId, businessData._id)}
+          onNewMessage={(newMessage) => {
+            console.log("New message:", newMessage);
+          }}
+          style={{
+            bottom: 80 + chatWindowIndex * 50,
+            right: 20,
+            zIndex: 1000,
+          }}
+        />
+      )}
 
       <Modal
         title="Chỉnh sửa thông tin doanh nghiệp"
         open={isModalOpen}
         onCancel={handleModalClose}
         footer={null}
-        width={800}
+        width={window.innerWidth < 768 ? "90%" : 800}
       >
         <ProfileBusinessPage
           businessId={businessData.id}
           onClose={handleModalClose}
         />
       </Modal>
+
       <Modal
         title={
           <Title level={4} style={{ color: "#000" }}>
@@ -559,13 +554,7 @@ const BusinessDetail = ({
           <Button
             key="register"
             type="primary"
-            style={{
-              backgroundColor: "#52c41a",
-              borderColor: "#52c41a",
-              borderRadius: "5px",
-              height: "35px",
-              fontWeight: "bold",
-            }}
+            style={styles.paymentButton}
             onClick={handlePaymentClick}
           >
             Thanh Toán
@@ -573,15 +562,12 @@ const BusinessDetail = ({
           <Button
             key="cancel"
             onClick={handlePaymentModalClose}
-            style={{
-              borderRadius: "5px",
-              height: "35px",
-            }}
+            style={styles.cancelButton}
           >
             Đóng
           </Button>,
         ]}
-        width={600}
+        width={window.innerWidth < 768 ? "90%" : 600}
       >
         <div>
           <Divider orientation="left" orientationMargin="0">
@@ -651,7 +637,7 @@ const BusinessDetail = ({
                 strokeWidth={1.75}
                 style={{ marginRight: "8px" }}
               />
-              Chiến dịch khuyến F mãi & ưu đãi độc quyền – Hỗ trợ các chương trình
+              Chiến dịch khuyến mãi & ưu đãi độc quyền – Hỗ trợ các chương trình
               giảm giá, voucher để thu hút khách hàng mới.
             </li>
           </ul>
@@ -662,110 +648,45 @@ const BusinessDetail = ({
           }}
         >
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text
-                strong
-                style={{
-                  fontSize: "16px",
-                  color: "#555",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
+            <div style={styles.paymentInfo}>
+              <Text strong style={styles.paymentLabel}>
                 <Store
                   color="#52c41a"
                   strokeWidth={1.5}
                   size={18}
-                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                  style={styles.paymentIcon}
                 />
                 Doanh nghiệp ẩm thực
               </Text>
-              <Text
-                style={{
-                  fontSize: "16px",
-                  color: "#333",
-                  lineHeight: "18px",
-                  fontWeight: "bolder",
-                }}
-              >
+              <Text style={styles.paymentValue}>
                 {businessData.business_name}
               </Text>
             </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text
-                strong
-                style={{
-                  fontSize: "16px",
-                  color: "#555",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
+            <div style={styles.paymentInfo}>
+              <Text strong style={styles.paymentLabel}>
                 <BadgeDollarSign
                   color="#52c41a"
                   strokeWidth={1.5}
                   size={18}
-                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                  style={styles.paymentIcon}
                 />
                 Ngày thanh toán gần nhất
               </Text>
-              <Text
-                style={{
-                  fontSize: "16px",
-                  color: "#333",
-                  lineHeight: "18px",
-                  fontWeight: "bolder",
-                }}
-              >
+              <Text style={styles.paymentValue}>
                 {formatDate(businessData.lastPaymentDate)}
               </Text>
             </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text
-                strong
-                style={{
-                  fontSize: "16px",
-                  color: "#555",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
+            <div style={styles.paymentInfo}>
+              <Text strong style={styles.paymentLabel}>
                 <BadgeDollarSign
                   color="#52c41a"
                   strokeWidth={1.5}
                   size={18}
-                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                  style={styles.paymentIcon}
                 />
                 Ngày thanh toán tiếp theo
               </Text>
-              <Text
-                style={{
-                  fontSize: "16px",
-                  color: "#333",
-                  lineHeight: "18px",
-                  fontWeight: "bolder",
-                }}
-              >
+              <Text style={styles.paymentValue}>
                 {formatDate(businessData.nextPaymentDueDate)}
               </Text>
             </div>
@@ -786,30 +707,49 @@ const BusinessDetail = ({
 const styles = {
   businessPage: {
     backgroundColor: "#ffffff",
-    padding: "20px 0px",
+    padding: "20px 10px",
     position: "relative",
+    minHeight: "100vh",
   },
   editButtonContainer: {
     position: "absolute",
-    top: "20px",
-    right: "120px",
+    top: "10px",
+    right: "10px",
     zIndex: 10,
+  },
+  editButton: {
+    height: "30px",
+    background: "#ffffff",
+  },
+  drawer: {
+    borderRadius: "10px 0 0 10px",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+    border: "none",
+  },
+  drawerButton: {
+    height: "40px",
+    borderRadius: "8px",
+    border: "none",
+    fontWeight: "500",
+    transition: "all 0.3s",
     display: "flex",
-    flexDirection: "column",
-    gap: "10px",
+    justifyContent: "flex-start",
+    paddingLeft: "10px",
+    textAlign: "left",
   },
   businessAva: {
-    margin: "18px 0px 25px 0px",
-    width: "95%",
+    margin: "10px 0",
+    width: "100%",
   },
   businessImage: {
     width: "100%",
-    height: "300px",
+    height: "auto",
+    maxHeight: "300px",
     borderRadius: "5px",
     objectFit: "cover",
   },
   businessDetail: {
-    margin: "0px",
+    margin: "0",
     width: "100%",
     display: "flex",
     flexDirection: "column",
@@ -820,60 +760,117 @@ const styles = {
     marginBottom: "7px",
   },
   businessName: {
-    fontSize: "25px",
+    fontSize: "clamp(18px, 6vw, 24px)", // Giảm từ 28px xuống 24px
     fontWeight: "bold",
     color: "#464646",
-    marginBottom: "10px",
+    marginBottom: "10px", // Tăng từ 0 lên 10px để cân đối với businessRating
     cursor: "text",
   },
   businessRating: {
     display: "flex",
+    alignItems: "center",
+    marginBottom: "10px", // Giữ nguyên, đồng bộ với các phần khác
   },
+  starIcon: { fontSize: "clamp(16px, 4vw, 18px)", color: "#ccc" },
+  starIconFull: { fontSize: "clamp(16px, 4vw, 18px)", color: "#FFD700" },
   ratingText: {
-    fontSize: "15px",
-    margin: "0px 0px 0px 6px",
+    fontSize: "clamp(12px, 4vw, 16px)", // Giảm max từ 18px xuống 16px cho cân đối
+    margin: "0 0 0 10px",
     fontWeight: "bold",
   },
   businessTime: {
-    fontSize: "15px",
+    fontSize: "clamp(12px, 4vw, 16px)", // Giảm max từ 18px xuống 16px
     color: "#252525",
+    marginBottom: "10px", // Đồng bộ marginBottom
   },
   businessTotalReviews: {
-    fontSize: "15px",
+    fontSize: "clamp(12px, 4vw, 16px)", // Giảm max từ 18px xuống 16px
     color: "#252525",
+    marginBottom: "10px", // Đồng bộ marginBottom
   },
   businessLocation: {
-    fontSize: "15px",
+    fontSize: "clamp(12px, 4vw, 16px)", // Giảm max từ 18px xuống 16px
     color: "#252525",
     cursor: "text",
+    marginBottom: "10px", // Đồng bộ marginBottom
   },
   businessContactInfo: {
-    fontSize: "15px",
+    fontSize: "clamp(12px, 4vw, 16px)", // Giảm max từ 18px xuống 16px
     color: "#252525",
     cursor: "text",
+    marginBottom: "10px", // Đồng bộ marginBottom
   },
-  icon: {
-    marginRight: "5px",
-    marginBottom: "-3px",
+  businessPrice: {
+    fontSize: "clamp(12px, 4vw, 16px)", // Giảm max từ 18px xuống 16px
+    color: "#252525",
+    marginBottom: "10px", // Đồng bộ marginBottom
   },
+  openStatus: { marginRight: "10px", fontWeight: "bold" },
+  icon: { marginRight: "5px", marginBottom: "-3px" },
   loadingText: {
     textAlign: "center",
-    fontSize: "24px",
+    fontSize: "clamp(18px, 5vw, 24px)",
     fontWeight: "bold",
     color: "#1890ff",
   },
   errorText: {
     textAlign: "center",
-    fontSize: "16px",
+    fontSize: "clamp(14px, 4vw, 16px)",
     fontWeight: "bold",
     color: "red",
   },
   mapContainer: {
     width: "100%",
-    height: "300px",
+    height: "clamp(200px, 50vw, 300px)", // Responsive height
     borderRadius: "5px",
     overflow: "hidden",
   },
+  map: {
+    width: "100%",
+    height: "100%",
+  },
+  paymentButton: {
+    backgroundColor: "#52c41a",
+    borderColor: "#52c41a",
+    borderRadius: "5px",
+    height: "35px",
+    fontWeight: "bold",
+  },
+  cancelButton: {
+    borderRadius: "5px",
+    height: "35px",
+  },
+  benefitsList: {
+    paddingLeft: "20px",
+    marginBottom: "20px",
+    listStyle: "none",
+  },
+  benefitItem: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "8px",
+  },
+  checkIcon: { marginRight: "8px" },
+  paymentCard: { borderRadius: "10px" },
+  paymentInfo: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+  },
+  paymentLabel: {
+    fontSize: "clamp(14px, 3vw, 16px)",
+    color: "#555",
+    display: "flex",
+    alignItems: "center",
+  },
+  paymentValue: {
+    fontSize: "clamp(14px, 3vw, 16px)",
+    color: "#333",
+    lineHeight: "18px",
+    fontWeight: "bolder",
+  },
+  paymentIcon: { marginRight: "8px", verticalAlign: "middle" },
 };
 
 export default BusinessDetail;

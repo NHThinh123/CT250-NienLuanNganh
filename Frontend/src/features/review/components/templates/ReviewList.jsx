@@ -1,4 +1,4 @@
-import { List, Row, Col, Flex } from "antd";
+import { List, Row, Col } from "antd";
 import BoxContainer from "../../../../components/atoms/BoxContainer";
 import "../../../../styles/global.css";
 import ReviewItem from "../organisms/ReviewItem";
@@ -73,7 +73,7 @@ const ReviewList = ({ reviewData, businessId }) => {
   return (
     <BoxContainer>
       <div>
-        <Flex style={{ display: "flex", alignItems: "stretch" }} gap={16}>
+        {/* <Flex style={{ display: "flex", alignItems: "stretch" }} gap={16}>
           <div style={{ flex: 1 }}>
             <ReviewOverview businessId={businessId} />
           </div>
@@ -81,7 +81,29 @@ const ReviewList = ({ reviewData, businessId }) => {
           <div style={{ flex: 1 }}>
             <ReviewFilter onFilterChange={handleFilterChange} />
           </div>
-        </Flex>
+        </Flex> */}
+        <Row>
+          <Col xs={24} sm={12} md={12} lg={24} xl={24}>
+            <ReviewOverview businessId={businessId} />
+          </Col>
+          <Col xs={0} sm={1} md={1} lg={0} xl={0}>
+            <div
+              style={{
+                width: "0.5px",
+                height: "100%",
+                backgroundColor: "#ddd",
+              }}
+            ></div>
+          </Col>
+          <Col xs={24} sm={0} md={0} lg={24} xl={24}>
+            <div
+              style={{ borderTop: "1px solid #ddd", marginBottom: 10 }}
+            ></div>
+          </Col>
+          <Col xs={24} sm={11} md={11} lg={24} xl={24}>
+            <ReviewFilter onFilterChange={handleFilterChange} />
+          </Col>
+        </Row>
         <Row>
           <Col span={24}>
             <div

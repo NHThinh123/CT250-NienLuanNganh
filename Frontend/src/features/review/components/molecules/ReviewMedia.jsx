@@ -76,8 +76,9 @@ const ReviewMedia = ({ assetReviewData }) => {
     if (duration && !isNaN(duration) && duration > 0) {
       const minutes = Math.floor(duration / 60);
       const seconds = Math.floor(duration % 60);
-      const formattedDuration = `${minutes}:${seconds < 10 ? "0" : ""
-        }${seconds}`;
+      const formattedDuration = `${minutes}:${
+        seconds < 10 ? "0" : ""
+      }${seconds}`;
       //console.log(`Duration set for index ${index}: ${formattedDuration}`);
       setVideoDurations((prev) => ({ ...prev, [index]: formattedDuration }));
     } else {
@@ -95,8 +96,12 @@ const ReviewMedia = ({ assetReviewData }) => {
             style={{
               position: "relative",
               display: "inline-block",
+              width: "70px",
+              height: "70px",
               marginRight: 8,
+              marginBottom: 8,
               cursor: "pointer",
+              overflow: "hidden",
             }}
             onClick={() => openModal(index)}
           >
@@ -180,7 +185,7 @@ const ReviewMedia = ({ assetReviewData }) => {
                   top: 0,
                   left: 0,
                   width: "100%",
-                  height: "90%",
+                  height: "100%",
                   background: "rgba(0, 0, 0, 0.5)",
                   borderRadius: "8px",
                   display: "flex",

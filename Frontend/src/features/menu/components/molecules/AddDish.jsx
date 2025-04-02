@@ -33,8 +33,8 @@ const AddDish = ({ menuData }) => {
             style={{
               margin: 0,
               padding: 0,
+              paddingBottom: "18px",
               border: "none",
-              height: "100%",
             }}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}

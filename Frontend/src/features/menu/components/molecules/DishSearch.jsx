@@ -17,17 +17,19 @@ const DishSearch = ({ onSearch }) => {
   // };
 
   return (
-    <BoxContainer style={{ padding: 0 }}>
+    <BoxContainer
+      style={{ position: "sticky", top: 63.8, zIndex: 100, width: "100%" }}
+    >
       <Input.Search
         placeholder="Tìm kiếm món"
         value={searchValue}
         onChange={handleInputChange}
         enterButton
-      // suffix={
-      //   searchValue ? (
-      //     <CloseCircleOutlined onClick={handleClearSearch} />
-      //   ) : null
-      // }
+        // suffix={
+        //   searchValue ? (
+        //     <CloseCircleOutlined onClick={handleClearSearch} />
+        //   ) : null
+        // }
       />
     </BoxContainer>
   );
