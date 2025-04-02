@@ -43,7 +43,7 @@ const ModalUpdateMenu = ({
     <Modal
       title={
         <Typography.Title level={4} style={{ textAlign: "center" }}>
-          Cập nhật menu
+          Cập nhật thực đơn
         </Typography.Title>
       }
       open={isModalOpen}
@@ -78,6 +78,10 @@ const ModalUpdateMenu = ({
               name="menu_name"
               rules={[
                 { required: true, message: "Vui lòng nhập tên thực đơn!" },
+                {
+                  max: 50,
+                  message: "Tên thực đơn không được vượt quá 50 ký tự!",
+                },
               ]}
             >
               <Input size="large" />
