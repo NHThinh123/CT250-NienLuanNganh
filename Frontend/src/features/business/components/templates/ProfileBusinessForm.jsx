@@ -1,10 +1,12 @@
-import { Form, Input, Button, message, Row, Col, Select } from "antd";
+import { Form, Input, Button, message, Row, Col, Select, TimePicker } from "antd";
 import { useState, useEffect } from "react";
 import { useUpdateProfileBusiness } from "../../hooks/useProfileBusiness";
 import { useContext } from "react";
 import { BusinessContext } from "../../../../contexts/business.context";
 import { Map as ReactMapGL, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
 
 const { Option } = Select;
 
@@ -13,14 +15,14 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
     const { business: businessData, setBusiness } = useContext(BusinessContext);
     const updateProfile = useUpdateProfileBusiness({
         onSuccess: (res) => {
-            console.log("onSuccess:", res); // Debug
+            console.log("onSuccess:", res);
             const updatedBusiness = { ...businessData, business: { ...businessData.business, ...res.business } };
             setBusiness(updatedBusiness);
             localStorage.setItem("authBusiness", JSON.stringify(updatedBusiness));
             onCancel();
         },
         onError: (error) => {
-            console.log("onError:", error.message); // Debug
+            console.log("onError:", error.message);
         },
     });
 
@@ -94,8 +96,7 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
                     const data = await response.json();
                     setWards(data.wards || []);
                     adjustMapToAddress(
-                        `${districts.find((d) => d.code === selectedDistrict)?.name}, ${provinces.find((p) => p.code === selectedProvince)?.name
-                        }`
+                        `${districts.find((d) => d.code === selectedDistrict)?.name}, ${provinces.find((p) => p.code === selectedProvince)?.name}`
                     );
                 } catch (error) {
                     console.error("Lỗi khi lấy danh sách phường/xã:", error);
@@ -110,8 +111,7 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
 
     useEffect(() => {
         if (selectedWard) {
-            const fullAddress = `${wards.find((w) => w.code === selectedWard)?.name}, ${districts.find((d) => d.code === selectedDistrict)?.name
-                }, ${provinces.find((p) => p.code === selectedProvince)?.name}`;
+            const fullAddress = `${wards.find((w) => w.code === selectedWard)?.name}, ${districts.find((d) => d.code === selectedDistrict)?.name}, ${provinces.find((p) => p.code === selectedProvince)?.name}`;
             adjustMapToAddress(fullAddress);
         }
     }, [selectedWard, wards, districts, provinces]);
@@ -167,11 +167,10 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
                 type: "Point",
                 coordinates: coordinates,
             },
-            open_hours: values.open_hours,
-            close_hours: values.close_hours,
+            open_hours: values.open_hours ? dayjs(values.open_hours).format("HH:mm") : "",
+            close_hours: values.close_hours ? dayjs(values.close_hours).format("HH:mm") : "",
         };
 
-        // Thêm mật khẩu nếu có
         if (values.oldPassword || values.newPassword) {
             if (!values.oldPassword || !values.newPassword) {
                 message.error("Vui lòng nhập cả mật khẩu cũ và mới để đổi mật khẩu!");
@@ -181,7 +180,7 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
             updatedData.newPassword = values.newPassword;
         }
 
-        console.log("Gửi dữ liệu:", updatedData); // Debug
+        console.log("Gửi dữ liệu:", updatedData);
         updateProfile.mutate({ id: business.id, data: updatedData });
     };
 
@@ -192,8 +191,8 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
             initialValues={{
                 ...business,
                 location: business.location || "",
-                open_hours: business.open_hours || "",
-                close_hours: business.close_hours || "",
+                open_hours: business.open_hours ? dayjs(business.open_hours, "HH:mm") : null,
+                close_hours: business.close_hours ? dayjs(business.close_hours, "HH:mm") : null,
             }}
             onFinish={handleSubmit}
         >
@@ -210,11 +209,29 @@ const ProfileBusinessForm = ({ business, onCancel }) => {
             <Form.Item label="Địa chỉ" name="location">
                 <Input placeholder="Nhập địa chỉ văn bản" />
             </Form.Item>
-            <Form.Item label="Giờ mở cửa" name="open_hours">
-                <Input placeholder="VD: 08:00 AM" />
+            <Form.Item
+                label="Giờ mở cửa"
+                name="open_hours"
+                rules={[{ required: true, message: "Vui lòng chọn giờ mở cửa!" }]}
+            >
+                <TimePicker
+                    size="large"
+                    format="HH:mm"
+                    style={{ width: "100%", borderRadius: "8px" }}
+                    placeholder="Chọn giờ"
+                />
             </Form.Item>
-            <Form.Item label="Giờ đóng cửa" name="close_hours">
-                <Input placeholder="VD: 10:00 PM" />
+            <Form.Item
+                label="Giờ đóng cửa"
+                name="close_hours"
+                rules={[{ required: true, message: "Vui lòng chọn giờ đóng cửa!" }]}
+            >
+                <TimePicker
+                    size="large"
+                    format="HH:mm"
+                    style={{ width: "100%", borderRadius: "8px" }}
+                    placeholder="Chọn giờ"
+                />
             </Form.Item>
             <Form.Item
                 label="Mật khẩu cũ"

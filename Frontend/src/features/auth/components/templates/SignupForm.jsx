@@ -138,9 +138,7 @@ const SignupForm = () => {
                             />
                         </Form.Item>
 
-                        <Form.Item>
-                            <Checkbox disabled={loading}>Hãy Nhớ Tôi</Checkbox>
-                        </Form.Item>
+
 
                         <Form.Item>
                             <Button
