@@ -8,8 +8,8 @@ const DashboardSummary = ({
 }) => {
   return (
     <Row gutter={[16, 16]}>
-      <Col span={6}>
-        <Card>
+      <Col xs={24} sm={12} lg={6}>
+        <Card hoverable>
           <Statistic
             title={
               <span style={{ fontWeight: "bold" }}>Số Lượng Doanh Nghiệp</span>
@@ -20,8 +20,8 @@ const DashboardSummary = ({
           />
         </Card>
       </Col>
-      <Col span={6}>
-        <Card>
+      <Col xs={24} sm={12} lg={6}>
+        <Card hoverable>
           <Statistic
             title={
               <span style={{ fontWeight: "bold" }}>Số Lượng Người Dùng</span>
@@ -32,18 +32,18 @@ const DashboardSummary = ({
           />
         </Card>
       </Col>
-      <Col span={6}>
-        <Card>
+      <Col xs={24} sm={12} lg={6}>
+        <Card hoverable>
           <Statistic
-            title="Số lượng post"
+            title={<span style={{ fontWeight: "bold" }}>Số lượng post</span>}
             value={postCount}
             valueStyle={{ color: "#52c41a" }}
             suffix="Bài viết"
           />
         </Card>
       </Col>
-      <Col span={6}>
-        <Card>
+      <Col xs={24} sm={12} lg={6}>
+        <Card hoverable>
           <Statistic
             title={<span style={{ fontWeight: "bold" }}>Doanh Thu</span>}
             value={totalRevenue}

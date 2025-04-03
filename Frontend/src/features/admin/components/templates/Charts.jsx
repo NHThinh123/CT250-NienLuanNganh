@@ -11,7 +11,7 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import { Card, Col, Row } from "antd";
+import { Card, Col, Row, Spin } from "antd";
 
 ChartJS.register(
     CategoryScale,
@@ -37,6 +37,7 @@ const GenericChart = ({ eventName, title, yAxisLabel, dataLabel, color }) => {
             },
         ],
     });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const ws = new WebSocket("ws://localhost:8080");
@@ -57,15 +58,29 @@ const GenericChart = ({ eventName, title, yAxisLabel, dataLabel, color }) => {
                         },
                     ],
                 });
+                setLoading(false);
             }
         };
-        ws.onerror = (error) => console.error(`WebSocket error (${eventName}):`, error);
+        ws.onerror = (error) => {
+            console.error(`WebSocket error (${eventName}):`, error);
+            setLoading(false);
+        };
         ws.onclose = () => console.log(`WebSocket closed for ${eventName}`);
-        return () => ws.close();
-    }, [eventName, color]);
+
+        // Set a timeout to handle connection issues
+        const timeout = setTimeout(() => {
+            if (loading) setLoading(false);
+        }, 10000);
+
+        return () => {
+            ws.close();
+            clearTimeout(timeout);
+        };
+    }, [eventName, color, dataLabel]);
 
     const options = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: { position: "top" },
             title: { display: true, text: "Cập Nhật Mỗi Ngày" },
@@ -78,7 +93,15 @@ const GenericChart = ({ eventName, title, yAxisLabel, dataLabel, color }) => {
 
     return (
         <Card title={title} headStyle={{ textAlign: "center" }}>
-            <Bar data={chartData} options={options} />
+            <div style={{ height: "300px", position: "relative" }}>
+                {loading ? (
+                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+                        <Spin />
+                    </div>
+                ) : (
+                    <Bar data={chartData} options={options} />
+                )}
+            </div>
             <p style={{ textAlign: "right", fontSize: 12 }}>Yumzy</p>
         </Card>
     );
@@ -103,6 +126,7 @@ const PaymentChart = () => {
             },
         ],
     });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const ws = new WebSocket("ws://localhost:8080");
@@ -132,15 +156,29 @@ const PaymentChart = () => {
                         },
                     ],
                 });
+                setLoading(false);
             }
         };
-        ws.onerror = (error) => console.error("WebSocket error (paymentStats):", error);
+        ws.onerror = (error) => {
+            console.error("WebSocket error (paymentStats):", error);
+            setLoading(false);
+        };
         ws.onclose = () => console.log("WebSocket closed for paymentStats");
-        return () => ws.close();
+
+        // Set a timeout to handle connection issues
+        const timeout = setTimeout(() => {
+            if (loading) setLoading(false);
+        }, 10000);
+
+        return () => {
+            ws.close();
+            clearTimeout(timeout);
+        };
     }, []);
 
     const options = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: { position: "top" },
             title: { display: true, text: "Cập Nhật Mỗi Ngày" },
@@ -165,7 +203,15 @@ const PaymentChart = () => {
 
     return (
         <Card title="Số tiền thanh toán theo ngày" headStyle={{ textAlign: "center" }}>
-            <Line data={chartData} options={options} />
+            <div style={{ height: "300px", position: "relative" }}>
+                {loading ? (
+                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+                        <Spin />
+                    </div>
+                ) : (
+                    <Line data={chartData} options={options} />
+                )}
+            </div>
             <p style={{ textAlign: "right", fontSize: 12 }}>
                 Yumzy
             </p>
@@ -195,13 +241,13 @@ export const UserChart = () => (
 
 export const Charts = () => (
     <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col span={12}>
+        <Col xs={24} lg={12}>
             <BusinessChart />
         </Col>
-        <Col span={12}>
+        <Col xs={24} lg={12}>
             <UserChart />
         </Col>
-        <Col span={24}>
+        <Col xs={24}>
             <PaymentChart />
         </Col>
     </Row>

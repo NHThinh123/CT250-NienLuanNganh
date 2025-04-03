@@ -2,6 +2,7 @@ import { useAdmin } from "../features/admin/hooks/useAdmin";
 import DashboardSummary from "../features/admin/components/templates/DashboardSummary";
 import { Charts } from "../features/admin/components/templates/Charts";
 import { usePost } from "../features/post/hooks/usePost";
+import { Spin } from "antd";
 
 const AdminPage = () => {
   const {
@@ -38,11 +39,15 @@ const AdminPage = () => {
       : `${totalRevenue.toLocaleString()}`;
 
   if (isUsersLoading || isBusinessesLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spin size="large" />
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="p-2 md:p-4 lg:p-6">
       <DashboardSummary
         userCount={userCount}
         businessCount={businessCount}

@@ -27,7 +27,7 @@ import UserList from "./features/chat/components/templates/UserList";
 import "antd/dist/reset.css";
 import { MessageCircleMore } from "lucide-react";
 
-const { Header, Content } = Layout;
+const { Header, Content, Sider } = Layout;
 
 function App() {
   const navigate = useNavigate();
@@ -46,12 +46,30 @@ function App() {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [navVisible, setNavVisible] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Điểm breakpoint cho việc chuyển đổi giữa sidebar cố định và drawer
+  const SIDEBAR_BREAKPOINT = 992; // Điểm breakpoint khi sidebar bắt đầu ẩn
 
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setWindowWidth(width);
+
+      // Tự động đóng sidebar drawer khi màn hình rộng ra
+      if (width > SIDEBAR_BREAKPOINT && sidebarVisible) {
+        setSidebarVisible(false);
+      }
+
+      // Tự động đóng navbar drawer khi màn hình rộng ra
+      if (width > 768 && navVisible) {
+        setNavVisible(false);
+      }
+    };
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [sidebarVisible, navVisible]);
 
   const isUserLoggedIn = auth?.isAuthenticated;
   const isBusinessLoggedIn = business?.isAuthenticated;
@@ -59,14 +77,14 @@ function App() {
   const avatarSrc = isUserLoggedIn
     ? auth.user?.avatar
     : isBusinessLoggedIn
-    ? business.business?.avatar
-    : null;
+      ? business.business?.avatar
+      : null;
 
   const displayName = isUserLoggedIn
     ? auth.user?.name
     : isBusinessLoggedIn
-    ? business.business?.business_name
-    : "";
+      ? business.business?.business_name
+      : "";
 
   const userId = isUserLoggedIn ? auth.user?.id : null;
   const businessId = isBusinessLoggedIn ? business.business?.id : null;
@@ -222,12 +240,17 @@ function App() {
   );
 
   const handleHamburgerClick = () => {
-    if (windowWidth <= 768 && isAdminRoute) {
+    if (windowWidth <= SIDEBAR_BREAKPOINT && isAdminRoute) {
       setSidebarVisible(true);
-    } else {
+    } else if (!isAdminRoute) {
       setNavVisible(true);
     }
   };
+
+  // Tính toán margin cho nội dung khi có sidebar
+  const contentMarginLeft = isAdminRoute && windowWidth > SIDEBAR_BREAKPOINT
+    ? (sidebarCollapsed ? 80 : 200)
+    : 0;
 
   return (
     <Layout style={{ margin: 0, position: "relative", overflowX: "hidden" }}>
@@ -254,17 +277,17 @@ function App() {
         style={{
           position: "fixed",
           top: 0,
-          left: 0, // Đảm bảo Header bắt đầu từ mép trái
+          left: 0,
           width: "100%",
-          maxWidth: "100vw", // Giới hạn chiều rộng tối đa
+          maxWidth: "100vw",
           zIndex: 1000,
           backgroundColor: "#fff",
           padding: windowWidth <= 768 ? "0 10px" : "0 20px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+          //boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           height: "64px",
           lineHeight: "64px",
-          boxSizing: "border-box", // Bao gồm padding trong chiều rộng
-          overflow: "hidden", // Ngăn tràn nội dung
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
         <div
@@ -273,11 +296,18 @@ function App() {
             justifyContent: "space-between",
             alignItems: "center",
             height: "100%",
-            maxWidth: "100%", // Giới hạn nội dung bên trong
+            maxWidth: "100%",
           }}
         >
           <div style={{ flexShrink: 0, marginTop: "10px" }}>
-            {windowWidth > 768 ? (
+            {(windowWidth <= SIDEBAR_BREAKPOINT && isAdminRoute) || (windowWidth <= 768 && !isAdminRoute) ? (
+              <Button
+                style={{ fontSize: "20px" }}
+                onClick={handleHamburgerClick}
+              >
+                ☰
+              </Button>
+            ) : (
               <img
                 src={logo}
                 style={{
@@ -287,13 +317,6 @@ function App() {
                 }}
                 alt="logo"
               />
-            ) : (
-              <Button
-                style={{ fontSize: "20px" }}
-                onClick={handleHamburgerClick}
-              >
-                ☰
-              </Button>
             )}
           </div>
 
@@ -361,44 +384,82 @@ function App() {
           }
           placement="left"
           onClose={() => setNavVisible(false)}
-          visible={navVisible}
+          open={navVisible}
           style={{ padding: 0 }}
           bodyStyle={{ padding: 0 }}
-          width={windowWidth <= 576 ? "80vw" : "300px"} // Responsive width cho Drawer
+          width={windowWidth <= 576 ? "80vw" : "300px"}
         >
           <NavBar />
         </Drawer>
       )}
 
-      {isAdminRoute && (
-        <Drawer
-          title="Admin Menu"
-          placement="left"
-          onClose={() => setSidebarVisible(false)}
-          visible={sidebarVisible}
-          width={windowWidth <= 576 ? "80vw" : "300px"} // Responsive width cho Drawer
-        >
-          <Sidebar />
-        </Drawer>
-      )}
+      <Layout style={{ minHeight: "100vh" }}>
+        {/* Sidebar cố định cho Admin khi màn hình rộng */}
+        {isAdminRoute && windowWidth > SIDEBAR_BREAKPOINT && (
+          <Sider
+            width={200}
+            collapsible
+            collapsed={sidebarCollapsed}
+            onCollapse={(collapsed) => setSidebarCollapsed(collapsed)}
+            style={{
+              background: "#fff",
+              overflow: 'auto',
+              height: '100vh',
+              position: 'fixed',
+              left: 0,
+              top: 64,
+              zIndex: 999,
+              boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
+            }}
+          >
+            <div style={{
+              padding: '16px',
+              textAlign: 'center',
+              display: sidebarCollapsed ? 'none' : 'block'
+            }}>
+              {/* <img
+                src={logo}
+                alt="Admin Logo"
+                style={{
+                  width: '80%',
+                  marginBottom: '20px'
+                }}
+              /> */}
+            </div>
+            <Sidebar collapsed={sidebarCollapsed} />
+          </Sider>
+        )}
 
-      <Layout
-        style={{ marginLeft: 0, minHeight: "100vh", overflowX: "hidden" }}
-      >
-        <Content
-          style={{
-            paddingTop: "68px",
-            padding: windowWidth <= 768 ? "0 10px" : "0 20px", // Khôi phục padding ngang
-            maxWidth: "100vw", // Giới hạn chiều rộng tối đa
-            overflowX: "hidden", // Ngăn tràn ngang
-            boxSizing: "border-box",
-          }}
-        >
-          <ScrollToTop />
-          <ScrollToTopButton />
-          <Outlet />
-        </Content>
-        {!isAdminRoute && <Footer />}
+        {/* Drawer Sidebar cho Admin khi màn hình nhỏ */}
+        {isAdminRoute && (
+          <Drawer
+
+            placement="left"
+            onClose={() => setSidebarVisible(false)}
+            open={sidebarVisible}
+            width={windowWidth <= 576 ? "80vw" : "300px"}
+          >
+            <Sidebar />
+          </Drawer>
+        )}
+
+        <Layout style={{ marginLeft: contentMarginLeft, transition: 'margin 0.2s' }}>
+          <Content
+            style={{
+              paddingTop: "68px",
+              padding: windowWidth <= 768 ? "68px 10px 10px" : "68px 20px 20px",
+              maxWidth: "100vw",
+              overflowX: "hidden",
+              boxSizing: "border-box",
+              minHeight: "100vh",
+            }}
+          >
+            <ScrollToTop />
+            <ScrollToTopButton />
+            <Outlet />
+          </Content>
+          {!isAdminRoute && <Footer />}
+        </Layout>
       </Layout>
 
       {(isUserLoggedIn || isBusinessLoggedIn) && !isAdminRoute && (
@@ -477,8 +538,8 @@ function App() {
                   bottom:
                     windowWidth <= 768 ? 60 + index * 40 : 80 + index * 50,
                   right: windowWidth <= 768 ? 10 : 20,
-                  width: windowWidth <= 768 ? "85vw" : "400px", // Giảm width trên mobile
-                  maxWidth: "100%", // Giới hạn tối đa
+                  width: windowWidth <= 768 ? "85vw" : "400px",
+                  maxWidth: "100%",
                   boxSizing: "border-box",
                 }}
               />
