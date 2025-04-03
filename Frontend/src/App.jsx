@@ -222,10 +222,10 @@ function App() {
   );
 
   const handleHamburgerClick = () => {
-    if (windowWidth <= 768 && isAdminRoute) {
-      setSidebarVisible(true);
-    } else {
-      setNavVisible(true);
+    if (isAdminRoute) {
+      setSidebarVisible(!sidebarVisible); // Luôn toggle sidebar trong admin route
+    } else if (windowWidth <= 768) {
+      setNavVisible(!navVisible); // Toggle NavBar trên mobile ngoài admin route
     }
   };
 
@@ -254,17 +254,17 @@ function App() {
         style={{
           position: "fixed",
           top: 0,
-          left: 0, // Đảm bảo Header bắt đầu từ mép trái
+          left: 0,
           width: "100%",
-          maxWidth: "100vw", // Giới hạn chiều rộng tối đa
+          maxWidth: "100vw",
           zIndex: 1000,
           backgroundColor: "#fff",
           padding: windowWidth <= 768 ? "0 10px" : "0 20px",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           height: "64px",
           lineHeight: "64px",
-          boxSizing: "border-box", // Bao gồm padding trong chiều rộng
-          overflow: "hidden", // Ngăn tràn nội dung
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
         <div
@@ -273,28 +273,35 @@ function App() {
             justifyContent: "space-between",
             alignItems: "center",
             height: "100%",
-            maxWidth: "100%", // Giới hạn nội dung bên trong
+            maxWidth: "100%",
           }}
         >
-          <div style={{ flexShrink: 0, marginTop: "10px" }}>
-            {windowWidth > 768 ? (
-              <img
-                src={logo}
-                style={{
-                  height: "60px",
-                  width: "auto",
-                  marginBottom: "10px",
-                }}
-                alt="logo"
-              />
-            ) : (
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+            {/* Luôn hiển thị nút hamburger trong admin route */}
+            {(isAdminRoute || windowWidth <= 768) && (
               <Button
-                style={{ fontSize: "20px" }}
+                style={{
+                  fontSize: windowWidth <= 576 ? "16px" : "20px",
+                  marginRight: 10,
+                  border: "none",
+                  padding: 0,
+                  height: "auto",
+                }}
                 onClick={handleHamburgerClick}
               >
                 ☰
               </Button>
             )}
+            <img
+              src={logo}
+              style={{
+                height: windowWidth <= 576 ? "40px" : "60px",
+                width: "auto",
+                marginTop: windowWidth <= 576 ? "5px" : "10px",
+                marginBottom: windowWidth <= 576 ? "5px" : "10px",
+              }}
+              alt="logo"
+            />
           </div>
 
           {!isAdminRoute && windowWidth > 768 && (
@@ -315,11 +322,13 @@ function App() {
                     <span
                       style={{
                         display: windowWidth <= 768 ? "none" : "inline",
+                        fontSize: windowWidth <= 768 ? "12px" : "14px",
                       }}
                     >
                       {displayName}
                     </span>
                     <Avatar
+                      size={windowWidth <= 576 ? "small" : "default"}
                       src={avatarSrc}
                       icon={!avatarSrc && <UserOutlined />}
                     />
@@ -361,10 +370,10 @@ function App() {
           }
           placement="left"
           onClose={() => setNavVisible(false)}
-          visible={navVisible}
+          open={navVisible}
           style={{ padding: 0 }}
           bodyStyle={{ padding: 0 }}
-          width={windowWidth <= 576 ? "80vw" : "300px"} // Responsive width cho Drawer
+          width={windowWidth <= 576 ? "80vw" : "300px"}
         >
           <NavBar />
         </Drawer>
@@ -375,8 +384,8 @@ function App() {
           title="Admin Menu"
           placement="left"
           onClose={() => setSidebarVisible(false)}
-          visible={sidebarVisible}
-          width={windowWidth <= 576 ? "80vw" : "300px"} // Responsive width cho Drawer
+          open={sidebarVisible}
+          width={windowWidth <= 576 ? "80vw" : "300px"}
         >
           <Sidebar />
         </Drawer>
@@ -388,9 +397,9 @@ function App() {
         <Content
           style={{
             paddingTop: "68px",
-            padding: windowWidth <= 768 ? "0 10px" : "0 20px", // Khôi phục padding ngang
-            maxWidth: "100vw", // Giới hạn chiều rộng tối đa
-            overflowX: "hidden", // Ngăn tràn ngang
+            padding: windowWidth <= 768 ? "0 10px" : "0 20px",
+            maxWidth: "100vw",
+            overflowX: "hidden",
             boxSizing: "border-box",
           }}
         >
@@ -477,8 +486,8 @@ function App() {
                   bottom:
                     windowWidth <= 768 ? 60 + index * 40 : 80 + index * 50,
                   right: windowWidth <= 768 ? 10 : 20,
-                  width: windowWidth <= 768 ? "85vw" : "400px", // Giảm width trên mobile
-                  maxWidth: "100%", // Giới hạn tối đa
+                  width: windowWidth <= 768 ? "85vw" : "400px",
+                  maxWidth: "100%",
                   boxSizing: "border-box",
                 }}
               />

@@ -42,7 +42,7 @@ const AdminPage = () => {
   }
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: "20px", marginTop: 68 }}>
       <DashboardSummary
         userCount={userCount}
         businessCount={businessCount}
