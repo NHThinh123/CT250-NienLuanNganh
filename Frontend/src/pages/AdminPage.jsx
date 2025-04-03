@@ -24,18 +24,18 @@ const AdminPage = () => {
   const userCount = isUsersLoading
     ? "Loading..."
     : usersError
-    ? "Error"
-    : users.length;
+      ? "Error"
+      : users.length;
   const businessCount = isBusinessesLoading
     ? "Loading..."
     : businessesError
-    ? "Error"
-    : businesses.length;
+      ? "Error"
+      : businesses.length;
   const revenue = isRevenueLoading
     ? "Loading..."
     : revenueError
-    ? "Error"
-    : `${totalRevenue.toLocaleString()}`;
+      ? "Error"
+      : `${totalRevenue.toLocaleString()}`;
 
   if (isUsersLoading || isBusinessesLoading) {
     return <div>Loading...</div>;
