@@ -15,7 +15,7 @@ const PostItem = ({ postData, onDelete, isDeleting, isMyPost }) => {
   };
   const isBusiness = postData?.business_id ? true : false;
   return (
-    <BoxContainer style={{ minWidth: "500px" }}>
+    <BoxContainer>
       <PostHeader
         postData={postData}
         isBusiness={isBusiness}

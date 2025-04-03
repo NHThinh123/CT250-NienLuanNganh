@@ -6,12 +6,32 @@ import {
   FacebookOutlined,
   GithubOutlined,
 } from "@ant-design/icons";
+import { useState, useEffect } from "react";
+
 const Footer = () => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <Row
-      style={{ backgroundColor: "#fff", padding: "32px", marginTop: "32px" }}
+      style={{
+        backgroundColor: "#fff",
+        padding: windowWidth <= 768 ? "16px" : "32px", // Giảm padding trên mobile
+        marginTop: "32px",
+      }}
+      gutter={[16, 16]} // Khoảng cách giữa các cột và hàng
     >
-      <Col span={4}>
+      <Col
+        xs={12} // Chiếm toàn bộ chiều rộng trên mobile
+        sm={12} // Chiếm nửa chiều rộng trên tablet
+        md={4} // Chiếm 4/24 trên desktop
+      >
         <Typography.Title level={4}>Dịch vụ</Typography.Title>
         <List>
           <List.Item>
@@ -25,11 +45,11 @@ const Footer = () => {
           </List.Item>
         </List>
       </Col>
-      <Col span={4}>
+      <Col xs={12} sm={12} md={4}>
         <Typography.Title level={4}>Hỗ trợ</Typography.Title>
         <List>
           <List.Item>
-            <Link to={"/faq"}> FAQ </Link>
+            <Link to={"/faq"}>FAQ</Link>
           </List.Item>
           <List.Item>
             <Link to={"/privacy-policy"}>Chính sách bảo mật</Link>
@@ -39,7 +59,7 @@ const Footer = () => {
           </List.Item>
         </List>
       </Col>
-      <Col span={4}>
+      <Col xs={12} sm={12} md={4}>
         <Typography.Title level={4}>Liên hệ</Typography.Title>
         <List>
           <List.Item>
@@ -59,19 +79,30 @@ const Footer = () => {
           </List.Item>
         </List>
       </Col>
-
-      <Col span={12} style={{ textAlign: "right" }}>
+      <Col
+        xs={12}
+        sm={12}
+        md={12}
+        style={{
+          textAlign: windowWidth <= 768 ? "left" : "right", // Căn trái trên mobile, căn phải trên desktop
+        }}
+      >
         <img
           src={logo}
           alt="logo"
           style={{
-            width: "15vw",
-            height: "15vh",
+            width: windowWidth <= 768 ? "30vw" : "15vw", // Thu nhỏ logo trên mobile
+            height: windowWidth <= 768 ? "10vh" : "15vh",
             objectFit: "contain",
-            marginTop: "-10px",
+            marginTop: "-20px",
           }}
         />
-        <Typography.Paragraph style={{ marginInline: "10px" }}>
+        <Typography.Paragraph
+          style={{
+            marginInline: "10px",
+            fontSize: windowWidth <= 768 ? "14px" : "16px", // Giảm cỡ chữ trên mobile
+          }}
+        >
           Yumzy là nền tảng đánh giá và chia sẻ những câu chuyện thú vị về ẩm
           thực khắp mọi nơi. Chúng tôi mong muốn tạo ra một cộng đồng ẩm thực
           văn minh, đa dạng và phong phú.

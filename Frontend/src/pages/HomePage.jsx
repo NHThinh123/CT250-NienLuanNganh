@@ -6,7 +6,7 @@ import ListPostHome from "../features/home/components/templates/ListPostHome";
 
 const HomePage = () => {
   return (
-    <Row justify="center">
+    <Row justify="center" style={{ marginTop: 68 }}>
       <Col span={24}>
         <BannerHome />
       </Col>
