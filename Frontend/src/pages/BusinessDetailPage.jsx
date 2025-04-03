@@ -26,7 +26,7 @@ const BusinessDetailPage = () => {
   }
 
   return (
-    <>
+    <div style={{ marginTop: 68 }}>
       <div>
         <BusinessDetail
           businessData={displayData}
@@ -43,7 +43,7 @@ const BusinessDetailPage = () => {
           business_id={id}
         />
       </div>
-    </>
+    </div>
   );
 };
 

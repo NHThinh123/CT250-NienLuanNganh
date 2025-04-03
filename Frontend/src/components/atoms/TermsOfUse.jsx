@@ -4,7 +4,7 @@ const { Title, Paragraph } = Typography;
 
 const TermsOfUse = () => {
   return (
-    <div>
+    <div style={{ marginTop: 68 }}>
       <Title level={2}>Điều khoản sử dụng</Title>
       <Paragraph>
         <strong>Cập nhật lần cuối: Ngày 15 tháng 3 năm 2025</strong>

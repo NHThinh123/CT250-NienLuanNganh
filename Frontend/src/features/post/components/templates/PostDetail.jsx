@@ -18,7 +18,7 @@ const PostDetail = ({ postData, isLoading, isError }) => {
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error</div>;
   return (
-    <Row justify={"center"}>
+    <Row justify={"center"} style={{ marginTop: 68 }}>
       <Col span={16}>
         <BoxContainer style={{ padding: "20px" }}>
           <Row align={"middle"}>

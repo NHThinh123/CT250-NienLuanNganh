@@ -1,16 +1,37 @@
+import { useState, useEffect } from "react";
 import { Button, Card, Col, Row } from "antd";
-
 import { formatTime } from "../../../../constants/formatTime";
 
 const PostOverviewCard = ({ post }) => {
-  if (!post) return <>loading</>;
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (!post)
+    return (
+      <div style={{ fontSize: windowWidth <= 576 ? "14px" : "16px" }}>
+        Đang tải...
+      </div>
+    );
+
   const renderMedia = (item) => {
+    const mediaHeight =
+      windowWidth <= 576 ? "150px" : windowWidth <= 768 ? "180px" : "200px"; // Responsive height
     if (item?.type === "image") {
       return (
         <img
           src={item.url}
           alt={`Media`}
-          style={{ maxHeight: "200px", width: "100%", objectFit: "cover" }}
+          style={{
+            maxHeight: mediaHeight,
+            width: "100%",
+            objectFit: "cover",
+          }}
           onContextMenu={(e) => e.preventDefault()}
           draggable="false"
         />
@@ -19,7 +40,11 @@ const PostOverviewCard = ({ post }) => {
       return (
         <video
           src={item.url}
-          style={{ maxHeight: "200px", width: "100%", objectFit: "cover" }}
+          style={{
+            maxHeight: mediaHeight,
+            width: "100%",
+            objectFit: "cover",
+          }}
           onContextMenu={(e) => e.preventDefault()}
           draggable="false"
         />
@@ -31,13 +56,23 @@ const PostOverviewCard = ({ post }) => {
           "https://res.cloudinary.com/nienluan/image/upload/v1741245839/Business_Avatar_Default_jkhjhf.jpg"
         }
         alt="Fallback"
-        style={{ maxHeight: "200px", width: "100%", objectFit: "cover" }}
+        style={{
+          maxHeight: mediaHeight,
+          width: "100%",
+          objectFit: "cover",
+        }}
       />
     );
   };
 
   return (
-    <Card cover={renderMedia(post?.media[0])} style={{ margin: 8 }}>
+    <Card
+      cover={renderMedia(post?.media[0])}
+      style={{
+        margin: windowWidth <= 576 ? 4 : 8, // Responsive margin
+        padding: windowWidth <= 576 ? "4px" : "8px", // Responsive padding
+      }}
+    >
       <h3
         style={{
           display: "-webkit-box",
@@ -45,7 +80,9 @@ const PostOverviewCard = ({ post }) => {
           WebkitBoxOrient: "vertical",
           overflow: "hidden",
           textOverflow: "ellipsis",
-          marginBottom: 4,
+          marginBottom: windowWidth <= 576 ? 2 : 4,
+          fontSize:
+            windowWidth <= 576 ? "16px" : windowWidth <= 768 ? "18px" : "20px", // Responsive font
         }}
       >
         {post?.title}
@@ -57,31 +94,94 @@ const PostOverviewCard = ({ post }) => {
           WebkitBoxOrient: "vertical",
           overflow: "hidden",
           textOverflow: "ellipsis",
+          fontSize:
+            windowWidth <= 576 ? "14px" : windowWidth <= 768 ? "15px" : "16px", // Responsive font
+          marginBottom: windowWidth <= 576 ? 4 : 8,
         }}
       >
         {post?.content}
       </p>
-      <Row justify="space-between" style={{ marginTop: 8, fontWeight: "bold" }}>
-        <Col span={12}>Số lượt thích:</Col>
-        <Col span={12} style={{ textAlign: "right" }}>
+      <Row
+        justify="space-between"
+        style={{
+          marginTop: windowWidth <= 576 ? 4 : 8,
+          fontWeight: "bold",
+        }}
+      >
+        <Col
+          span={12}
+          style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}
+        >
+          Số lượt thích:
+        </Col>
+        <Col
+          span={12}
+          style={{
+            textAlign: "right",
+            fontSize: windowWidth <= 576 ? "12px" : "14px",
+          }}
+        >
           {post?.likeCount}
         </Col>
       </Row>
-      <Row justify="space-between" style={{ marginTop: 8, fontWeight: "bold" }}>
-        <Col span={12}>Số lượt bình luận:</Col>
-        <Col span={12} style={{ textAlign: "right" }}>
+      <Row
+        justify="space-between"
+        style={{
+          marginTop: windowWidth <= 576 ? 4 : 8,
+          fontWeight: "bold",
+        }}
+      >
+        <Col
+          span={12}
+          style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}
+        >
+          Số lượt bình luận:
+        </Col>
+        <Col
+          span={12}
+          style={{
+            textAlign: "right",
+            fontSize: windowWidth <= 576 ? "12px" : "14px",
+          }}
+        >
           {post?.commentCount}
         </Col>
       </Row>
-      <Row justify="space-between" style={{ marginTop: 8, fontWeight: "bold" }}>
-        <Col span={12}>Thời gian đăng tải:</Col>
-        <Col span={12} style={{ textAlign: "right" }}>
+      <Row
+        justify="space-between"
+        style={{
+          marginTop: windowWidth <= 576 ? 4 : 8,
+          fontWeight: "bold",
+        }}
+      >
+        <Col
+          span={12}
+          style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}
+        >
+          Thời gian đăng tải:
+        </Col>
+        <Col
+          span={12}
+          style={{
+            textAlign: "right",
+            fontSize: windowWidth <= 576 ? "12px" : "14px",
+          }}
+        >
           {formatTime(post?.createdAt)}
         </Col>
       </Row>
-      <Row justify="space-between" style={{ marginTop: 8 }}>
+      <Row
+        justify="space-between"
+        style={{
+          marginTop: windowWidth <= 576 ? 8 : 12,
+        }}
+      >
         <Col span={24}>
-          <Button type="primary" style={{ width: "100%" }}>
+          <Button
+            type="primary"
+            size={windowWidth <= 576 ? "middle" : "large"} // Responsive size
+            style={{ width: "100%" }}
+          >
             Xem bài viết
           </Button>
         </Col>

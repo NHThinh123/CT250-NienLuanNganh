@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BoxContainer from "../components/atoms/BoxContainer";
 import { Button, Card, Col, Row, Select } from "antd";
 import PostOverviewCard from "../features/post/components/organisms/PostOverviewCard";
@@ -33,32 +33,35 @@ ChartJS.register(
 
 const PostOverviewPage = () => {
   const { entity } = useAuthEntity();
-  const [timeRange, setTimeRange] = useState("7days"); // Thêm state để quản lý timeRange
+  const [timeRange, setTimeRange] = useState("7days");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { mutate: deletePost, isLoading: isDeleting } = useDeletePost();
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleDeletePost = (post_id) => {
     deletePost({ post_id, id: entity.id });
   };
-  // Lấy tần suất đăng bài với timeRange
+
   const { data: frequencyData, isLoading: freqLoading } = usePostFrequency(
     entity.id,
     timeRange
   );
-
-  // Lấy tổng quan bài viết với timeRange
   const { data: summaryData, isLoading: summaryLoading } = usePostSummary(
     entity.id,
     timeRange
   );
-
-  // Lấy danh sách bài viết của người dùng để tìm bài gần nhất và nổi bật nhất
   const { data: myPostsData, isLoading: myPostsLoading } = useMyPost({
     id: entity.id,
-    sort: "newest", // Sắp xếp theo bài mới nhất
-    limit: 999, // Giới hạn số lượng bài để tối ưu
+    sort: "newest",
+    limit: 999,
   });
 
-  // Hàm tạo dữ liệu biểu đồ dựa trên timeRange
   const getChartData = () => {
     let labels;
     let data;
@@ -103,7 +106,7 @@ const PostOverviewPage = () => {
 
   const chartOptions = {
     responsive: true,
-
+    maintainAspectRatio: false, // Cho phép biểu đồ co giãn theo chiều cao
     plugins: {
       legend: { position: "bottom", align: "start" },
       title: {
@@ -116,14 +119,30 @@ const PostOverviewPage = () => {
             : "tất cả thời gian"
         }`,
         align: "start",
+        font: {
+          size: windowWidth <= 576 ? 14 : windowWidth <= 768 ? 16 : 18, // Responsive font
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          font: {
+            size: windowWidth <= 576 ? 10 : windowWidth <= 768 ? 12 : 14, // Responsive font
+          },
+        },
+      },
+      y: {
+        ticks: {
+          font: {
+            size: windowWidth <= 576 ? 10 : windowWidth <= 768 ? 12 : 14, // Responsive font
+          },
+        },
       },
     },
   };
 
-  // Lấy bài viết gần nhất (dựa trên createdAt)
   const latestPost = myPostsData?.pages[0]?.posts[0];
-
-  // Lấy bài viết nổi bật nhất (dựa trên likeCount hoặc commentCount)
   const mostPopularPost = myPostsData?.pages[0]?.posts.reduce((prev, curr) => {
     const prevScore = (prev?.likeCount || 0) + (prev?.commentCount || 0);
     const currScore = (curr?.likeCount || 0) + (curr?.commentCount || 0);
@@ -131,62 +150,130 @@ const PostOverviewPage = () => {
   }, null);
 
   return (
-    <Row justify={"center"}>
-      <Col span={21}>
+    <Row
+      gutter={[16, 16]} // Thêm gutter để tạo khoảng cách
+      justify="center"
+      style={{ width: "100%", padding: windowWidth <= 576 ? "8px" : "16px" }}
+    >
+      <Col xs={24} sm={22} md={21} lg={21} xl={21}>
         <BoxContainer>
           <Button
             href="/posts"
             type="link"
             style={{ padding: 0, color: "black" }}
           >
-            <h1 style={{ fontWeight: "bold", margin: 0 }}>
-              <ArrowLeft strokeWidth={4} size={30} style={{ paddingTop: 12 }} />
+            <h1
+              style={{
+                fontWeight: "bold",
+                margin: 0,
+                fontSize:
+                  windowWidth <= 576
+                    ? "20px"
+                    : windowWidth <= 768
+                    ? "24px"
+                    : "28px", // Responsive font
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <ArrowLeft
+                strokeWidth={4}
+                size={windowWidth <= 576 ? 24 : windowWidth <= 768 ? 28 : 30} // Responsive icon
+                style={{ marginRight: 8 }}
+              />
               Tổng quan bài viết
             </h1>
           </Button>
         </BoxContainer>
       </Col>
-      <Col span={7}>
+
+      <Col xs={24} sm={12} md={8} lg={7} xl={7}>
         <BoxContainer>
-          <h2 style={{ margin: 4, fontWeight: "bold" }}>Bài viết mới nhất</h2>
+          <h2
+            style={{
+              margin: windowWidth <= 576 ? 2 : 4,
+              fontWeight: "bold",
+              fontSize:
+                windowWidth <= 576
+                  ? "16px"
+                  : windowWidth <= 768
+                  ? "18px"
+                  : "20px", // Responsive font
+            }}
+          >
+            Bài viết mới nhất
+          </h2>
           {myPostsLoading ? (
-            <p>Đang tải...</p>
+            <p style={{ fontSize: windowWidth <= 576 ? "14px" : "16px" }}>
+              Đang tải...
+            </p>
           ) : latestPost ? (
             <PostOverviewCard post={latestPost} />
           ) : (
-            <p>Chưa có bài viết nào</p>
+            <p style={{ fontSize: windowWidth <= 576 ? "14px" : "16px" }}>
+              Chưa có bài viết nào
+            </p>
           )}
         </BoxContainer>
       </Col>
-      <Col span={7}>
+
+      <Col xs={24} sm={12} md={8} lg={7} xl={7}>
         <BoxContainer>
-          <h2 style={{ margin: 4, fontWeight: "bold" }}>
+          <h2
+            style={{
+              margin: windowWidth <= 576 ? 2 : 4,
+              fontWeight: "bold",
+              fontSize:
+                windowWidth <= 576
+                  ? "16px"
+                  : windowWidth <= 768
+                  ? "18px"
+                  : "20px", // Responsive font
+            }}
+          >
             Bài viết nổi bật nhất
           </h2>
           {myPostsLoading ? (
-            <p>Đang tải...</p>
+            <p style={{ fontSize: windowWidth <= 576 ? "14px" : "16px" }}>
+              Đang tải...
+            </p>
           ) : mostPopularPost ? (
             <PostOverviewCard post={mostPopularPost} />
           ) : (
-            <p>Chưa có bài viết nào</p>
+            <p style={{ fontSize: windowWidth <= 576 ? "14px" : "16px" }}>
+              Chưa có bài viết nào
+            </p>
           )}
         </BoxContainer>
       </Col>
-      <Col span={7}>
-        <BoxContainer style={{ padding: 16 }}>
-          <h2 style={{ margin: 4, fontWeight: "bold" }}>
+
+      <Col xs={24} sm={24} md={8} lg={7} xl={7}>
+        <BoxContainer style={{ padding: windowWidth <= 576 ? 8 : 16 }}>
+          <h2
+            style={{
+              margin: windowWidth <= 576 ? 2 : 4,
+              fontWeight: "bold",
+              fontSize:
+                windowWidth <= 576
+                  ? "16px"
+                  : windowWidth <= 768
+                  ? "18px"
+                  : "20px", // Responsive font
+            }}
+          >
             Tổng quan về các bài viết của bạn
           </h2>
           <Select
             defaultValue="7days"
             style={{
-              width: 120,
+              width: windowWidth <= 576 ? "100%" : 120, // Full width trên mobile
               marginBottom: 16,
               display: "block",
               marginLeft: "auto",
               marginTop: 16,
             }}
             onChange={setTimeRange}
+            size={windowWidth <= 576 ? "middle" : "large"} // Responsive size
             options={[
               { value: "7days", label: "7 ngày qua" },
               { value: "28days", label: "28 ngày qua" },
@@ -194,16 +281,40 @@ const PostOverviewPage = () => {
             ]}
           />
           {freqLoading || summaryLoading ? (
-            <p>Đang tải...</p>
+            <p style={{ fontSize: windowWidth <= 576 ? "14px" : "16px" }}>
+              Đang tải...
+            </p>
           ) : (
             <>
-              <Bar data={getChartData()} options={chartOptions} />
+              <div
+                style={{
+                  height:
+                    windowWidth <= 576
+                      ? "200px"
+                      : windowWidth <= 768
+                      ? "250px"
+                      : "300px",
+                }}
+              >
+                <Bar data={getChartData()} options={chartOptions} />
+              </div>
               <Row
                 justify="space-between"
                 style={{ marginTop: 8, fontWeight: "bold" }}
               >
-                <Col span={12}>Tổng số bài viết</Col>
-                <Col span={12} style={{ textAlign: "right" }}>
+                <Col
+                  span={12}
+                  style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}
+                >
+                  Tổng số bài viết
+                </Col>
+                <Col
+                  span={12}
+                  style={{
+                    textAlign: "right",
+                    fontSize: windowWidth <= 576 ? "12px" : "14px",
+                  }}
+                >
                   {summaryData?.totalPosts}
                 </Col>
               </Row>
@@ -211,8 +322,19 @@ const PostOverviewPage = () => {
                 justify="space-between"
                 style={{ marginTop: 8, fontWeight: "bold" }}
               >
-                <Col span={12}>Tổng số lượt thích</Col>
-                <Col span={12} style={{ textAlign: "right" }}>
+                <Col
+                  span={12}
+                  style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}
+                >
+                  Tổng số lượt thích
+                </Col>
+                <Col
+                  span={12}
+                  style={{
+                    textAlign: "right",
+                    fontSize: windowWidth <= 576 ? "12px" : "14px",
+                  }}
+                >
                   {summaryData?.totalLikes}
                 </Col>
               </Row>
@@ -220,8 +342,19 @@ const PostOverviewPage = () => {
                 justify="space-between"
                 style={{ marginTop: 8, fontWeight: "bold" }}
               >
-                <Col span={12}>Tổng số bình luận</Col>
-                <Col span={12} style={{ textAlign: "right" }}>
+                <Col
+                  span={12}
+                  style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}
+                >
+                  Tổng số bình luận
+                </Col>
+                <Col
+                  span={12}
+                  style={{
+                    textAlign: "right",
+                    fontSize: windowWidth <= 576 ? "12px" : "14px",
+                  }}
+                >
                   {summaryData?.totalComments}
                 </Col>
               </Row>
@@ -229,8 +362,24 @@ const PostOverviewPage = () => {
           )}
         </BoxContainer>
       </Col>
-      <Col span={21}>
-        <Card title="Danh sách bài viết">
+
+      <Col xs={24} sm={22} md={21} lg={21} xl={21}>
+        <Card
+          title={
+            <span
+              style={{
+                fontSize:
+                  windowWidth <= 576
+                    ? "16px"
+                    : windowWidth <= 768
+                    ? "18px"
+                    : "20px", // Responsive font
+              }}
+            >
+              Danh sách bài viết
+            </span>
+          }
+        >
           <PostList
             postData={myPostsData?.pages?.flatMap((page) => page.posts)}
             onDeletePost={handleDeletePost}

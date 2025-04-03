@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -14,7 +15,6 @@ import {
   ConfigProvider,
 } from "antd";
 import dayjs from "dayjs";
-import { useState, useRef } from "react";
 import ModalUpdatePost from "../../../post/components/molecules/ModalUpdatePost";
 import Highlighter from "react-highlight-words";
 
@@ -27,7 +27,15 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
   const [postToUpdate, setPostToUpdate] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const searchInput = useRef(null);
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -56,22 +64,26 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{ marginBottom: 8, display: "block" }}
+          style={{
+            marginBottom: 8,
+            display: "block",
+            width: windowWidth <= 576 ? "100%" : 200, // Responsive width
+          }}
         />
         <Space>
           <Button
             type="primary"
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
+            size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
+            style={{ width: windowWidth <= 576 ? 80 : 90 }}
           >
             Tìm
           </Button>
           <Button
             onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
+            size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
+            style={{ width: windowWidth <= 576 ? 80 : 90 }}
           >
             Xóa
           </Button>
@@ -117,22 +129,27 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
               dates ? [[dates[0].toDate(), dates[1].toDate()]] : []
             )
           }
-          style={{ marginBottom: 8, display: "block" }}
+          style={{
+            marginBottom: 8,
+            display: "block",
+            width: windowWidth <= 576 ? "100%" : 250, // Responsive width
+          }}
+          size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
         />
         <Space>
           <Button
             type="primary"
             onClick={() => confirm()}
             icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
+            size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
+            style={{ width: windowWidth <= 576 ? 80 : 90 }}
           >
             Tìm
           </Button>
           <Button
             onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
+            size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
+            style={{ width: windowWidth <= 576 ? 80 : 90 }}
           >
             Xóa
           </Button>
@@ -183,7 +200,7 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
       title: "Bài viết",
       dataIndex: "title",
       key: "title",
-      width: 300,
+      width: windowWidth <= 576 ? 200 : 300, // Responsive width
       ...getColumnSearchProps("title"),
       render: (text, record) => (
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -194,9 +211,9 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
             }
             alt={text || "Ảnh bài viết"}
             style={{
-              width: 40,
-              height: 40,
-              marginRight: 10,
+              width: windowWidth <= 576 ? 30 : 40, // Responsive image size
+              height: windowWidth <= 576 ? 30 : 40,
+              marginRight: windowWidth <= 576 ? 6 : 10,
               objectFit: "cover",
             }}
           />
@@ -210,7 +227,8 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
                 WebkitLineClamp: 1,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                maxWidth: "250px",
+                maxWidth: windowWidth <= 576 ? "150px" : "250px", // Responsive maxWidth
+                fontSize: windowWidth <= 576 ? "12px" : "14px", // Responsive font
               }}
             >
               {text || "Không có tiêu đề"}
@@ -222,7 +240,8 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
                 WebkitLineClamp: 2,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                maxWidth: "200px",
+                maxWidth: windowWidth <= 576 ? "120px" : "200px", // Responsive maxWidth
+                fontSize: windowWidth <= 576 ? "10px" : "12px", // Responsive font
               }}
             >
               {record?.content || "Không có nội dung"}
@@ -235,11 +254,13 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
       title: "Người đăng",
       dataIndex: "author",
       key: "author",
-      width: 150,
+      width: windowWidth <= 576 ? 100 : 150, // Responsive width
       ...getColumnSearchProps("author.name"),
       render: (_, record) => (
         <div style={{ display: "flex", alignItems: "center" }}>
-          <span>{record?.author?.name || "Ẩn danh"}</span>
+          <span style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}>
+            {record?.author?.name || "Ẩn danh"}
+          </span>
         </div>
       ),
     },
@@ -247,27 +268,43 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
       title: "Lượt thích",
       dataIndex: "likeCount",
       key: "likeCount",
+      width: windowWidth <= 576 ? 80 : 100, // Responsive width
       sorter: (a, b) => a.likeCount - b.likeCount,
       sortDirections: ["ascend", "descend"],
+      render: (text) => (
+        <span style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}>
+          {text}
+        </span>
+      ),
     },
     {
       title: "Lượt bình luận",
       dataIndex: "commentCount",
       key: "commentCount",
+      width: windowWidth <= 576 ? 80 : 100, // Responsive width
       sorter: (a, b) => a.commentCount - b.commentCount,
       sortDirections: ["ascend", "descend"],
+      render: (text) => (
+        <span style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}>
+          {text}
+        </span>
+      ),
     },
     {
       title: "Trạng Thái",
       dataIndex: "edited",
       key: "edited",
+      width: windowWidth <= 576 ? 100 : 120, // Responsive width
       filters: [
         { text: "Đã chỉnh sửa", value: true },
         { text: "Chưa chỉnh sửa", value: false },
       ],
       onFilter: (value, record) => record.edited === value,
       render: (edited) => (
-        <Tag color={edited ? "yellow" : "gray"}>
+        <Tag
+          color={edited ? "yellow" : "gray"}
+          style={{ fontSize: windowWidth <= 576 ? "10px" : "12px" }}
+        >
           {edited ? "Đã chỉnh sửa" : "Chưa chỉnh sửa"}
         </Tag>
       ),
@@ -276,29 +313,36 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
       title: "Ngày Đăng",
       dataIndex: "createdAt",
       key: "createdAt",
+      width: windowWidth <= 576 ? 100 : 120, // Responsive width
       ...getDateSearchProps("createdAt"),
-      render: (date) => (date ? dayjs(date).format("YYYY-MM-DD") : "N/A"),
+      render: (date) => (
+        <span style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}>
+          {date ? dayjs(date).format("YYYY-MM-DD") : "N/A"}
+        </span>
+      ),
     },
     {
       title: "Hành động",
       key: "action",
+      width: windowWidth <= 576 ? 120 : 150, // Responsive width
       render: (_, record) => (
-        <>
+        <Space size="small">
           <Button
             icon={<EditOutlined />}
-            style={{ marginRight: 8 }}
+            size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
             onClick={() => handleShowModalUpdatePost(record)}
           >
-            Sửa
+            {windowWidth > 576 && "Sửa"}
           </Button>
           <Button
             icon={<DeleteOutlined />}
+            size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
             danger
             onClick={() => showDeleteConfirm(record)}
           >
-            Xóa
+            {windowWidth > 576 && "Xóa"}
           </Button>
-        </>
+        </Space>
       ),
     },
   ];
@@ -308,13 +352,13 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
       theme={{
         components: {
           Table: {
-            headerBg: "#141414", // Header background color
+            headerBg: "#141414",
             headerSortHoverBg: "#141414",
             headerSortActiveBg: "#141414",
-            headerColor: "#fff", // Header text color
-            // Customize sort icons color
-            colorIcon: "#fff", // Default icon color
-            colorIconHover: "#fff", // Icon color on hover
+            headerColor: "#fff",
+            colorIcon: "#fff",
+            colorIconHover: "#fff",
+            fontSize: windowWidth <= 576 ? 12 : 14, // Responsive font size
           },
         },
       }}
@@ -323,8 +367,12 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
         dataSource={postData}
         columns={columns}
         rowKey="_id"
-        scroll={{ x: 1000 }}
-        pagination={{ pageSize: 5, position: ["bottomCenter"] }}
+        scroll={{ x: windowWidth <= 576 ? 800 : 1000 }} // Responsive scroll
+        pagination={{
+          pageSize: windowWidth <= 576 ? 5 : 10, // Responsive page size
+          position: ["bottomCenter"],
+          size: windowWidth <= 576 ? "small" : "default", // Responsive pagination size
+        }}
         rowClassName={() => "custom-table-row"}
       />
       <Modal
@@ -334,10 +382,20 @@ const PostList = ({ postData = [], onDeletePost, isDeleting }) => {
         onCancel={handleCancel}
         okText="Xóa"
         cancelText="Hủy"
-        okButtonProps={{ danger: true, loading: isDeleting }}
-        cancelButtonProps={{ disabled: isDeleting }}
+        okButtonProps={{
+          danger: true,
+          loading: isDeleting,
+          size: windowWidth <= 576 ? "small" : "middle", // Responsive size
+        }}
+        cancelButtonProps={{
+          disabled: isDeleting,
+          size: windowWidth <= 576 ? "small" : "middle", // Responsive size
+        }}
+        width={windowWidth <= 576 ? "90%" : windowWidth <= 768 ? 400 : 500} // Responsive width
       >
-        <p>Bạn có chắc chắn muốn xóa bài viết này không?</p>
+        <p style={{ fontSize: windowWidth <= 576 ? "14px" : "16px" }}>
+          Bạn có chắc chắn muốn xóa bài viết này không?
+        </p>
       </Modal>
       <ModalUpdatePost
         handleCancel={handleCancelModalUpdatePost}

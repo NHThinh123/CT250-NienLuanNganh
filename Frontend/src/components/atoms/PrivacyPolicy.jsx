@@ -4,7 +4,7 @@ const { Title, Paragraph } = Typography;
 
 const PrivacyPolicy = () => {
   return (
-    <div>
+    <div style={{ marginTop: 68 }}>
       <Title level={2}>Chính sách bảo mật</Title>
       <Paragraph>
         <strong>Cập nhật lần cuối: Ngày 15 tháng 3 năm 2025</strong>

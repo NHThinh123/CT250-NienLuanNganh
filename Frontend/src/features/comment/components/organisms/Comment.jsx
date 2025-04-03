@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import { useState, useEffect, useRef } from "react";
 import {
   CaretDownOutlined,
   CaretUpOutlined,
@@ -24,7 +25,6 @@ import useLikeComment from "../../hooks/useLikeComment";
 import useUnlikeComment from "../../hooks/useUnlikeComment";
 import useUpdateComment from "../../hooks/useUpdateComment";
 import useDeleteComment from "../../hooks/useDeleteComment";
-import { useEffect, useRef, useState } from "react";
 import LoginRequiredModal from "../../../../components/organisms/LoginRequiredModal";
 import TextArea from "antd/es/input/TextArea";
 import CommentList from "../templates/CommentList";
@@ -38,6 +38,7 @@ const Comment = ({ commentData, post_id, minWidth }) => {
   const { entity } = useAuthEntity();
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const { mutate: createReply } = useCreateReply(commentData?._id);
   const { mutate: likeComment } = useLikeComment(post_id);
@@ -59,6 +60,13 @@ const Comment = ({ commentData, post_id, minWidth }) => {
   );
 
   const isOwner = entity?.id === commentData?.author?.id;
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleShowReply = () => setIsShowReply(!isShowReply);
   const showLoginRequiredModal = () => setIsLoginRequiredModalOpen(true);
@@ -142,28 +150,43 @@ const Comment = ({ commentData, post_id, minWidth }) => {
   );
 
   return (
-    <Row style={{ minWidth: minWidth || "380px", margin: 0 }}>
-      <Col style={{ marginRight: "10px" }}>
+    <Row
+      style={{
+        minWidth: minWidth || (windowWidth <= 576 ? "300px" : "380px"), // Responsive minWidth
+        margin: 0,
+        padding: windowWidth <= 576 ? "4px 0" : "8px 0", // Responsive padding
+      }}
+    >
+      <Col style={{ marginRight: windowWidth <= 576 ? "6px" : "10px" }}>
         <Avatar
+          size={windowWidth <= 576 ? "small" : "default"} // Responsive Avatar
           src={
             commentData?.author?.avatar ||
             "https://res.cloudinary.com/nienluan/image/upload/v1741015659/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector_d3dgki.jpg"
           }
         />
       </Col>
-      <Col style={{ maxWidth: "89%" }}>
+      <Col style={{ maxWidth: windowWidth <= 576 ? "85%" : "89%" }}>
         <div
           style={{
             backgroundColor: "#f0f2f5",
-            padding: "10px",
+            padding: windowWidth <= 576 ? "6px" : "10px", // Responsive padding
             borderRadius: "10px",
           }}
         >
-          <Typography.Text strong>
+          <Typography.Text
+            strong
+            style={{
+              fontSize: windowWidth <= 576 ? "14px" : "16px", // Responsive font
+            }}
+          >
             {commentData?.author?.name}{" "}
             {commentData?.author?.isBusiness && (
               <Link
-                style={{ fontSize: 14, marginLeft: 8 }}
+                style={{
+                  fontSize: windowWidth <= 576 ? "12px" : "14px", // Responsive font
+                  marginLeft: 8,
+                }}
                 to={`/businesses/${commentData?.author?.id}`}
               >
                 <CheckCircleFilled /> - Quán ăn
@@ -180,14 +203,25 @@ const Comment = ({ commentData, post_id, minWidth }) => {
                   { required: true, message: "Please enter comment content" },
                 ]}
               >
-                <TextArea autoSize={{ minRows: 1, maxRows: 5 }} />
+                <TextArea
+                  autoSize={{ minRows: 1, maxRows: 5 }}
+                  style={{
+                    fontSize: windowWidth <= 576 ? "14px" : "16px", // Responsive font
+                  }}
+                />
               </Form.Item>
-              <Button type="primary" htmlType="submit" loading={isUpdating}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isUpdating}
+                size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
+              >
                 Lưu
               </Button>
               <Button
                 onClick={() => setIsEditing(false)}
                 style={{ marginLeft: 8 }}
+                size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
               >
                 Hủy
               </Button>
@@ -195,13 +229,19 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           ) : (
             <Typography.Text
               style={{
-                color: commentData?.deleted ? "#999" : "inherit", // Nhạt màu nếu bị xóa
-                fontWeight: commentData?.deleted ? "lighter" : "normal", // Mỏng hơn nếu bị xóa
+                color: commentData?.deleted ? "#999" : "inherit",
+                fontWeight: commentData?.deleted ? "lighter" : "normal",
+                fontSize: windowWidth <= 576 ? "14px" : "16px", // Responsive font
               }}
             >
               {commentData?.comment_content}
               {commentData?.isEdited && !commentData?.deleted && (
-                <span style={{ fontSize: "12px", color: "gray" }}>
+                <span
+                  style={{
+                    fontSize: windowWidth <= 576 ? "10px" : "12px", // Responsive font
+                    color: "gray",
+                  }}
+                >
                   {" "}
                   (đã chỉnh sửa)
                 </span>
@@ -209,12 +249,18 @@ const Comment = ({ commentData, post_id, minWidth }) => {
             </Typography.Text>
           )}
         </div>
-        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "4px",
+            alignItems: "center",
+            flexWrap: "wrap", // Cho phép xuống dòng trên mobile
+          }}
+        >
           <Typography.Text
             style={{
               padding: "0px",
-
-              fontSize: "12px",
+              fontSize: windowWidth <= 576 ? "10px" : "12px", // Responsive font
               lineHeight: "1",
               color: "gray",
             }}
@@ -223,11 +269,19 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           </Typography.Text>
           <Button
             type="link"
-            style={{ padding: "0px", fontSize: "12px", lineHeight: "1" }}
+            style={{
+              padding: "0px",
+              fontSize: windowWidth <= 576 ? "10px" : "12px", // Responsive font
+              lineHeight: "1",
+            }}
             onClick={() => handleAction(handleLike)}
           >
             <HeartFilled
-              style={{ color: !commentData?.isLike ? "gray" : "#ff4d4f" }}
+              style={{
+                fontSize: windowWidth <= 576 ? "10px" : "12px", // Responsive icon
+                color: !commentData?.isLike ? "gray" : "#ff4d4f",
+                marginRight: 4,
+              }}
             />
             <p
               style={{
@@ -240,7 +294,10 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           </Button>
           <Button
             type="link"
-            style={{ padding: "0px", fontSize: "12px" }}
+            style={{
+              padding: "0px",
+              fontSize: windowWidth <= 576 ? "10px" : "12px", // Responsive font
+            }}
             onClick={() => handleAction(handleShowReply)}
           >
             <p style={{ fontWeight: "bold", color: "gray", margin: 0 }}>
@@ -249,25 +306,47 @@ const Comment = ({ commentData, post_id, minWidth }) => {
           </Button>
         </div>
       </Col>
-      <Col span={1} style={{ textAlign: "right", marginLeft: 4 }}>
+      <Col
+        span={1}
+        style={{
+          textAlign: "right",
+          marginLeft: windowWidth <= 576 ? 2 : 4, // Responsive margin
+        }}
+      >
         {isOwner && !commentData?.deleted && !isEditing && (
           <Dropdown overlay={menu} trigger={["hover"]}>
-            <Button type="link" style={{ padding: "0px", fontSize: "12px" }}>
-              <EllipsisOutlined style={{ fontSize: "18px", color: "#555" }} />{" "}
-              {/* Đậm hơn */}
+            <Button
+              type="link"
+              style={{
+                padding: "0px",
+                fontSize: windowWidth <= 576 ? "10px" : "12px",
+              }}
+            >
+              <EllipsisOutlined
+                style={{
+                  fontSize: windowWidth <= 576 ? "14px" : "18px", // Responsive icon
+                  color: "#555",
+                }}
+              />
             </Button>
           </Dropdown>
         )}
       </Col>
 
       {commentData?.replyCount > 0 && (
-        <Col span={24} style={{ marginBottom: "4px" }}>
+        <Col
+          span={24}
+          style={{ marginBottom: windowWidth <= 576 ? "2px" : "4px" }}
+        >
           <Row>
-            <Col span={2}></Col>
-            <Col span={22}>
+            <Col span={windowWidth <= 576 ? 3 : 2}></Col>
+            <Col span={windowWidth <= 576 ? 21 : 22}>
               <Button
                 type="link"
-                style={{ padding: "0px", fontSize: "12px" }}
+                style={{
+                  padding: "0px",
+                  fontSize: windowWidth <= 576 ? "10px" : "12px", // Responsive font
+                }}
                 onClick={() => setIsShowListReply(!isShowListReply)}
               >
                 {!isShowListReply ? (
@@ -287,16 +366,20 @@ const Comment = ({ commentData, post_id, minWidth }) => {
       {isShowListReply && (
         <Col span={24}>
           {loading ? (
-            <>đang tải phản hồi</>
+            <Typography.Text
+              style={{ fontSize: windowWidth <= 576 ? "12px" : "14px" }}
+            >
+              đang tải phản hồi
+            </Typography.Text>
           ) : (
             <Row>
-              <Col span={2}></Col>
-              <Col span={22}>
+              <Col span={windowWidth <= 576 ? 3 : 2}></Col>
+              <Col span={windowWidth <= 576 ? 21 : 22}>
                 <CommentList
                   commentData={replyData}
                   post_id={post_id}
-                  height={"auto"}
-                  minWidth={100}
+                  height="auto"
+                  minWidth={windowWidth <= 576 ? 80 : 100} // Responsive minWidth
                 />
               </Col>
             </Row>
@@ -306,22 +389,28 @@ const Comment = ({ commentData, post_id, minWidth }) => {
       {isShowReply && entity.id && (
         <Col span={24}>
           <Row>
-            <Col span={1}></Col>
-            <Col span={2} style={{ textAlign: "center" }}>
-              <Avatar size={"small"} src={entity.avatar} />
+            <Col span={windowWidth <= 576 ? 2 : 1}></Col>
+            <Col
+              span={windowWidth <= 576 ? 2 : 2}
+              style={{ textAlign: "center" }}
+            >
+              <Avatar
+                size={windowWidth <= 576 ? "small" : "default"} // Responsive Avatar
+                src={entity.avatar}
+              />
             </Col>
-            <Col span={20}>
+            <Col span={windowWidth <= 576 ? 20 : 21}>
               <div
                 style={{
                   backgroundColor: "#f0f2f5",
                   borderRadius: "10px",
-                  padding: "4px",
+                  padding: windowWidth <= 576 ? "2px" : "4px", // Responsive padding
                 }}
               >
                 <Form form={form} onFinish={handleReply}>
                   <Row>
-                    <Col span={21}>
-                      <Form.Item noStyle name={"comment_content"}>
+                    <Col span={windowWidth <= 576 ? 20 : 21}>
+                      <Form.Item noStyle name="comment_content">
                         <TextArea
                           ref={replyInputRef}
                           autoSize={{ minRows: 1, maxRows: 5 }}
@@ -331,14 +420,24 @@ const Comment = ({ commentData, post_id, minWidth }) => {
                             e.preventDefault();
                             form.submit();
                           }}
+                          style={{
+                            fontSize: windowWidth <= 576 ? "12px" : "14px", // Responsive font
+                          }}
                         />
                       </Form.Item>
                     </Col>
-                    <Col span={3}>
+                    <Col span={windowWidth <= 576 ? 4 : 3}>
                       <Form.Item noStyle>
-                        <Button type="text" htmlType="submit">
+                        <Button
+                          type="text"
+                          htmlType="submit"
+                          size={windowWidth <= 576 ? "small" : "middle"} // Responsive size
+                        >
                           <SendOutlined
-                            style={{ fontSize: "20px", color: "#1890ff" }}
+                            style={{
+                              fontSize: windowWidth <= 576 ? "14px" : "20px", // Responsive icon
+                              color: "#1890ff",
+                            }}
                           />
                         </Button>
                       </Form.Item>

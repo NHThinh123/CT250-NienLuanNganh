@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import {
   Button,
   Col,
@@ -8,12 +9,10 @@ import {
   Row,
   Typography,
 } from "antd";
-import { useState, useEffect, useRef } from "react";
 import { SendOutlined } from "@ant-design/icons";
 import useComment from "../../hooks/useComment";
 import useCreateComment from "../../hooks/useCreateComment";
 import CommentList from "./CommentList";
-
 import { useAuthEntity } from "../../../../hooks/useAuthEntry";
 
 const { TextArea } = Input;
@@ -24,7 +23,15 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
   const { commentData } = useComment(post_id, isModalOpen);
   const { mutate: createComment, isPending } = useCreateComment();
   const [inputValue, setInputValue] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const inputRef = useRef(null);
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Focus vào input khi mở modal
   useEffect(() => {
@@ -68,46 +75,70 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
     <Modal
       centered
       title={
-        <Typography.Title level={4} style={{ textAlign: "center" }}>
+        <Typography.Title
+          level={4}
+          style={{
+            textAlign: "center",
+            fontSize:
+              windowWidth <= 576
+                ? "16px"
+                : windowWidth <= 768
+                ? "18px"
+                : "20px", // Responsive font
+            margin: 0,
+          }}
+        >
           Bình luận
         </Typography.Title>
       }
       open={isModalOpen}
       onCancel={() => setIsModalOpen(false)}
-      width={700}
+      width={windowWidth <= 576 ? "90%" : windowWidth <= 768 ? "80%" : 700} // Responsive width
       footer={
         entity?.id ? (
           <Form form={form} onFinish={handleSubmit}>
-            <Row>
-              <Col span={20}>
-                <Form.Item name="comment_content">
+            <Row gutter={[8, 8]} align="middle">
+              {" "}
+              {/* Thêm gutter */}
+              <Col
+                xs={20} // Mobile: 20/24
+                sm={21} // Tablet: 21/24
+                md={20} // Desktop: 20/24
+              >
+                <Form.Item name="comment_content" style={{ marginBottom: 0 }}>
                   <TextArea
                     ref={inputRef}
                     placeholder="Bình luận về bài viết này"
                     autoSize={{ minRows: 1, maxRows: 5 }} // Mở rộng khi nhập dài
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyDown} // Xử lý Enter
+                    onKeyDown={handleKeyDown}
+                    style={{
+                      fontSize: windowWidth <= 576 ? "14px" : "16px", // Responsive font
+                    }}
                   />
                 </Form.Item>
               </Col>
               <Col
-                span={4}
+                xs={4} // Mobile: 4/24
+                sm={3} // Tablet: 3/24
+                md={4} // Desktop: 4/24
                 style={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                <Form.Item>
+                <Form.Item style={{ marginBottom: 0 }}>
                   <Button
                     type="text"
                     htmlType="submit"
-                    disabled={!inputValue.trim()} // Disable khi input rỗng
+                    disabled={!inputValue.trim()}
+                    size={windowWidth <= 576 ? "middle" : "large"} // Responsive size
                   >
                     <SendOutlined
                       style={{
-                        fontSize: "20px",
+                        fontSize: windowWidth <= 576 ? "16px" : "20px", // Responsive icon
                         color: !inputValue.trim() ? "gray" : "#1890ff",
                       }}
                     />
@@ -118,7 +149,12 @@ const CommentModal = ({ isModalOpen, setIsModalOpen, post_id }) => {
           </Form>
         ) : (
           <Typography.Text
-            style={{ textAlign: "center", width: "100%", display: "block" }}
+            style={{
+              textAlign: "center",
+              width: "100%",
+              display: "block",
+              fontSize: windowWidth <= 576 ? "14px" : "16px", // Responsive font
+            }}
           >
             Vui lòng đăng nhập để bình luận
           </Typography.Text>

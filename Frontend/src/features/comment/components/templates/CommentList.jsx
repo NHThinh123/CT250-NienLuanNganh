@@ -1,9 +1,18 @@
+import { useState, useEffect, useRef } from "react";
 import { Col, List, Row } from "antd";
+
 import Comment from "../organisms/Comment";
-import { useEffect, useRef } from "react";
 
 const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
   const listRef = useRef(null); // Tạo ref để tham chiếu đến danh sách bình luận
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Theo dõi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (listRef.current) {
@@ -11,39 +20,65 @@ const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
     }
   }, [commentData]); // Theo dõi sự thay đổi của commentData
 
+  // Tính chiều cao responsive
+  const responsiveHeight =
+    height ||
+    (windowWidth <= 576 ? "300px" : windowWidth <= 768 ? "340px" : "380px");
+
   if (isPending)
     return (
       <Row
         style={{
-          height: height || "380px",
-          padding: "0px 16px",
+          height: responsiveHeight,
+          padding: windowWidth <= 576 ? "0px 8px" : "0px 16px", // Responsive padding
           textAlign: "center",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <p>Loading...</p>
+        <p
+          style={{
+            fontSize: windowWidth <= 576 ? "14px" : "16px", // Responsive font
+            margin: 0,
+          }}
+        >
+          Loading...
+        </p>
       </Row>
     );
+
   if (commentData?.length < 1)
     return (
       <Row
         style={{
-          height: height || "380px",
-          padding: "0px 16px",
+          height: responsiveHeight,
+          padding: windowWidth <= 576 ? "0px 8px" : "0px 16px", // Responsive padding
           textAlign: "center",
-          lineHeight: "380px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-        justify={"center"}
+        justify="center"
       >
-        <p>Không có bình luận</p>
+        <p
+          style={{
+            fontSize: windowWidth <= 576 ? "14px" : "16px", // Responsive font
+            margin: 0,
+          }}
+        >
+          Không có bình luận
+        </p>
       </Row>
     );
+
   return (
     <Row
       style={{
-        height: height || "380px",
+        height: responsiveHeight,
         overflowY: "auto",
         scrollbarWidth: "thin",
-        padding: "0px 8px",
+        padding: windowWidth <= 576 ? "0px 4px" : "0px 8px", // Responsive padding
         margin: "0px",
       }}
     >
@@ -67,7 +102,7 @@ const CommentList = ({ commentData, post_id, minWidth, height, isPending }) => {
               </Row>
             </List.Item>
           )}
-        ></List>
+        />
       </Col>
     </Row>
   );

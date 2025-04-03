@@ -4,7 +4,7 @@ const { Title, Paragraph } = Typography;
 
 const FAQ = () => {
   return (
-    <div>
+    <div style={{ marginTop: 68 }}>
       <Title level={2}>FAQ - Câu hỏi thường gặp</Title>
       <Paragraph>
         <strong>
