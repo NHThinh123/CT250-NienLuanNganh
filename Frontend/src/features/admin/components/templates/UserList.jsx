@@ -147,7 +147,7 @@ const UserList = ({ users, onDeleteUser, updateUser }) => {
             onFilter: (value, record) => record.status === value,
             filterMultiple: false,
             filterIcon: (filtered) => (
-                <FilterOutlined style={{ color: 'white' }} /> // Icon bộ lọc màu trắng
+                <FilterOutlined style={{ color: 'white' }} />
             ),
             render: (status) => (
                 <Tag color={status === "ONLINE" ? "green" : "gray"}>{status}</Tag>
